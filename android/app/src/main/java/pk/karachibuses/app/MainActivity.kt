@@ -13,8 +13,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import pk.karachibuses.app.data.AppContainer
 import pk.karachibuses.app.data.local.RouteEntity
 import pk.karachibuses.app.ui.HomeViewModel
+import pk.karachibuses.app.data.sync.TransportSyncWorker
 class MainActivity:ComponentActivity(){
- override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);val container=AppContainer(applicationContext);setContent{MaterialTheme{HomeScreen(container)}}}
+ override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);val container=AppContainer(applicationContext);TransportSyncWorker.schedule(applicationContext);setContent{MaterialTheme{HomeScreen(container)}}}
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable private fun HomeScreen(container:AppContainer){
