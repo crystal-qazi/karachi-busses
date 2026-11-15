@@ -58,7 +58,7 @@ def test_direct_journey_uses_ordered_route_stops(client, monkeypatch):
         _row(10, 1, 3, 3, "Saddar Market", 24.8620),
     ]
     _install_rows(monkeypatch, rows)
-    response = client.get("/api/v1/journeys?origin_lat=24.8600&origin_lng=67&destination=Saddar")
+    response = client.get("/api/v1/journeys?origin_lat=24.8600&origin_lng=67&destination=Saddar&radius=100")
     assert response.status_code == 200
     data = response.get_json()["data"]
     assert data["journey_count"] == 1
