@@ -334,13 +334,19 @@ def stops():
             lat = _coordinate(request.form.get("latitude"), "Latitude", -90, 90)
             lng = _coordinate(request.form.get("longitude"), "Longitude", -180, 180)
             address = _text("address", 500)
+            source_id = request.form.get("source_id") or None
             status = request.form.get("status", "under_review")
             if status not in {"active", "inactive", "under_review"}:
                 raise ValueError("Invalid stop status.")
             with cursor_context(commit=True) as (_, cursor):
+                if status == "active":
+                    cursor.execute("SELECT verification_status FROM data_sources WHERE id=%s", (source_id,))
+                    source = cursor.fetchone()
+                    if not source or source["verification_status"] != "verified":
+                        raise ValueError("An active stop requires a verified data source.")
                 cursor.execute(
-                    "INSERT INTO bus_stops (stop_name, latitude, longitude, address, status) VALUES (%s,%s,%s,%s,%s)",
-                    (name, lat, lng, address, status),
+                    "INSERT INTO bus_stops (stop_name, latitude, longitude, address, source_id, status) VALUES (%s,%s,%s,%s,%s,%s)",
+                    (name, lat, lng, address, source_id, status),
                 )
                 _audit(cursor, "create", "bus_stop", cursor.lastrowid, {"name": name})
             flash("Stop created.", "success")
@@ -350,7 +356,9 @@ def stops():
     with cursor_context() as (_, cursor):
         cursor.execute("SELECT * FROM bus_stops ORDER BY stop_name")
         rows = cursor.fetchall()
-    return render_template("admin/stops.html", stops=rows)
+        cursor.execute("SELECT id, source_name, verification_status FROM data_sources ORDER BY source_name")
+        sources = cursor.fetchall()
+    return render_template("admin/stops.html", stops=rows, sources=sources)
 
 
 @admin_bp.post("/stops/<int:stop_id>/update")
@@ -361,13 +369,19 @@ def update_stop(stop_id):
         lat = _coordinate(request.form.get("latitude"), "Latitude", -90, 90)
         lng = _coordinate(request.form.get("longitude"), "Longitude", -180, 180)
         address = _text("address", 500)
+        source_id = request.form.get("source_id") or None
         status = request.form.get("status", "under_review")
         if status not in {"active", "inactive", "under_review"}:
             raise ValueError("Invalid stop status.")
         with cursor_context(commit=True) as (_, cursor):
+            if status == "active":
+                cursor.execute("SELECT verification_status FROM data_sources WHERE id=%s", (source_id,))
+                source = cursor.fetchone()
+                if not source or source["verification_status"] != "verified":
+                    raise ValueError("An active stop requires a verified data source.")
             cursor.execute(
-                "UPDATE bus_stops SET stop_name=%s, latitude=%s, longitude=%s, address=%s, status=%s WHERE id=%s",
-                (name, lat, lng, address, status, stop_id),
+                "UPDATE bus_stops SET stop_name=%s, latitude=%s, longitude=%s, address=%s, source_id=%s, status=%s WHERE id=%s",
+                (name, lat, lng, address, source_id, status, stop_id),
             )
             if not cursor.rowcount:
                 raise ValueError("Stop not found or unchanged.")
