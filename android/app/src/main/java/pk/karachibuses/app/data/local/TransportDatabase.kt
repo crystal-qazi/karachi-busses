@@ -15,6 +15,10 @@ data class RouteShapeEntity(@PrimaryKey val directionId:Long,val geoJson:String)
 data class SyncStateEntity(@PrimaryKey val id:Int=1,val datasetVersion:String,val checksum:String,val syncedAt:Long)
 @Dao interface TransportDao {
  @Query("SELECT * FROM routes ORDER BY routeCode") fun observeRoutes():Flow<List<RouteEntity>>
+ @Query("SELECT * FROM routes") suspend fun allRoutes():List<RouteEntity>
+ @Query("SELECT * FROM directions") suspend fun allDirections():List<DirectionEntity>
+ @Query("SELECT * FROM stops") suspend fun allStops():List<StopEntity>
+ @Query("SELECT * FROM direction_stops ORDER BY directionId, sequence") suspend fun allDirectionStops():List<DirectionStopEntity>
  @Query("SELECT * FROM routes WHERE routeCode LIKE '%' || :q || '%' OR routeName LIKE '%' || :q || '%' ORDER BY routeCode") fun searchRoutes(q:String):Flow<List<RouteEntity>>
  @Insert(onConflict=OnConflictStrategy.REPLACE) suspend fun putRoutes(v:List<RouteEntity>)
  @Insert(onConflict=OnConflictStrategy.REPLACE) suspend fun putDirections(v:List<DirectionEntity>)
