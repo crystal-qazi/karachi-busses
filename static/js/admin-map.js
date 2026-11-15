@@ -27,6 +27,34 @@
   });
 
   document.getElementById("clear-shape")?.addEventListener("click", () => drawn.clearLayers());
+
+  document.getElementById("import-geojson")?.addEventListener("click", async () => {
+    const fileInput = document.getElementById("geojson-file");
+    const file = fileInput?.files?.[0];
+    if (!file) {
+      alert("Choose a GeoJSON file first.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      alert("GeoJSON file must be 2 MB or smaller.");
+      return;
+    }
+    try {
+      const parsed = JSON.parse(await file.text());
+      const geometry = parsed.type === "Feature" ? parsed.geometry : parsed;
+      if (!geometry || geometry.type !== "LineString" ||
+          !Array.isArray(geometry.coordinates) || geometry.coordinates.length < 2) {
+        throw new Error("Expected a GeoJSON LineString or Feature containing a LineString.");
+      }
+      const layer = L.geoJSON(geometry);
+      if (!layer.getBounds().isValid()) throw new Error("GeoJSON has no valid map coordinates.");
+      drawn.clearLayers();
+      layer.eachLayer((child) => drawn.addLayer(child));
+      map.fitBounds(layer.getBounds(), {padding:[20,20]});
+    } catch (error) {
+      alert("Could not load GeoJSON: " + error.message);
+    }
+  });
   document.getElementById("shape-form")?.addEventListener("submit", (event) => {
     const layers = drawn.getLayers();
     if (!layers.length) {
