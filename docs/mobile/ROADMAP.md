@@ -70,7 +70,8 @@
 - [ ] Compare local journey results with backend rules using shared fixtures.
 
 ## Phase 5 — Hybrid MapLibre maps
-- [ ] Integrate MapLibre Native Android and configurable style/source.
+- [x] Integrate MapLibre Native Android and configurable style/source.
+- [x] Add bounded visible-neighbourhood downloads through MapLibre OfflineManager with progress and local package state.
 - [ ] Select a provider or self-hosted vector/raster tile pipeline with explicit offline rights.
 - [ ] Define and validate a Karachi-wide package boundary and a catalogue of neighbourhood/area boundaries.
 - [ ] Estimate package size for supported zoom ranges from real generated tiles; do not publish speculative size claims.
