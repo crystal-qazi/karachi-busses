@@ -2,6 +2,7 @@ services:
   tileserver:
     image: maptiler/tileserver-gl:latest
     container_name: karachi-buses-tileserver
+    profiles: ["maps"]
     restart: unless-stopped
     ports:
       # Development-only bind. Put production behind an HTTPS reverse proxy.
@@ -11,6 +12,5 @@ services:
     command: ["--config", "/data/config.json"]
     security_opt:
       - no-new-privileges:true
-    read_only: true
     tmpfs:
       - /tmp
