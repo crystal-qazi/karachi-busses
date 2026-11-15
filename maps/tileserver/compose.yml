@@ -1,0 +1,16 @@
+services:
+  tileserver:
+    image: maptiler/tileserver-gl:latest
+    container_name: karachi-buses-tileserver
+    restart: unless-stopped
+    ports:
+      # Development-only bind. Put production behind an HTTPS reverse proxy.
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./data:/data:ro
+    command: ["--config", "/data/config.json"]
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
