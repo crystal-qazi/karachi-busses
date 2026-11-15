@@ -98,15 +98,16 @@ def routes():
             name = _text("route_name", 180, True)
             description = _text("description", 5000)
             operator_id = request.form.get("operator_id") or None
+            source_id = request.form.get("source_id") or None
             status = request.form.get("status", "draft")
-            if status not in {"draft", "active", "inactive", "under_review"}:
-                raise ValueError("Invalid route status.")
+            if status not in {"draft", "inactive", "under_review"}:
+                raise ValueError("Routes can only be activated through the verification workflow.")
             if status == "active":
-                raise ValueError("Create routes as draft, then activate after adding a mapped direction and at least two ordered stops.")
+                raise ValueError("Use the Publish after verification action to activate a route.")
             with cursor_context(commit=True) as (_, cursor):
                 cursor.execute(
-                    "INSERT INTO bus_routes (operator_id, route_code, route_name, description, status) VALUES (%s,%s,%s,%s,%s)",
-                    (operator_id, code, name, description, status),
+                    "INSERT INTO bus_routes (operator_id, source_id, route_code, route_name, description, status) VALUES (%s,%s,%s,%s,%s,%s)",
+                    (operator_id, source_id, code, name, description, status),
                 )
                 route_id = cursor.lastrowid
                 _audit(cursor, "create", "bus_route", route_id, {"route_code": code})
@@ -117,6 +118,8 @@ def routes():
     with cursor_context() as (_, cursor):
         cursor.execute("SELECT id, name FROM bus_operators WHERE is_active=1 ORDER BY name")
         operators_list = cursor.fetchall()
+        cursor.execute("SELECT id, source_name, verification_status FROM data_sources ORDER BY source_name")
+        sources_list = cursor.fetchall()
         cursor.execute("""
             SELECT r.*, o.name AS operator_name,
                    (SELECT COUNT(*) FROM route_directions d WHERE d.route_id=r.id) AS direction_count
@@ -124,7 +127,7 @@ def routes():
             ORDER BY r.updated_at DESC
         """)
         rows = cursor.fetchall()
-    return render_template("admin/routes.html", routes=rows, operators=operators_list)
+    return render_template("admin/routes.html", routes=rows, operators=operators_list, sources=sources_list)
 
 
 @admin_bp.route("/routes/<int:route_id>", methods=["GET", "POST"])
@@ -164,6 +167,49 @@ def route_detail(route_id):
         cursor.execute("SELECT id, stop_name, latitude, longitude FROM bus_stops WHERE status='active' ORDER BY stop_name")
         stops = cursor.fetchall()
     return render_template("admin/route_detail.html", route=route, directions=directions, stops=stops)
+
+
+@admin_bp.post("/routes/<int:route_id>/publish")
+@login_required
+def publish_route(route_id):
+    if session.get("admin_role") not in {"super_admin", "data_reviewer"}:
+        flash("Only a super administrator or data reviewer can publish routes.", "danger")
+        return redirect(url_for("admin.route_detail", route_id=route_id))
+    try:
+        with cursor_context(commit=True) as (_, cursor):
+            cursor.execute("""
+                SELECT r.id, r.source_id, ds.verification_status
+                FROM bus_routes r LEFT JOIN data_sources ds ON ds.id=r.source_id
+                WHERE r.id=%s
+            """, (route_id,))
+            route = cursor.fetchone()
+            if not route:
+                raise ValueError("Route not found.")
+            if not route["source_id"] or route["verification_status"] != "verified":
+                raise ValueError("Attach a verified source before publishing this route.")
+            cursor.execute("""
+                SELECT d.id, COUNT(rs.id) AS stop_count,
+                       SUM(CASE WHEN s.status='active' THEN 1 ELSE 0 END) AS active_stop_count
+                FROM route_directions d
+                LEFT JOIN route_stops rs ON rs.direction_id=d.id
+                LEFT JOIN bus_stops s ON s.id=rs.stop_id
+                WHERE d.route_id=%s GROUP BY d.id
+            """, (route_id,))
+            directions = cursor.fetchall()
+            if not directions:
+                raise ValueError("Add at least one direction before publishing.")
+            if any((d["active_stop_count"] or 0) < 2 for d in directions):
+                raise ValueError("Every direction must contain at least two active, ordered stops.")
+            for direction in directions:
+                cursor.execute("SELECT id FROM route_shapes WHERE direction_id=%s", (direction["id"],))
+                if not cursor.fetchone():
+                    raise ValueError("Every direction must have a saved route shape before publication.")
+            cursor.execute("UPDATE bus_routes SET status='active' WHERE id=%s", (route_id,))
+            _audit(cursor, "publish", "bus_route", route_id, {"verified_source_id": route["source_id"]})
+        flash("Route published. It is now visible in public discovery.", "success")
+    except Exception as exc:
+        flash(f"Route was not published: {exc}", "danger")
+    return redirect(url_for("admin.route_detail", route_id=route_id))
 
 
 @admin_bp.post("/routes/<int:route_id>/directions")
