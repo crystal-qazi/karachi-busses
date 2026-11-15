@@ -138,8 +138,8 @@ def route_detail(route_id):
             name = _text("route_name", 180, True)
             description = _text("description", 5000)
             status = request.form.get("status", "draft")
-            if status not in {"draft", "active", "inactive", "under_review"}:
-                raise ValueError("Invalid route status.")
+            if status not in {"draft", "inactive", "under_review"}:
+                raise ValueError("Routes can only be activated through the verification workflow.")
             with cursor_context(commit=True) as (_, cursor):
                 cursor.execute(
                     "UPDATE bus_routes SET route_name=%s, description=%s, status=%s WHERE id=%s",
@@ -154,7 +154,10 @@ def route_detail(route_id):
         return redirect(url_for("admin.route_detail", route_id=route_id))
 
     with cursor_context() as (_, cursor):
-        cursor.execute("SELECT r.*, o.name AS operator_name FROM bus_routes r LEFT JOIN bus_operators o ON o.id=r.operator_id WHERE r.id=%s", (route_id,))
+        cursor.execute("""SELECT r.*, o.name AS operator_name, ds.source_name,
+                          ds.verification_status AS source_verification_status
+                          FROM bus_routes r LEFT JOIN bus_operators o ON o.id=r.operator_id
+                          LEFT JOIN data_sources ds ON ds.id=r.source_id WHERE r.id=%s""", (route_id,))
         route = cursor.fetchone()
         if not route:
             return "Route not found", 404
