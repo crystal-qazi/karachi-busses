@@ -49,7 +49,7 @@ object JourneyPlanner {
             }
         }
 
-        if (results.isEmpty()) {
+        run {
             for ((firstDirectionId, firstRows) in byDirection) {
                 val boardIndex = firstRows.indexOfFirst { it.stopId == origin.id }
                 if (boardIndex < 0) continue
