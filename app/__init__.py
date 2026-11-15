@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, send_from_directory
 
 from config import Config
 
@@ -29,6 +29,12 @@ def create_app(test_config: dict | None = None) -> Flask:
     @app.get("/manifest.json")
     def manifest():
         return app.send_static_file("manifest.json")
+
+    @app.get("/service-worker.js")
+    def service_worker():
+        response = send_from_directory(app.static_folder, "service-worker.js")
+        response.headers["Service-Worker-Allowed"] = "/"
+        return response
 
     @app.errorhandler(404)
     def not_found(_error):
