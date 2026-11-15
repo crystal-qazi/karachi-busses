@@ -192,10 +192,11 @@ def publish_route(route_id):
                 raise ValueError("Attach a verified source before publishing this route.")
             cursor.execute("""
                 SELECT d.id, COUNT(rs.id) AS stop_count,
-                       SUM(CASE WHEN s.status='active' THEN 1 ELSE 0 END) AS active_stop_count
+                       SUM(CASE WHEN s.status='active' AND stop_source.verification_status='verified' THEN 1 ELSE 0 END) AS active_stop_count
                 FROM route_directions d
                 LEFT JOIN route_stops rs ON rs.direction_id=d.id
                 LEFT JOIN bus_stops s ON s.id=rs.stop_id
+                LEFT JOIN data_sources stop_source ON stop_source.id=s.source_id
                 WHERE d.route_id=%s GROUP BY d.id
             """, (route_id,))
             directions = cursor.fetchall()
