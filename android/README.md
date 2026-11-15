@@ -14,6 +14,23 @@ Native Android client foundation. This app is Kotlin + Jetpack Compose; it is no
 4. The debug API URL targets `http://10.0.2.2:5000/api/v1/` for the Android emulator and a Flask server running on the host machine. For a physical device, use your development PC's LAN IP and a network-reachable Flask server.
 5. Release API URL is deliberately a placeholder. Configure the real HTTPS production API URL before release.
 
+## Configure a map source
+
+The app uses the official MapLibre Native Android SDK. It does not silently select a public tile server or enable offline downloads without permission.
+
+Add these properties to your local `android/gradle.properties` (do not commit provider secrets):
+```properties
+MAP_STYLE_URL=https://your-approved-provider.example/style.json
+MAP_ATTRIBUTION=© OpenStreetMap contributors
+MAP_SOURCE_NAME=Your approved tile provider
+MAP_LICENSE_NAME=Your provider licence
+MAP_LICENSE_URL=https://your-approved-provider.example/terms
+MAP_OFFLINE_ALLOWED=true
+```
+Only set `MAP_OFFLINE_ALLOWED=true` after checking that your provider contract explicitly allows app-level offline downloads. Use a project-controlled/self-hosted style and tile source for a fully open infrastructure path. Do not use the public OSM tile endpoints for bulk/offline downloads.
+
+The map screen can render a configured style and download the currently visible neighbourhood-sized region through MapLibre's OfflineManager. The downloader deliberately rejects large viewports to avoid uncontrolled city-scale tile requests and native memory pressure. Full-Karachi package creation still requires an approved administrative boundary, tile-source licence, zoom policy and size testing.
+
 ## Confirmed map behaviour
 - MapLibre Native is the selected Android map renderer.
 - The app uses a hybrid map strategy: transport data and journey planning are offline-first; map downloads are optional.
@@ -32,6 +49,6 @@ Native Android client foundation. This app is Kotlin + Jetpack Compose; it is no
 ## Known limitations
 - This is the initial client foundation, not a store-ready app.
 - The backend currently provides content-addressed full snapshots. Incremental sync is not yet enabled.
-- MapLibre rendering, tile-provider integration, map package download/management, runtime GPS discovery, local favourites and saved journeys remain roadmap work.
+- The MapLibre renderer and visible-neighbourhood OfflineManager download flow are now wired; provider configuration is required before either can be used. Full-Karachi package preparation/management, runtime GPS discovery, local favourites and saved journeys remain roadmap work.
 - Do not use the placeholder release API URL in a release build.
 - Android build/device verification must be run in an Android SDK/JDK 17 environment.
