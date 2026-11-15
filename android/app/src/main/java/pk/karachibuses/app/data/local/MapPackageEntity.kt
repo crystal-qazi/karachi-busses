@@ -51,7 +51,7 @@ interface MapPackageDao {
     suspend fun findPackage(packageId: String): MapPackageEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun savePackage(package: MapPackageEntity)
+    suspend fun savePackage(item: MapPackageEntity)
 
     @Query("UPDATE map_packages SET state = :state WHERE packageId = :packageId")
     suspend fun updateState(packageId: String, state: String)
