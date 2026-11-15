@@ -9,6 +9,12 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     if test_config:
         app.config.update(test_config)
+    if app.config.get("APP_ENV") == "production":
+        secret = app.config.get("SECRET_KEY", "")
+        if not secret or secret == "development-only-change-me" or len(secret) < 32:
+            raise RuntimeError("Production requires a unique SECRET_KEY of at least 32 characters.")
+        if app.config.get("DEBUG"):
+            raise RuntimeError("DEBUG must be disabled in production.")
 
     from flask_wtf.csrf import CSRFProtect
     CSRFProtect(app)
