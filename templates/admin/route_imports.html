@@ -1,0 +1,43 @@
+{% extends "admin/base.html" %}
+{% block title %}Route CSV import{% endblock %}
+{% block content %}
+<h1 class="h3">Import routes, directions and stops</h1>
+<p class="text-secondary">Bulk import a route network from CSV. Imported routes remain drafts and imported stops remain under review. No route is published automatically.</p>
+<div class="card p-3 mb-3" style="max-width:900px">
+  <h2 class="h5">CSV format</h2>
+  <p class="small">One row per stop in its route direction. Use the same route_code and direction_name for rows belonging to the same direction.</p>
+  <div class="table-responsive"><table class="table table-sm"><thead><tr><th>Column</th><th>Required</th><th>Example / purpose</th></tr></thead><tbody>
+    <tr><td><code>route_code</code></td><td>Yes</td><td>R-01</td></tr>
+    <tr><td><code>route_name</code></td><td>Yes</td><td>Korangi to Tower</td></tr>
+    <tr><td><code>operator_name</code></td><td>No</td><td>Operator name</td></tr>
+    <tr><td><code>direction_name</code></td><td>Yes</td><td>Outbound / Inbound</td></tr>
+    <tr><td><code>start_label</code>, <code>end_label</code></td><td>No</td><td>Terminal labels (consistent per direction)</td></tr>
+    <tr><td><code>stop_name</code></td><td>Yes</td><td>Named boarding stop</td></tr>
+    <tr><td><code>latitude</code>, <code>longitude</code></td><td>Yes</td><td>WGS84 decimal coordinates</td></tr>
+    <tr><td><code>stop_sequence</code></td><td>Yes</td><td>1, 2, 3…</td></tr>
+    <tr><td><code>address</code></td><td>No</td><td>Road / landmark</td></tr>
+  </tbody></table></div>
+  <p class="small text-secondary mb-0">Maximum 5,000 stop rows per import. Each direction needs at least two stops. GeoJSON shapes are added separately in the direction map editor.</p>
+</div>
+<div class="card p-3" style="max-width:680px">
+  <form method="post" enctype="multipart/form-data">
+    <label class="form-label">Data source / evidence</label>
+    <select class="form-select mb-3" name="source_id" required>
+      <option value="">Select source</option>
+      {% for source in sources %}<option value="{{ source.id }}">{{ source.source_name }} ({{ source.verification_status }})</option>{% endfor %}
+    </select>
+    <label class="form-label">Route CSV</label>
+    <input class="form-control mb-3" type="file" name="file" accept=".csv,text/csv" required>
+    <button class="btn btn-outline-success" name="confirm" value="no">Validate / preview</button>
+    <button class="btn btn-success" name="confirm" value="yes" onclick="return confirm('Import routes as drafts and stops under review?')">Validate and import</button>
+  </form>
+</div>
+{% if preview %}
+<div class="card p-3 mt-3">
+  <h2 class="h5">Validated import summary</h2>
+  <p>{{ preview.route_count }} routes · {{ preview.direction_count }} directions · {{ preview.stop_count }} stop rows</p>
+  <p class="small text-secondary">Route codes: {{ preview.routes|join(', ') }}</p>
+  <p class="small text-secondary mb-0">Upload the same file again and choose Validate and import to create the draft records.</p>
+</div>
+{% endif %}
+{% endblock %}
