@@ -138,9 +138,16 @@ def route_detail(route_id):
             name = _text("route_name", 180, True)
             description = _text("description", 5000)
             status = request.form.get("status", "draft")
-            if status not in {"draft", "inactive", "under_review"}:
-                raise ValueError("Routes can only be activated through the verification workflow.")
             with cursor_context(commit=True) as (_, cursor):
+                cursor.execute("SELECT status FROM bus_routes WHERE id=%s", (route_id,))
+                current = cursor.fetchone()
+                if not current:
+                    raise ValueError("Route not found.")
+                allowed = {"draft", "inactive", "under_review"}
+                if current["status"] == "active":
+                    allowed.add("active")
+                if status not in allowed:
+                    raise ValueError("Routes can only be activated through the verification workflow.")
                 cursor.execute(
                     "UPDATE bus_routes SET route_name=%s, description=%s, status=%s WHERE id=%s",
                     (name, description, status, route_id),
