@@ -1,3 +1,10 @@
+val mapStyleUrl = providers.gradleProperty("MAP_STYLE_URL").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
+val mapAttribution = providers.gradleProperty("MAP_ATTRIBUTION").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
+val mapSource = providers.gradleProperty("MAP_SOURCE_NAME").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
+val mapLicense = providers.gradleProperty("MAP_LICENSE_NAME").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
+val mapLicenseUrl = providers.gradleProperty("MAP_LICENSE_URL").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
+val offlineAllowed = providers.gradleProperty("MAP_OFFLINE_ALLOWED").orElse("false").get()
+
 plugins {
  id("com.android.application")
  id("org.jetbrains.kotlin.android")
@@ -13,12 +20,6 @@ android {
   targetSdk = 35
   versionCode = 1
   versionName = "0.1.0"
-  val mapStyleUrl = providers.gradleProperty("MAP_STYLE_URL").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
-  val mapAttribution = providers.gradleProperty("MAP_ATTRIBUTION").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
-  val mapSource = providers.gradleProperty("MAP_SOURCE_NAME").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
-  val mapLicense = providers.gradleProperty("MAP_LICENSE_NAME").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
-  val mapLicenseUrl = providers.gradleProperty("MAP_LICENSE_URL").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
-  val offlineAllowed = providers.gradleProperty("MAP_OFFLINE_ALLOWED").orElse("false").get()
   buildConfigField("String", "MAP_STYLE_URL", "\"$mapStyleUrl\"")
   buildConfigField("String", "MAP_ATTRIBUTION", "\"$mapAttribution\"")
   buildConfigField("String", "MAP_SOURCE_NAME", "\"$mapSource\"")
