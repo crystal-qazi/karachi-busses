@@ -1,0 +1,14 @@
+{
+  "options": {
+    "paths": {
+      "root": "/data",
+      "mbtiles": "/data",
+      "styles": "/data/styles",
+      "fonts": "/data/fonts",
+      "sprites": "/data/sprites"
+    },
+    "serveAllStyles": true,
+    "serveAllFonts": true,
+    "staticAttributionText": "© OpenMapTiles © OpenStreetMap contributors"
+  }
+}
