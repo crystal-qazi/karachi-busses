@@ -48,6 +48,8 @@ def journeys():
                        rs.stop_sequence
                 FROM route_directions d
                 JOIN bus_routes r ON r.id=d.route_id AND r.status='active'
+                JOIN data_sources route_source ON route_source.id=r.source_id AND route_source.verification_status='verified'
+                JOIN data_sources stop_source ON stop_source.id=s.source_id AND stop_source.verification_status='verified'
                 LEFT JOIN bus_operators o ON o.id=r.operator_id AND o.is_active=1
                 JOIN route_stops rs ON rs.direction_id=d.id
                 JOIN bus_stops s ON s.id=rs.stop_id AND s.status='active'
