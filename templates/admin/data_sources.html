@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% block title %}Data sources{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Data sources & verification</h1>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <form method="post" class="card p-3">
+      <h2 class="h5">Record a source</h2>
+      <label class="form-label">Source name</label>
+      <input class="form-control mb-2" name="source_name" maxlength="180" required placeholder="Official transport authority / field survey">
+      <label class="form-label">Source URL</label>
+      <input class="form-control mb-2" name="source_url" type="url" maxlength="1000" placeholder="https://…">
+      <label class="form-label">Notes / evidence</label>
+      <textarea class="form-control mb-3" name="notes" rows="4" placeholder="Publication date, field survey date, verifier notes…"></textarea>
+      <button class="btn btn-success">Save as pending</button>
+      <p class="form-text mb-0 mt-2">Only sources reviewed by an authorized data reviewer or super administrator can be marked verified.</p>
+    </form>
+  </div>
+  <div class="col-lg-8">
+    <div class="card p-3 table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Source</th><th>Routes</th><th>Status</th><th>Review</th></tr></thead>
+        <tbody>
+        {% for source in sources %}
+          <tr>
+            <td><strong>{{ source.source_name }}</strong>{% if source.source_url %}<div><a href="{{ source.source_url }}" target="_blank" rel="noopener noreferrer">Open source</a></div>{% endif %}<div class="small text-secondary">{{ source.notes or '' }}</div></td>
+            <td>{{ source.route_count }}</td><td><span class="badge text-bg-secondary">{{ source.verification_status }}</span></td>
+            <td><form method="post" action="{{ url_for('admin.update_source_verification',source_id=source.id) }}" class="d-flex gap-1"><select name="verification_status" class="form-select form-select-sm">{% for status in ['pending','verified','rejected','unverified'] %}<option value="{{ status }}" {% if source.verification_status==status %}selected{% endif %}>{{ status }}</option>{% endfor %}</select><button class="btn btn-sm btn-outline-success">Save</button></form></td>
+          </tr>
+        {% else %}<tr><td colspan="4" class="text-secondary">No source records yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
