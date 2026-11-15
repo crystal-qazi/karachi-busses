@@ -138,6 +138,7 @@ def route_detail(route_id):
         try:
             name = _text("route_name", 180, True)
             description = _text("description", 5000)
+            source_id = request.form.get("source_id") or None
             status = request.form.get("status", "draft")
             with cursor_context(commit=True) as (_, cursor):
                 cursor.execute("SELECT status FROM bus_routes WHERE id=%s", (route_id,))
@@ -150,8 +151,8 @@ def route_detail(route_id):
                 if status not in allowed:
                     raise ValueError("Routes can only be activated through the verification workflow.")
                 cursor.execute(
-                    "UPDATE bus_routes SET route_name=%s, description=%s, status=%s WHERE id=%s",
-                    (name, description, status, route_id),
+                    "UPDATE bus_routes SET route_name=%s, description=%s, source_id=%s, status=%s WHERE id=%s",
+                    (name, description, source_id, status, route_id),
                 )
                 if not cursor.rowcount:
                     raise ValueError("Route not found.")
@@ -177,7 +178,9 @@ def route_detail(route_id):
         directions = cursor.fetchall()
         cursor.execute("SELECT id, stop_name, latitude, longitude FROM bus_stops WHERE status='active' ORDER BY stop_name")
         stops = cursor.fetchall()
-    return render_template("admin/route_detail.html", route=route, directions=directions, stops=stops)
+        cursor.execute("SELECT id, source_name, verification_status FROM data_sources ORDER BY source_name")
+        sources = cursor.fetchall()
+    return render_template("admin/route_detail.html", route=route, directions=directions, stops=stops, sources=sources)
 
 
 @admin_bp.post("/routes/<int:route_id>/publish")
