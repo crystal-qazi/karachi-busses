@@ -15,7 +15,7 @@ The Android client uses MapLibre Native. Production online fallback and offline 
 5. Start the development server:
 
 ```powershell
-docker compose up -d
+docker compose --profile maps up -d
 docker compose logs -f tileserver
 ```
 
