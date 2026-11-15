@@ -32,11 +32,11 @@ Updated: 2026-11-15
 - Users can pause/resume, retry, update and remove individual packages; show installed/downloaded size and last-updated time.
 - Render local stop and route-shape overlays from Room over whichever basemap is active.
 - Online fallback is permitted only where the chosen provider permits it; otherwise show an explicit no-basemap/offline-area state while preserving transport search and journey features.
-- No city-wide size estimate or provider is approved yet. Select the provider/self-hosting model only after licensing, coverage, style, storage and operating-cost review.
+- The preferred self-hosted direction is OpenMapTiles + TileServer GL; the Docker Compose scaffold is in `maps/tileserver/`. Actual tile data/style deployment, licence review and package-size measurements remain outstanding.
 
 ## Deliberate limitations
 - The API currently uses full snapshots. It does not claim incremental synchronization, because existing admin publication changes are not yet recorded in a durable change log with deletion tombstones.
-- The native MapLibre renderer and OfflineManager visible-neighbourhood download flow are implemented behind explicit provider configuration and offline-rights flags. A provider/style has not been selected or configured, so the feature is not active in a stock build.
+- The native MapLibre renderer and OfflineManager visible-neighbourhood download flow are implemented behind explicit provider configuration and offline-rights flags. The screen asks for download confirmation and supports progress, pause, resume and removal. A provider/style has not been selected or configured, so the feature is not active in a stock build.
 - Full-Karachi package generation, city boundary approval and large-package delivery remain pending.
 - Runtime GPS permission/current-location flow, favourites, saved journeys, Urdu/RTL and map overlays remain to implement.
 - The current backend dataset is only as complete as the reviewed records entered by operators. No comprehensive Karachi route dataset is bundled.
