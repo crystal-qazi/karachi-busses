@@ -1,3 +1,10 @@
+plugins {
+ id("com.android.application")
+ id("org.jetbrains.kotlin.android")
+ id("org.jetbrains.kotlin.plugin.compose")
+ id("com.google.devtools.ksp")
+}
+
 val mapStyleUrl = providers.gradleProperty("MAP_STYLE_URL").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
 val mapAttribution = providers.gradleProperty("MAP_ATTRIBUTION").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
 val mapSource = providers.gradleProperty("MAP_SOURCE_NAME").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
@@ -5,12 +12,6 @@ val mapLicense = providers.gradleProperty("MAP_LICENSE_NAME").orElse("").get().r
 val mapLicenseUrl = providers.gradleProperty("MAP_LICENSE_URL").orElse("").get().replace("\\", "\\\\").replace("\"", "\\\"")
 val offlineAllowed = providers.gradleProperty("MAP_OFFLINE_ALLOWED").orElse("false").get()
 
-plugins {
- id("com.android.application")
- id("org.jetbrains.kotlin.android")
- id("org.jetbrains.kotlin.plugin.compose")
- id("com.google.devtools.ksp")
-}
 android {
  namespace = "pk.karachibuses.app"
  compileSdk = 35
