@@ -55,7 +55,8 @@
 - [ ] Add WorkManager launch/periodic/connectivity-aware sync and backoff.
 - [ ] Add manual sync and freshness/error state.
 - [ ] Test interrupted downloads, retries, duplicates and rollback.
-- [ ] Add local map-package registry: package ID, version, bounds, size, checksum, attribution, state and installed path.
+- [x] Add local Room map-package registry: package ID, version, bounds, size, checksum, attribution, state and installed path.
+- [x] Add Room 1→2 migration and DAO operations for package catalogue state.
 - [ ] Keep old installed package active until a verified replacement is committed.
 - [ ] Add storage inspection, pause/resume/retry/remove and metered-network controls.
 
