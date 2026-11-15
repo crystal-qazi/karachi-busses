@@ -8,5 +8,5 @@ data class RouteDto(val id:Long,val route_code:String,val route_name:String,val 
 data class DirectionDto(val id:Long,val route_id:Long,val direction_name:String,val start_label:String?,val end_label:String?)
 data class StopDto(val id:Long,val stop_name:String,val latitude:Double,val longitude:Double,val address:String?)
 data class DirectionStopDto(val direction_id:Long,val stop_id:Long,val stop_sequence:Int)
-data class ShapeDto(val direction_id:Long,val geojson:Any?)
+data class ShapeDto(val direction_id:Long,val geojson:com.google.gson.JsonElement?)
 interface MobileApi { @GET("mobile/snapshot") suspend fun snapshot():ApiEnvelope<SnapshotDto> }
