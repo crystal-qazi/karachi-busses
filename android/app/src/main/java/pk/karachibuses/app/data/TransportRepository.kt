@@ -3,6 +3,7 @@ import androidx.room.withTransaction
 import kotlinx.coroutines.flow.Flow
 import pk.karachibuses.app.data.local.*
 import pk.karachibuses.app.data.remote.MobileApi
+import pk.karachibuses.app.data.remote.DatasetChecksum
 import pk.karachibuses.app.domain.JourneyPlanner
 import pk.karachibuses.app.domain.JourneyOption
 import pk.karachibuses.app.data.local.StopEntity
@@ -17,6 +18,8 @@ class TransportRepository(private val api:MobileApi,private val db:TransportData
   check(response.success && response.data!=null){response.error?.message ?: "Snapshot request failed"}
   val dto=response.data
   check(dto.schema_version==1){"Unsupported dataset schema"}
+  val calculated=DatasetChecksum.sha256(dto.dataset)
+  check(dto.dataset_version==calculated && dto.checksum=="sha256:"+calculated){"Snapshot checksum validation failed"}
   val dao=db.dao()
   db.withTransaction {
    dao.clearShapes();dao.clearDirectionStops();dao.clearDirections();dao.clearStops();dao.clearRoutes()
