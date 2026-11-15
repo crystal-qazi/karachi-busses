@@ -14,11 +14,12 @@ import pk.karachibuses.app.data.AppContainer
 import pk.karachibuses.app.data.local.RouteEntity
 import pk.karachibuses.app.ui.HomeViewModel
 import pk.karachibuses.app.data.sync.TransportSyncWorker
+import androidx.compose.material3.TextButton
 class MainActivity:ComponentActivity(){
- override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);val container=AppContainer(applicationContext);TransportSyncWorker.schedule(applicationContext);setContent{MaterialTheme{HomeScreen(container)}}}
+ override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);val container=AppContainer(applicationContext);TransportSyncWorker.schedule(applicationContext);setContent{MaterialTheme{var showMap by remember { mutableStateOf(false) }; if(showMap) MapScreen(container, onBack = { showMap = false }) else HomeScreen(container, onOpenMap = { showMap = true })}}}
 }
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable private fun HomeScreen(container:AppContainer){
+@Composable private fun HomeScreen(container:AppContainer, onOpenMap: () -> Unit){
  val vm= remember{HomeViewModel(container.repository)}
  val routes by vm.routes.collectAsStateWithLifecycle()
  val status by vm.status.collectAsStateWithLifecycle()
@@ -28,7 +29,7 @@ class MainActivity:ComponentActivity(){
  var originLat by remember{mutableStateOf("24.8607")}
  var originLng by remember{mutableStateOf("67.0011")}
  var destination by remember{mutableStateOf("")}
- Scaffold(topBar={TopAppBar(title={Text("Karachi Buses")})}){padding->
+ Scaffold(topBar={TopAppBar(title={Text("Karachi Buses")}, actions={TextButton(onClick=onOpenMap){Text("Map")}})}){padding->
   Column(Modifier.fillMaxSize().padding(padding).padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
    Text("Discover public transport across Karachi",style=MaterialTheme.typography.titleMedium)
    Text(status,style=MaterialTheme.typography.bodySmall)
