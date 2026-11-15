@@ -58,7 +58,7 @@
 - [x] Add local Room map-package registry: package ID, version, bounds, size, checksum, attribution, state and installed path.
 - [x] Add Room 1→2 migration and DAO operations for package catalogue state.
 - [ ] Keep old installed package active until a verified replacement is committed.
-- [ ] Add storage inspection, pause/resume/retry/remove and metered-network controls.
+- [ ] Add reliable storage preflight, retry/recovery, metered-network/Wi-Fi-only settings and download scheduling.
 
 ## Phase 4 — Native passenger features
 - [ ] Route and stop search against Room.
@@ -72,11 +72,13 @@
 ## Phase 5 — Hybrid MapLibre maps
 - [x] Integrate MapLibre Native Android and configurable style/source.
 - [x] Add bounded visible-neighbourhood downloads through MapLibre OfflineManager with progress and local package state.
-- [ ] Select a provider or self-hosted vector/raster tile pipeline with explicit offline rights.
-- [ ] Define and validate a Karachi-wide package boundary and a catalogue of neighbourhood/area boundaries.
+- [x] Select the project-controlled OpenMapTiles + TileServer GL self-hosting direction; deployment and licence validation remain pending.
+- [ ] Define and validate a Karachi-wide administrative boundary and catalogue of neighbourhood/area polygons.
+- [x] Document city-wide aggregate-download design using bounded area packages rather than one huge native region.
 - [ ] Estimate package size for supported zoom ranges from real generated tiles; do not publish speculative size claims.
 - [ ] Implement map catalogue and package manifest API.
-- [ ] Implement download, progress, pause/resume, retry, checksum, atomic install, update and delete.
+- [ ] Complete download lifecycle: robust retry/recovery, storage preflight, package integrity/version validation, update/atomic replacement and backend catalogue integration.
+- [x] Implement visible-neighbourhood OfflineManager download with progress, pause/resume and remove controls.
 - [ ] Render local stops and route shapes above the basemap.
 - [ ] Use approved online tiles for undownloaded areas, with attribution and provider-compliant caching.
 - [ ] Show offline map coverage clearly and preserve non-map transport features if basemap unavailable.
