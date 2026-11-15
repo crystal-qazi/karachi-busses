@@ -61,6 +61,8 @@ def nearby():
         JOIN route_stops rs ON rs.stop_id=s.id
         JOIN route_directions d ON d.id=rs.direction_id
         JOIN bus_routes r ON r.id=d.route_id
+        JOIN data_sources route_source ON route_source.id=r.source_id AND route_source.verification_status='verified'
+        JOIN data_sources stop_source ON stop_source.id=s.source_id AND stop_source.verification_status='verified'
         LEFT JOIN bus_operators o ON o.id=r.operator_id AND o.is_active=1
         WHERE s.status='active' AND r.status='active'
           AND s.latitude BETWEEN %s AND %s
@@ -117,6 +119,7 @@ def public_direction(direction_id):
                        r.id AS route_id, r.route_code, r.route_name, o.name AS operator_name
                 FROM route_directions d
                 JOIN bus_routes r ON r.id=d.route_id
+                JOIN data_sources route_source ON route_source.id=r.source_id AND route_source.verification_status='verified'
                 LEFT JOIN bus_operators o ON o.id=r.operator_id AND o.is_active=1
                 WHERE d.id=%s AND r.status='active'
             """, (direction_id,))
@@ -126,6 +129,7 @@ def public_direction(direction_id):
             cursor.execute("""
                 SELECT s.id, s.stop_name, s.latitude, s.longitude, s.address, rs.stop_sequence
                 FROM route_stops rs JOIN bus_stops s ON s.id=rs.stop_id
+                JOIN data_sources stop_source ON stop_source.id=s.source_id AND stop_source.verification_status='verified'
                 WHERE rs.direction_id=%s AND s.status='active'
                 ORDER BY rs.stop_sequence
             """, (direction_id,))
@@ -168,6 +172,7 @@ def search():
                 SELECT r.id, r.route_code, r.route_name, o.name AS operator_name,
                        d.id AS direction_id, d.direction_name, d.start_label, d.end_label
                 FROM bus_routes r
+                JOIN data_sources route_source ON route_source.id=r.source_id AND route_source.verification_status='verified'
                 LEFT JOIN bus_operators o ON o.id=r.operator_id AND o.is_active=1
                 LEFT JOIN route_directions d ON d.route_id=r.id
                 WHERE r.status='active'
@@ -179,6 +184,7 @@ def search():
             cursor.execute("""
                 SELECT s.id, s.stop_name, s.latitude, s.longitude, s.address
                 FROM bus_stops s
+                JOIN data_sources stop_source ON stop_source.id=s.source_id AND stop_source.verification_status='verified'
                 WHERE s.status='active' AND (s.stop_name LIKE %s OR s.address LIKE %s)
                 ORDER BY s.stop_name LIMIT 50
             """, (term, term))
