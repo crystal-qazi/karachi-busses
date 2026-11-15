@@ -401,6 +401,166 @@ def update_stop(stop_id):
     return redirect(url_for("admin.stops"))
 
 
+@admin_bp.route("/imports/routes", methods=["GET", "POST"])
+@login_required
+def route_imports():
+    preview = None
+    with cursor_context() as (_, cursor):
+        cursor.execute("SELECT id, source_name, verification_status FROM data_sources ORDER BY source_name")
+        sources = cursor.fetchall()
+    if request.method == "POST":
+        upload = request.files.get("file")
+        source_id = request.form.get("source_id", "").strip()
+        if not upload or not upload.filename.lower().endswith(".csv"):
+            flash("Select a UTF-8 route CSV file.", "danger")
+            return render_template("admin/route_imports.html", sources=sources, preview=None)
+        try:
+            if not source_id.isdigit():
+                raise ValueError("Select a data source for this route import.")
+            stream = io.StringIO(upload.stream.read().decode("utf-8-sig"))
+            reader = csv.DictReader(stream)
+            required = {
+                "route_code", "route_name", "direction_name", "stop_name",
+                "latitude", "longitude", "stop_sequence",
+            }
+            if not reader.fieldnames or not required.issubset(set(reader.fieldnames)):
+                raise ValueError("Required columns: route_code, route_name, direction_name, stop_name, latitude, longitude, stop_sequence. Optional: operator_name, start_label, end_label, address.")
+            grouped = {}
+            for line, raw in enumerate(reader, start=2):
+                if line > 5002:
+                    raise ValueError("A single route import is limited to 5,000 stop rows.")
+                code = (raw.get("route_code") or "").strip()
+                name = (raw.get("route_name") or "").strip()
+                direction_name = (raw.get("direction_name") or "").strip()
+                stop_name = (raw.get("stop_name") or "").strip()
+                if not CODE_RE.fullmatch(code):
+                    raise ValueError(f"Line {line}: invalid route_code.")
+                if not name or len(name) > 180 or not direction_name or len(direction_name) > 100:
+                    raise ValueError(f"Line {line}: route_name and direction_name are required and must fit the schema.")
+                if not stop_name or len(stop_name) > 180:
+                    raise ValueError(f"Line {line}: stop_name is required and must be 180 characters or fewer.")
+                try:
+                    sequence = int(raw.get("stop_sequence", ""))
+                except (TypeError, ValueError):
+                    raise ValueError(f"Line {line}: stop_sequence must be a positive integer.")
+                if sequence < 1:
+                    raise ValueError(f"Line {line}: stop_sequence must be a positive integer.")
+                row = {
+                    "route_code": code, "route_name": name,
+                    "operator_name": (raw.get("operator_name") or "").strip()[:180] or None,
+                    "direction_name": direction_name,
+                    "start_label": (raw.get("start_label") or "").strip()[:180] or None,
+                    "end_label": (raw.get("end_label") or "").strip()[:180] or None,
+                    "stop_name": stop_name,
+                    "latitude": _coordinate(raw.get("latitude"), f"Line {line} latitude", -90, 90),
+                    "longitude": _coordinate(raw.get("longitude"), f"Line {line} longitude", -180, 180),
+                    "address": (raw.get("address") or "").strip()[:500] or None,
+                    "stop_sequence": sequence,
+                }
+                route = grouped.setdefault(code, {"name": name, "operator_name": row["operator_name"], "directions": {}})
+                if route["name"] != name or route["operator_name"] != row["operator_name"]:
+                    raise ValueError(f"Line {line}: route name/operator must be consistent for route {code}.")
+                direction = route["directions"].setdefault(direction_name, {
+                    "start_label": row["start_label"], "end_label": row["end_label"], "stops": []
+                })
+                if (direction["start_label"], direction["end_label"]) != (row["start_label"], row["end_label"]):
+                    raise ValueError(f"Line {line}: direction labels must be consistent for {code}/{direction_name}.")
+                direction["stops"].append(row)
+            if not grouped:
+                raise ValueError("CSV contains no data rows.")
+            for code, route in grouped.items():
+                for direction_name, direction in route["directions"].items():
+                    direction["stops"].sort(key=lambda item: item["stop_sequence"])
+                    sequences = [item["stop_sequence"] for item in direction["stops"]]
+                    if len(direction["stops"]) < 2:
+                        raise ValueError(f"{code}/{direction_name} needs at least two stops.")
+                    if len(sequences) != len(set(sequences)):
+                        raise ValueError(f"{code}/{direction_name} contains duplicate stop_sequence values.")
+            if request.form.get("confirm") == "yes":
+                with cursor_context(commit=True) as (_, cursor):
+                    cursor.execute("SELECT id FROM data_sources WHERE id=%s", (int(source_id),))
+                    if not cursor.fetchone():
+                        raise ValueError("Selected data source does not exist.")
+                    for code, route in grouped.items():
+                        cursor.execute("SELECT id FROM bus_routes WHERE route_code=%s", (code,))
+                        if cursor.fetchone():
+                            raise ValueError(f"Route code {code} already exists. Resolve it before importing.")
+                    stop_cache = {}
+                    for code, route in grouped.items():
+                        operator_id = None
+                        if route["operator_name"]:
+                            cursor.execute("""
+                                INSERT INTO bus_operators (name) VALUES (%s)
+                                ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)
+                            """, (route["operator_name"],))
+                            operator_id = cursor.lastrowid
+                        cursor.execute("""
+                            INSERT INTO bus_routes
+                              (operator_id, source_id, route_code, route_name, status)
+                            VALUES (%s,%s,%s,%s,'draft')
+                        """, (operator_id, int(source_id), code, route["name"]))
+                        route_id = cursor.lastrowid
+                        for direction_name, direction in route["directions"].items():
+                            cursor.execute("""
+                                INSERT INTO route_directions
+                                  (route_id, direction_name, start_label, end_label)
+                                VALUES (%s,%s,%s,%s)
+                            """, (route_id, direction_name, direction["start_label"], direction["end_label"]))
+                            direction_id = cursor.lastrowid
+                            for stop in direction["stops"]:
+                                key = (stop["stop_name"].casefold(),
+                                       round(stop["latitude"], 6), round(stop["longitude"], 6))
+                                stop_id = stop_cache.get(key)
+                                if stop_id is None:
+                                    cursor.execute("""
+                                        SELECT s.id, s.status, ds.verification_status
+                                        FROM bus_stops s
+                                        LEFT JOIN data_sources ds ON ds.id=s.source_id
+                                        WHERE LOWER(s.stop_name)=LOWER(%s)
+                                          AND s.latitude BETWEEN %s AND %s
+                                          AND s.longitude BETWEEN %s AND %s
+                                        LIMIT 1
+                                    """, (stop["stop_name"], stop["latitude"] - 0.00025,
+                                          stop["latitude"] + 0.00025, stop["longitude"] - 0.00025,
+                                          stop["longitude"] + 0.00025))
+                                    existing = cursor.fetchone()
+                                    if existing:
+                                        if existing["status"] != "active" or existing["verification_status"] != "verified":
+                                            raise ValueError(
+                                                f"Stop {stop['stop_name']} already exists but is not verified/active; resolve it in Bus stops before importing."
+                                            )
+                                        stop_id = int(existing["id"])
+                                    else:
+                                        cursor.execute("""
+                                            INSERT INTO bus_stops
+                                              (stop_name, latitude, longitude, address, source_id, status)
+                                            VALUES (%s,%s,%s,%s,%s,'under_review')
+                                        """, (stop["stop_name"], stop["latitude"], stop["longitude"],
+                                              stop["address"], int(source_id)))
+                                        stop_id = cursor.lastrowid
+                                    stop_cache[key] = stop_id
+                                cursor.execute("""
+                                    INSERT INTO route_stops (direction_id, stop_id, stop_sequence)
+                                    VALUES (%s,%s,%s)
+                                """, (direction_id, stop_id, stop["stop_sequence"]))
+                        _audit(cursor, "route_csv_import", "bus_route", route_id,
+                               {"route_code": code, "source_id": int(source_id)})
+                    _audit(cursor, "route_csv_import_batch", "bus_route", None,
+                           {"route_count": len(grouped), "source_id": int(source_id)})
+                flash(f"Imported {len(grouped)} routes as drafts. Review stops, draw each direction's map shape, then publish after source verification.", "success")
+                return redirect(url_for("admin.routes"))
+            preview = {
+                "route_count": len(grouped),
+                "direction_count": sum(len(route["directions"]) for route in grouped.values()),
+                "stop_count": sum(len(direction["stops"]) for route in grouped.values() for direction in route["directions"].values()),
+                "routes": list(grouped.keys())[:30],
+            }
+            flash("CSV validated. Upload the same file again and choose Import to create draft records.", "info")
+        except Exception as exc:
+            flash(f"Route import rejected: {exc}", "danger")
+    return render_template("admin/route_imports.html", sources=sources, preview=preview)
+
+
 @admin_bp.route("/imports", methods=["GET", "POST"])
 @login_required
 def imports():
