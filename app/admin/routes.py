@@ -3,7 +3,7 @@ import io
 import json
 import re
 
-from flask import flash, jsonify, redirect, render_template, request, url_for
+from flask import flash, jsonify, redirect, render_template, request, session, url_for
 
 from app.admin import admin_bp
 from app.admin.auth import login_required
@@ -34,7 +34,7 @@ def _coordinate(value, label, minimum, maximum):
 def _audit(cursor, action, entity_type, entity_id, details=None):
     cursor.execute(
         "INSERT INTO audit_logs (admin_user_id, action, entity_type, entity_id, details) VALUES (%s,%s,%s,%s,%s)",
-        (None, action, entity_type, entity_id, json.dumps(details or {})),
+        (session.get('admin_user_id'), action, entity_type, entity_id, json.dumps(details or {})),
     )
 
 
