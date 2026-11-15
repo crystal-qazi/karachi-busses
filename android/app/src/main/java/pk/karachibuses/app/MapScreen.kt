@@ -67,7 +67,7 @@ fun MapScreen(container: AppContainer, onBack: () -> Unit) {
     var mapView by remember { mutableStateOf<MapView?>(null) }
     val packages by container.database.mapPackageDao().observePackages().collectAsState(initial = emptyList())
 
-    MapLibre.getInstance(context)
+    remember(context) { MapLibre.getInstance(context) }
 
     DisposableEffect(lifecycleOwner, mapView) {
         val view = mapView
@@ -150,8 +150,9 @@ fun MapScreen(container: AppContainer, onBack: () -> Unit) {
                         installedPath = "maplibre-offline:${region.id}",
                         updatedAtEpochMs = System.currentTimeMillis()
                     )
-                    scope.launch { container.database.mapPackageDao().savePackage(entity) }
-                    region.setObserver(object : OfflineRegion.OfflineRegionObserver {
+                    scope.launch {
+                        container.database.mapPackageDao().savePackage(entity)
+                        region.setObserver(object : OfflineRegion.OfflineRegionObserver {
                         override fun onStatusChanged(status: OfflineRegionStatus) {
                             val required = status.requiredResourceCount
                             progress = if (required > 0) {
@@ -181,8 +182,9 @@ fun MapScreen(container: AppContainer, onBack: () -> Unit) {
                             message = "The map provider's offline tile limit was reached ($limit)."
                             scope.launch { container.database.mapPackageDao().updateState(packageId, "failed") }
                         }
-                    })
-                    region.setDownloadState(OfflineRegion.STATE_ACTIVE)
+                        })
+                        region.setDownloadState(OfflineRegion.STATE_ACTIVE)
+                    }
                 }
                 override fun onError(error: String) {
                     progress = null
