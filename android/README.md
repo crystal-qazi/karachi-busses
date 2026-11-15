@@ -25,6 +25,7 @@ Native Android client foundation. This app is Kotlin + Jetpack Compose; it is no
 ## Current implementation
 - Compose application shell and route search screen.
 - Room local database for routes, directions, stops, stop order, route shapes and sync state.
+- Versioned local map-package catalogue for full-Karachi and area packages, with a database migration; actual tile download/rendering is still pending.
 - Read-only full-snapshot fetch and transactional replacement of the local transport dataset.
 - Existing locally stored data is retained if the API request or Room transaction fails.
 
