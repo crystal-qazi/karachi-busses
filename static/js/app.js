@@ -57,7 +57,7 @@
 
   if ("serviceWorker" in navigator && window.isSecureContext) {
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/static/service-worker.js")
+      navigator.serviceWorker.register("/service-worker.js")
         .catch((error) => console.error("Service worker registration failed:", error));
     });
   }
