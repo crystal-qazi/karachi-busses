@@ -1,8 +1,8 @@
 # Karachi Buses
 
-A Karachi-wide public transport discovery PWA. Users will be able to find nearby bus routes using GPS, search journeys by destination, and view verified route shapes and stops on OpenStreetMap.
+A Karachi-wide public transport discovery PWA. Users can find nearby bus routes using GPS, search routes and stops, and view verified route shapes and stops on OpenStreetMap.
 
-**No live vehicle tracking is planned.** Route geometry and stop locations are maintained in the application's database.
+**No live vehicle tracking is implemented or planned.** Route geometry and stop locations are maintained in MySQL.
 
 ## Technology
 - Python 3.11+
@@ -14,69 +14,58 @@ A Karachi-wide public transport discovery PWA. Users will be able to find nearby
 - PWA manifest and service worker
 
 ## Current implementation
-Phase 1 foundation:
+### Phase 1 — Foundation
 - Flask application factory and configuration
-- MySQL connection helper
-- Initial MySQL schema migration
+- MySQL connection helper and schema migrations
 - Versioned health API
 - Responsive Bootstrap/Leaflet map shell
 - PWA manifest and service worker
-- Initial automated tests
 
-Phase 2 route administration is available on the `feature/phase-2-route-management` branch (admin login, operators, routes, directions, stops, route drawing and CSV stop imports). Nearby discovery, journey planning and verified Karachi route data are subsequent phases.
+### Phase 2 — Route management
+- Protected admin authentication and dashboard
+- Operator, route, direction and stop management
+- Ordered route stops and Leaflet route geometry editor
+- GeoJSON route import and CSV stop import
+- Administrative audit log and CSRF protection
+
+### Phase 3 — Nearby discovery
+- GPS-based nearby stop search with configurable radius
+- Manual map selection fallback
+- Nearby stop cards with serving routes and directions
+- Route geometry and ordered stop display
+- Search for active route codes/names and active stop names
+- Public read-only discovery APIs
+- No GPS history or live vehicle tracking
 
 ## Quick start
-1. Install Python 3.11 or newer and MySQL 8.
+1. Install Python 3.11+ and MySQL 8+.
 2. Create the database:
-   ```sql
-   CREATE DATABASE karachi_buses CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   ```
+   \`CREATE DATABASE karachi_buses CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\`
 3. Create and activate a virtual environment:
-   ```powershell
-   # Windows PowerShell
-   python -m venv .venv
-   .venv\Scripts\Activate.ps1
-   ```
-   macOS/Linux: `python -m venv .venv && source .venv/bin/activate`
-4. Install dependencies: `pip install -r requirements.txt`
-5. Copy `.env.example` to `.env` and update the MySQL credentials.
-6. Apply migrations: `python scripts/migrate.py`
-7. Start Flask: `python run.py`
-8. Open http://127.0.0.1:5000.
+   \`python -m venv .venv\`
+   Windows PowerShell: \`.venv\\Scripts\\Activate.ps1\`
+4. Install dependencies: \`pip install -r requirements.txt\`
+5. Copy \`.env.example\` to \`.env\` and configure MySQL credentials.
+6. Apply migrations: \`python scripts/migrate.py\`
+7. Create an admin: \`python scripts/create_admin.py\`
+8. Start Flask: \`python run.py\`
+9. Open http://127.0.0.1:5000. Admin login is at /admin/login.
 
-The browser map uses OpenStreetMap tiles and requires internet access. GPS access requires HTTPS in production; localhost is generally treated as a secure browser context.
-
-## Configuration
-See [.env.example](.env.example). Never commit real credentials. The configured MySQL database must already exist; migrations create application tables, not the database or MySQL user.
-
-## Admin route management (Phase 2 branch)
-
-After checking out `feature/phase-2-route-management`, install dependencies, apply migrations, then create an administrator with `python scripts/create_admin.py`. Sign in at `/admin/login`. The tool prompts for a username and a password of at least 12 characters; no default admin credentials are shipped. See [Phase 2 guide](docs/PHASE_2.md).
+The configured MySQL database must already exist. Never commit real credentials. Browser geolocation requires HTTPS in production; localhost is normally treated as secure.
 
 ## API
-- `GET /api/v1/health` — application and database health.
-- `GET /api/v1/health?check_db=false` — process health without a database check.
+- GET /api/v1/health
+- GET /api/v1/discover/nearby?lat=24.8607&lng=67.0011&radius=1500
+- GET /api/v1/directions/{direction_id}
+- GET /api/v1/search?q={text}
 
-## Database
-The initial schema is in `migrations/001_initial_schema.sql`. It includes operators, routes, directions, stops, ordered route stops, GeoJSON route shapes, categories, data sources, admin accounts and audit logs.
+See docs/API_DOCUMENTATION.md and docs/PHASE_3.md.
 
-The migration runner records applied files in `schema_migrations` and does not reapply them.
-
-## Tests
-```bash
-pytest
-```
+## Data quality
+No sample or invented Karachi route data is published. Only active routes and active stops entered and verified by administrators are discoverable. Nearby distance is straight-line distance, not walking distance. Journey planning, transfers, ETAs and live vehicle tracking are not provided.
 
 ## Map attribution and tile usage
-The map displays © OpenStreetMap contributors attribution. The public OSM standard tile service has a usage policy and is not an unlimited production tile service. Before public launch, select a tile provider or self-hosted tile infrastructure appropriate for expected traffic and comply with its terms.
-
-## Project principles
-- Store verified routes and stops in MySQL; do not infer bus service from road geometry.
-- Keep forward and reverse route directions separate.
-- Store route geometry as GeoJSON LineString coordinates in [longitude, latitude] order.
-- Retain route data provenance and verification status.
-- Do not persist a user's GPS location by default.
-- Distinguish straight-line proximity from actual pedestrian walking directions.
+Map data © OpenStreetMap contributors. The standard OpenStreetMap tile service is not an unlimited production tile service. Before public launch, choose an appropriate tile provider or self-hosted tile infrastructure and comply with its terms.
 
 ## License
 No license has been selected yet. Add one before accepting external contributions or distributing the project.
