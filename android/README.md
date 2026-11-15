@@ -18,7 +18,7 @@ Native Android client foundation. This app is Kotlin + Jetpack Compose; it is no
 
 The app uses the official MapLibre Native Android SDK. It does not silently select a public tile server or enable offline downloads without permission.
 
-Add these properties to your local `android/gradle.properties` (do not commit provider secrets):
+Add these properties to your user-level Gradle properties file (`%USERPROFILE%\\.gradle\\gradle.properties` on Windows, or `~/.gradle/gradle.properties` on Linux/macOS). This keeps provider configuration out of the repository:
 ```properties
 MAP_STYLE_URL=https://your-approved-provider.example/style.json
 MAP_ATTRIBUTION=© OpenStreetMap contributors
