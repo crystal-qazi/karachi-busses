@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#126b50">
-  <meta name="description" content="Find Karachi bus routes and stops on an interactive map.">
-  <title>Karachi Buses</title>
+  <meta name="description" content="Find Karachi bus routes and nearby boarding stops on an interactive map.">
+  <title>Karachi Buses — Find your route</title>
   <link rel="manifest" href="{{ url_for('manifest') }}">
   <link rel="icon" href="{{ url_for('static', filename='images/bus.svg') }}" type="image/svg+xml">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,45 +13,53 @@
   <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark app-navbar">
+  <nav class="navbar navbar-dark app-navbar">
     <div class="container-fluid px-3 px-lg-4">
-      <a class="navbar-brand fw-bold" href="/"> <img src="{{ url_for('static', filename='images/bus.svg') }}" alt="" width="30" height="30" class="me-2">Karachi Buses</a>
-      <span class="navbar-text text-white-50 small">Explore public transport routes</span>
+      <a class="navbar-brand fw-bold" href="/"><img src="{{ url_for('static', filename='images/bus.svg') }}" alt="" width="30" height="30" class="me-2">Karachi Buses</a>
+      <span class="navbar-text text-white-50 small d-none d-sm-inline">Karachi-wide bus route discovery</span>
     </div>
   </nav>
-
   <main class="container-fluid app-shell py-3">
     <div class="row g-3">
       <aside class="col-12 col-lg-4 col-xl-3">
         <section class="panel p-3">
-          <h1 class="h5 mb-1">Find a bus</h1>
-          <p class="text-secondary small mb-3">Discover routes near you or explore a journey across Karachi.</p>
-          <button id="locate-button" class="btn btn-success w-100 mb-3" type="button"> <span aria-hidden="true">⌖</span> Use my current location</button>
-          <div id="location-status" class="small text-secondary mb-3" role="status" aria-live="polite">Map is centred on Karachi. Allow location access to search nearby stops.</div>
-          <label for="destination-input" class="form-label fw-semibold">Where do you want to go?</label>
+          <h1 class="h5 mb-1">Find a bus near you</h1>
+          <p class="text-secondary small mb-3">Use GPS or tap anywhere on the map to find nearby published routes.</p>
+          <button id="locate-button" class="btn btn-success w-100 mb-2" type="button">⌖ Use my current location</button>
+          <label for="radius-select" class="form-label small fw-semibold mb-1">Search radius</label>
+          <select id="radius-select" class="form-select mb-3">
+            <option value="500">500 metres</option>
+            <option value="1000">1 kilometre</option>
+            <option value="1500" selected>1.5 kilometres</option>
+            <option value="3000">3 kilometres</option>
+            <option value="5000">5 kilometres</option>
+            <option value="10000">10 kilometres</option>
+          </select>
+          <div id="location-status" class="small text-secondary mb-3" role="status" aria-live="polite">Map is centred on Karachi. Allow location access or tap the map to search nearby stops.</div>
+          <label for="destination-input" class="form-label fw-semibold">Search route or stop</label>
           <div class="input-group">
-            <input id="destination-input" class="form-control" type="search" placeholder="Enter destination or stop" autocomplete="off">
+            <input id="destination-input" class="form-control" type="search" placeholder="Route number, area or stop" autocomplete="off" maxlength="100">
             <button id="search-button" class="btn btn-outline-success" type="button">Search</button>
           </div>
-          <p class="form-text">Destination search will be enabled when route data is added.</p>
         </section>
         <section class="panel p-3 mt-3">
-          <div class="d-flex align-items-center justify-content-between">
-            <h2 class="h6 mb-0">Nearby routes</h2>
-            <span class="badge text-bg-light">Coming in Phase 3</span>
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h2 class="h6 mb-0">Routes and stops</h2>
+            <span class="badge text-bg-light">Static routes</span>
           </div>
-          <p class="text-secondary small mb-0 mt-2">Verified bus routes and boarding stops will appear here. No live vehicle tracking is used.</p>
+          <div id="discovery-results" aria-live="polite">
+            <p class="text-secondary small mb-0">Nearby stops and routes will appear here after you share your location or tap the map. You can also search by route or stop name.</p>
+          </div>
         </section>
-        <p class="small text-secondary px-1 mt-3 mb-0">Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>.</p>
+        <p class="small text-secondary px-1 mt-3 mb-0">Distances are straight-line estimates, not walking directions. Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>. No live bus tracking.</p>
       </aside>
       <section class="col-12 col-lg-8 col-xl-9">
         <div class="map-frame panel">
-          <div id="map" role="application" aria-label="Map of Karachi" data-lat="{{ map_lat }}" data-lng="{{ map_lng }}" data-zoom="{{ map_zoom }}"></div>
+          <div id="map" role="application" aria-label="Interactive Karachi bus route map" data-lat="{{ map_lat }}" data-lng="{{ map_lng }}" data-zoom="{{ map_zoom }}"></div>
         </div>
       </section>
     </div>
   </main>
-
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
   <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
 </body>
