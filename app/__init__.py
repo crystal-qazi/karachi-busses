@@ -10,8 +10,21 @@ def create_app(test_config: dict | None = None) -> Flask:
     if test_config:
         app.config.update(test_config)
 
+    from flask_wtf.csrf import CSRFProtect
+    CSRFProtect(app)
+
     from app.api.health import health_bp
+    from app.api.admin import admin_api_bp
+    from app.admin import admin_bp
+    from app.admin import auth, routes  # noqa: F401
     app.register_blueprint(health_bp, url_prefix="/api/v1")
+    app.register_blueprint(admin_api_bp, url_prefix="/api/v1")
+    app.register_blueprint(admin_bp)
+
+    @app.context_processor
+    def inject_csrf_token():
+        from flask_wtf.csrf import generate_csrf
+        return {"csrf_token": generate_csrf}
 
     @app.get("/")
     def index():
