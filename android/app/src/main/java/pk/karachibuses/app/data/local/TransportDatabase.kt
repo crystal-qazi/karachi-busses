@@ -32,5 +32,8 @@ data class SyncStateEntity(@PrimaryKey val id:Int=1,val datasetVersion:String,va
  @Query("DELETE FROM stops") suspend fun clearStops()
  @Query("DELETE FROM routes") suspend fun clearRoutes()
 }
-@Database(entities=[RouteEntity::class,DirectionEntity::class,StopEntity::class,DirectionStopEntity::class,RouteShapeEntity::class,SyncStateEntity::class],version=1,exportSchema=true)
-abstract class TransportDatabase:RoomDatabase(){ abstract fun dao():TransportDao }
+@Database(entities=[RouteEntity::class,DirectionEntity::class,StopEntity::class,DirectionStopEntity::class,RouteShapeEntity::class,SyncStateEntity::class,MapPackageEntity::class],version=2,exportSchema=true)
+abstract class TransportDatabase:RoomDatabase(){
+ abstract fun dao():TransportDao
+ abstract fun mapPackageDao():MapPackageDao
+}
