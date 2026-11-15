@@ -29,4 +29,4 @@ class Config:
     MAP_DEFAULT_LAT = float(os.getenv("MAP_DEFAULT_LAT", "24.8607"))
     MAP_DEFAULT_LNG = float(os.getenv("MAP_DEFAULT_LNG", "67.0011"))
     MAP_DEFAULT_ZOOM = int(os.getenv("MAP_DEFAULT_ZOOM", "11"))
-    JSON_SORT_KEYS = False
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024\n    JSON_SORT_KEYS = False
