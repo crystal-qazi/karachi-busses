@@ -159,7 +159,7 @@ def journeys():
             for j in range(i + 1, len(first_stops)):
                 interchange = first_stops[j]
                 for second in directions.values():
-                    if second["id"] == first["id"]:
+                    if second["route"]["id"] == first["route"]["id"]:
                         continue
                     second_stops = second["stops"]
                     for k, transfer_board in enumerate(second_stops):
