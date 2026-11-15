@@ -30,12 +30,12 @@ The implemented first iteration uses `/mobile/manifest` and `/mobile/snapshot` w
 {
   "success": true,
   "data": {
-    "dataset_version": 104,
+    "dataset_version": "sha256-content-hash",
     "schema_version": 1,
     "generated_at": "2026-11-15T12:00:00Z",
     "minimum_supported_client": 1,
-    "snapshot_checksum": "sha256:...",
-    "changes_available_since": 80
+    "checksum": "sha256:...",
+    "sync_mode": "full_snapshot",\n    "incremental_sync_available": false
   }
 }
 ```
