@@ -1,6 +1,6 @@
 # API Documentation
 
-Base path: /api/v1. All public discovery endpoints are read-only.
+Base path: /api/v1. Public discovery endpoints are read-only.
 
 Success envelope: {"success": true, "data": {...}}
 Error envelope: {"success": false, "error": {"code": "...", "message": "..."}}
@@ -9,23 +9,34 @@ Error envelope: {"success": false, "error": {"code": "...", "message": "..."}}
 ### GET /health
 Checks application and database connectivity. Use check_db=false to skip the database check.
 
-## Nearby bus discovery
+## Nearby discovery
 ### GET /discover/nearby?lat=24.8607&lng=67.0011&radius=1500&limit=50
-Finds active bus stops served by active routes around a WGS84 coordinate.
-- lat and lng are required decimal degrees.
-- radius is optional, 100–10,000 metres; default 1,500.
-- limit is optional, 1–100; default 50.
-- Returns nearby stops, straight-line distance in metres, and active route directions serving each stop.
-- The SQL query applies a latitude/longitude bounding box before Haversine distance calculation.
-- Coordinates are not stored.
+Returns active stops served by active routes within a radius of a WGS84 coordinate. Radius is 100–10,000 metres (default 1,500); limit is 1–100 (default 50). Distances are straight-line Haversine estimates.
 
-## Route direction detail
+## Direction detail
 ### GET /directions/{direction_id}
-Returns an active route direction, its ordered active stops, and stored GeoJSON LineString when available. Returns 404 when the direction does not belong to an active route.
+Returns active direction metadata, ordered active stops and saved GeoJSON LineString. Only routes and stops whose linked data sources are verified are visible.
 
-## Search
+## Route and stop search
 ### GET /search?q={text}
-Searches active route codes, names and descriptions, direction start/end labels, and active stop names/addresses. Query length must be 2–100 characters.
+Searches active, verified-source route codes, names, descriptions, direction endpoint labels and active, verified-source stop names/addresses. Query length is 2–100 characters.
 
-## Data visibility
-Only bus_routes with status active and bus_stops with status active are returned. A direction without a stored shape can still be displayed using its ordered stop markers. No live vehicle positions, arrival predictions or pedestrian directions are returned.
+## Journey discovery
+### GET /journeys?origin_lat=24.8607&origin_lng=67.0011&destination=Saddar&radius=1500
+Returns direct and one-transfer itineraries from an origin coordinate to a destination stop name/address.
+- origin_lat and origin_lng are required WGS84 coordinates.
+- destination is 2–100 characters and must match a curated active stop name or address.
+- radius is 100–10,000 metres; default 1,500.
+- At most 20 results are returned.
+- Direct journeys are ranked ahead of one-transfer journeys, then by distance to the boarding stop.
+- Transfers require the exact same stop record to be present in both direction sequences.
+- No travel time, fare, timetable, walking directions or live vehicle data is inferred.
+
+## Visibility and provenance
+Public APIs return only active routes and active stops whose respective data sources have verification_status=verified. Route publication is restricted to super administrators and data reviewers and requires:
+- a verified route source;
+- at least one direction;
+- at least two active, verified-source stops in every direction;
+- a saved route GeoJSON shape for every direction.
+
+No browser GPS coordinates are stored. No live vehicle tracking is implemented.
