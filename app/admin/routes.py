@@ -427,7 +427,7 @@ def route_imports():
                 raise ValueError("Required columns: route_code, route_name, direction_name, stop_name, latitude, longitude, stop_sequence. Optional: operator_name, start_label, end_label, address.")
             grouped = {}
             for line, raw in enumerate(reader, start=2):
-                if line > 5002:
+                if line > 5001:
                     raise ValueError("A single route import is limited to 5,000 stop rows.")
                 code = (raw.get("route_code") or "").strip()
                 name = (raw.get("route_name") or "").strip()
@@ -476,6 +476,12 @@ def route_imports():
                         raise ValueError(f"{code}/{direction_name} needs at least two stops.")
                     if len(sequences) != len(set(sequences)):
                         raise ValueError(f"{code}/{direction_name} contains duplicate stop_sequence values.")
+                    stop_keys = {
+                        (item["stop_name"].casefold(), round(item["latitude"], 6), round(item["longitude"], 6))
+                        for item in direction["stops"]
+                    }
+                    if len(stop_keys) != len(direction["stops"]):
+                        raise ValueError(f"{code}/{direction_name} repeats the same stop more than once.")
             if request.form.get("confirm") == "yes":
                 with cursor_context(commit=True) as (_, cursor):
                     cursor.execute("SELECT id FROM data_sources WHERE id=%s", (int(source_id),))
