@@ -17,6 +17,9 @@
   const resultsElement = document.getElementById("discovery-results");
   const searchInput = document.getElementById("destination-input");
   const searchButton = document.getElementById("search-button");
+  const journeyInput = document.getElementById("journey-destination");
+  const journeyButton = document.getElementById("journey-button");
+  let currentOrigin = null;
   const radiusSelect = document.getElementById("radius-select");
   const userLayer = L.layerGroup().addTo(map);
   const stopsLayer = L.layerGroup().addTo(map);
@@ -143,6 +146,7 @@
   }
 
   async function discover(lat, lng) {
+    currentOrigin = {lat, lng};
     addUserMarker(lat, lng);
     map.setView([lat, lng], 15);
     setStatus("Searching nearby bus stops…");
@@ -261,6 +265,78 @@
   searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") search();
   });
+
+
+  async function findJourneys() {
+    const destination = journeyInput.value.trim();
+    if (destination.length < 2) {
+      setStatus("Enter at least 2 characters for the destination stop or area.");
+      return;
+    }
+    if (!currentOrigin) {
+      setStatus("First use GPS or tap the map to select your starting location.");
+      return;
+    }
+    journeyButton.disabled = true;
+    setStatus("Finding direct and one-transfer journeys…");
+    showEmpty("Checking published route directions…");
+    try {
+      const params = new URLSearchParams({
+        origin_lat: currentOrigin.lat,
+        origin_lng: currentOrigin.lng,
+        radius: radiusSelect.value || "1500",
+        destination
+      });
+      const data = await getJson("/api/v1/journeys?" + params.toString());
+      resultsElement.replaceChildren();
+      if (!data.journeys.length) {
+        showEmpty(data.message || "No matching journey found.");
+        setStatus(data.message || "No journey found.");
+        return;
+      }
+      const summary = document.createElement("p");
+      summary.className = "small text-secondary";
+      summary.textContent = data.journey_count + " options found. Routes are based on published stop sequences; times and fares are not available.";
+      resultsElement.append(summary);
+      data.journeys.forEach((journey, index) => {
+        const card = document.createElement("div");
+        card.className = "border rounded-3 p-2 mb-2";
+        const heading = document.createElement("div");
+        heading.className = "fw-semibold";
+        heading.textContent = (index + 1) + ". " +
+          (journey.type === "direct" ? "Direct bus" : "One transfer");
+        const description = document.createElement("div");
+        description.className = "small text-secondary mb-2";
+        description.textContent = "Board: " + journey.origin_stop.name +
+          (journey.transfer_stop ? " · Change at: " + journey.transfer_stop.name : "") +
+          " · Get off: " + journey.destination_stop.name;
+        card.append(heading, description);
+        journey.legs.forEach((leg, legIndex) => {
+          const route = leg.direction.route;
+          const button = makeButton(
+            (legIndex === 0 ? "Leg 1: " : "Leg 2: ") + route.code + " · " +
+            route.name + " (" + leg.direction.name + ")",
+            () => showDirection(leg.direction.id),
+            "btn btn-sm btn-outline-success w-100 text-start mb-1"
+          );
+          card.append(button);
+        });
+        resultsElement.append(card);
+      });
+      setStatus("Found " + data.journey_count + " journey options. Select a leg to display its full route and stop sequence.");
+    } catch (error) {
+      showEmpty(error.message);
+      setStatus(error.message);
+    } finally {
+      journeyButton.disabled = false;
+    }
+  }
+
+  journeyButton.addEventListener("click", findJourneys);
+  journeyInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") findJourneys();
+  });
+
 
   if ("serviceWorker" in navigator && window.isSecureContext) {
     window.addEventListener("load", () => {

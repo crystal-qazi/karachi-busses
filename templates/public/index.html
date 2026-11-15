@@ -41,6 +41,14 @@
             <input id="destination-input" class="form-control" type="search" placeholder="Route number, area or stop" autocomplete="off" maxlength="100">
             <button id="search-button" class="btn btn-outline-success" type="button">Search</button>
           </div>
+          <div class="border-top mt-3 pt-3">
+            <label for="journey-destination" class="form-label fw-semibold">Plan a bus journey</label>
+            <div class="input-group">
+              <input id="journey-destination" class="form-control" type="search" placeholder="Destination stop or area" maxlength="100">
+              <button id="journey-button" class="btn btn-success" type="button">Find buses</button>
+            </div>
+            <div class="form-text">Find direct buses or one transfer using your selected GPS/map origin. Destination must match a published bus stop.</div>
+          </div>
         </section>
         <section class="panel p-3 mt-3">
           <div class="d-flex align-items-center justify-content-between mb-2">
@@ -51,7 +59,7 @@
             <p class="text-secondary small mb-0">Nearby stops and routes will appear here after you share your location or tap the map. You can also search by route or stop name.</p>
           </div>
         </section>
-        <p class="small text-secondary px-1 mt-3 mb-0">Distances are straight-line estimates, not walking directions. Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>. No live bus tracking.</p>
+        <p class="small text-secondary px-1 mt-3 mb-0">Distances are straight-line estimates, not walking directions. Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>. No live bus tracking. <a href="/privacy">Privacy</a>.</p>
       </aside>
       <section class="col-12 col-lg-8 col-xl-9">
         <div class="map-frame panel">

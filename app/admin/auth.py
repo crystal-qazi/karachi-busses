@@ -1,4 +1,5 @@
 from functools import wraps
+from urllib.parse import urljoin, urlparse
 
 from flask import flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash
@@ -29,10 +30,16 @@ def login():
             user = cursor.fetchone()
         if user and check_password_hash(user["password_hash"], password):
             session.clear()
+            session.permanent = True
             session["admin_user_id"] = user["id"]
             session["admin_username"] = user["username"]
             session["admin_role"] = user["role"]
-            return redirect(request.args.get("next") or url_for("admin.dashboard"))
+            target = request.args.get("next", "")
+            candidate = urljoin(request.host_url, target)
+            parsed = urlparse(candidate)
+            if parsed.scheme in {"http", "https"} and parsed.netloc == request.host:
+                return redirect(candidate)
+            return redirect(url_for("admin.dashboard"))
         flash("Invalid username or password.", "danger")
     return render_template("admin/login.html")
 

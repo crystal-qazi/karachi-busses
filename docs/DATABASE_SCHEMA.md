@@ -1,25 +1,33 @@
 # Database Schema
 
-Database name: `karachi_buses` (create it before applying migrations).
+Database name: \`karachi_buses\` (create it before applying migrations).
 
-Initial migration: `migrations/001_initial_schema.sql`.
+Apply migrations in order with \`python scripts/migrate.py\`.
 
 ## Tables
-- `data_sources`: provenance and verification status for imported/curated data.
-- `bus_operators`: transport operators.
-- `route_categories`: route/service categories.
-- `bus_routes`: route identity, operator, source and publication status.
-- `route_category_map`: many-to-many route categories.
-- `route_directions`: independently modelled forward/reverse journeys.
-- `bus_stops`: reusable stop records with coordinates.
-- `route_stops`: ordered stop membership for a direction.
-- `route_shapes`: one GeoJSON geometry per direction.
-- `admin_users`: future admin authentication identities.
-- `audit_logs`: administrative change history.
-- `schema_migrations`: created by the migration runner.
+- \`data_sources\`: source name, URL, notes, verification status, reviewer and verification timestamp.
+- \`bus_operators\`: transport operators.
+- \`route_categories\`: route/service categories.
+- \`bus_routes\`: route identity, operator, source and publication status.
+- \`route_category_map\`: many-to-many route categories.
+- \`route_directions\`: independent forward/reverse directions.
+- \`bus_stops\`: reusable stop records, coordinates and source provenance.
+- \`route_stops\`: ordered stop membership for a direction.
+- \`route_shapes\`: one GeoJSON geometry per direction.
+- \`admin_users\`: admin identities and roles.
+- \`audit_logs\`: administrative change history.
+- \`schema_migrations\`: migration runner history.
+
+## Migrations
+1. \`001_initial_schema.sql\` — base entities and route relationships.
+2. \`002_unique_route_code.sql\` — globally unique route code.
+3. \`003_data_provenance.sql\` — stop source link and source verification reviewer/timestamp.
 
 ## Geometry conventions
-GeoJSON LineString coordinates are `[longitude, latitude]`. Stop coordinates are stored in separate decimal latitude and longitude columns. Validate coordinate ranges in application code as well as database constraints.
+GeoJSON LineString coordinates are \`[longitude, latitude]\`. Stop coordinates are decimal latitude/longitude. Validate coordinate ranges in application code and database constraints.
 
-## Migration
-Run `python scripts/migrate.py`. Applied migration filenames are recorded to avoid reapplication. Back up production data before any future schema changes.
+## Publication integrity
+Public endpoints require active routes/stops and verified linked data sources. A route can be published only by a super administrator or data reviewer, after it has a verified source, at least one direction, two or more active verified-source stops in every direction, and a saved shape for each direction.
+
+## Backups
+Back up the production database before applying schema migrations. Migrations are recorded and are not re-applied once recorded.

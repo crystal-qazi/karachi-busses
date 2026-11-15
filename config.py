@@ -15,7 +15,13 @@ def _as_bool(value: str | None, default: bool = False) -> bool:
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "development-only-change-me")
+    APP_ENV = os.getenv("APP_ENV", "development").strip().lower()
     DEBUG = _as_bool(os.getenv("DEBUG"), False)
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = APP_ENV == "production"
+    SESSION_COOKIE_SAMESITE = "Lax"
+    PERMANENT_SESSION_LIFETIME = 28800
+    WTF_CSRF_TIME_LIMIT = 3600
     DB_CONFIG = {
         "host": os.getenv("DB_HOST", "127.0.0.1"),
         "port": int(os.getenv("DB_PORT", "3306")),

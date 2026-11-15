@@ -1,0 +1,20 @@
+{% extends "public/base.html" %}
+{% block title %}Privacy · Karachi Buses{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:800px">
+  <h1 class="h3 mb-3">Privacy notice</h1>
+  <p class="text-secondary">Karachi Buses helps you discover published bus stops and routes. It does not track buses or create passenger location histories.</p>
+  <h2 class="h5 mt-4">Your location</h2>
+  <p>When you choose “Use my current location”, your browser asks permission and sends your coordinates to the application to find nearby published stops or journeys. If you tap the map, the selected map point is used instead. Location is not saved to the application's route database or attached to an account.</p>
+  <h2 class="h5 mt-4">Searches</h2>
+  <p>Route and stop searches are processed to return matching published records. Journey search uses your selected origin and destination stop text to calculate possible direct or one-transfer options.</p>
+  <h2 class="h5 mt-4">Third-party map services</h2>
+  <p>The map uses Leaflet and OpenStreetMap map tiles. Your browser connects to the configured tile provider to load map images. The provider may receive technical connection information such as your IP address. Review the provider's privacy and usage terms.</p>
+  <h2 class="h5 mt-4">Operational logs</h2>
+  <p>The hosting operator may retain ordinary security and diagnostic logs. Production reverse-proxy logging should be configured not to record GPS query parameters or request bodies. No advertising or analytics tracking is included by this application.</p>
+  <h2 class="h5 mt-4">Contact</h2>
+  <p>Before public launch, the operator must publish a support/privacy contact and update this notice with the responsible organization and applicable retention policy.</p>
+  <p class="small text-secondary mt-4">This is a technical project notice, not legal advice. The deploying organization is responsible for meeting applicable privacy laws and publishing accurate operator details.</p>
+  <a href="/" class="btn btn-outline-success mt-2">Back to map</a>
+</div>
+{% endblock %}

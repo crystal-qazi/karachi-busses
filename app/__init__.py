@@ -9,18 +9,26 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     if test_config:
         app.config.update(test_config)
+    if app.config.get("APP_ENV") == "production":
+        secret = app.config.get("SECRET_KEY", "")
+        if not secret or secret == "development-only-change-me" or len(secret) < 32:
+            raise RuntimeError("Production requires a unique SECRET_KEY of at least 32 characters.")
+        if app.config.get("DEBUG"):
+            raise RuntimeError("DEBUG must be disabled in production.")
 
     from flask_wtf.csrf import CSRFProtect
     CSRFProtect(app)
 
     from app.api.health import health_bp
     from app.api.public import public_api_bp
+    from app.api.journeys import journey_api_bp
     from app.api.admin import admin_api_bp
     from app.admin import admin_bp
-    from app.admin import auth, routes  # noqa: F401
+    from app.admin import auth, routes, sources  # noqa: F401
     app.register_blueprint(health_bp, url_prefix="/api/v1")
     app.register_blueprint(admin_api_bp, url_prefix="/api/v1")
     app.register_blueprint(public_api_bp, url_prefix="/api/v1")
+    app.register_blueprint(journey_api_bp, url_prefix="/api/v1")
     app.register_blueprint(admin_bp)
 
     @app.context_processor
@@ -36,6 +44,10 @@ def create_app(test_config: dict | None = None) -> Flask:
             map_lng=app.config["MAP_DEFAULT_LNG"],
             map_zoom=app.config["MAP_DEFAULT_ZOOM"],
         )
+
+    @app.get("/privacy")
+    def privacy():
+        return render_template("public/privacy.html")
 
     @app.get("/offline")
     def offline():
