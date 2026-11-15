@@ -1,6 +1,7 @@
 import csv
 import io
 import json
+import math
 import re
 
 from flask import flash, jsonify, redirect, render_template, request, session, url_for
@@ -440,14 +441,19 @@ def imports():
                         raise ValueError(f"Line {line_number}: stop_name is required.")
                 if not rows:
                     raise ValueError("CSV contains no data rows.")
-                # Detect obvious duplicates in the upload before writing anything.
+                # Detect same-name coordinate duplicates in O(n) using neighbouring
+                # spatial buckets rather than pairwise comparisons.
+                buckets = {}
                 for index, row in enumerate(rows):
-                    for prior in rows[:index]:
-                        if row["stop_name"].casefold() == prior["stop_name"].casefold():
-                            lat_gap = abs(row["latitude"] - prior["latitude"])
-                            lng_gap = abs(row["longitude"] - prior["longitude"])
-                            if lat_gap <= 0.00025 and lng_gap <= 0.00025:
+                    name_key = row["stop_name"].casefold()
+                    lat_cell = math.floor(row["latitude"] / 0.00025)
+                    lng_cell = math.floor(row["longitude"] / 0.00025)
+                    for lat_offset in (-1, 0, 1):
+                        for lng_offset in (-1, 0, 1):
+                            key = (name_key, lat_cell + lat_offset, lng_cell + lng_offset)
+                            if key in buckets:
                                 raise ValueError(f"Duplicate stop near line {index + 2}: {row['stop_name']}.")
+                    buckets[(name_key, lat_cell, lng_cell)] = index
                 if request.form.get("confirm") == "yes":
                     with cursor_context(commit=True) as (_, cursor):
                         for row in rows:
