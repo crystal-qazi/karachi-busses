@@ -32,7 +32,7 @@ A Karachi-wide public transport discovery PWA. Passengers can find nearby verifi
 - One-transfer suggestions when two directions share the same stop record.
 - Admin data-source register, reviewer verification and route publication gate.
 - CSV stop import with source attribution and duplicate checks.
-- No storage of passenger GPS coordinates.
+- No storage of passenger GPS coordinates in the application database; hosting logs must be configured to omit them.
 
 ## Quick start (Windows / local)
 1. Install Python 3.11+ and MySQL 8+.
@@ -70,6 +70,6 @@ See [Phase 6 deployment guide](docs/PHASE_6.md). Docker Compose starts MySQL and
 - Destination search matches known stop names/addresses; arbitrary-address geocoding is not included.
 - No fares, timetables, travel-time estimates, walking directions, transfer walk links or live vehicle tracking.
 - The standard OpenStreetMap tile endpoint is not an unlimited production tile service. Choose a suitable tile provider or self-host tiles, retain attribution and comply with its policy.
-- Add a privacy notice, support contact and selected open-source license before public launch.
+- Privacy notice is included; add the responsible operator's support contact and retention details before public launch.
 
 Map data © OpenStreetMap contributors.
