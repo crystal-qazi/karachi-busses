@@ -1,7 +1,5 @@
 # Mobile API contract
 
-**Status:** Proposed contract only. These routes are not implemented or available yet.
-
 Base path remains `/api/v1`. Preserve all existing PWA endpoints and their current success/error envelope:
 
 - Success: `{"success": true, "data": {...}}`
@@ -9,8 +7,7 @@ Base path remains `/api/v1`. Preserve all existing PWA endpoints and their curre
 
 Existing endpoints remain unchanged: health, nearby discovery, direction detail, search and journey discovery. Mobile endpoints must follow the same envelope and publication visibility rules.
 
-## Proposed endpoints
-
+## Transport endpoints
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/mobile/manifest` | Current content-addressed published dataset version and schema metadata (implemented) |
@@ -19,58 +16,58 @@ Existing endpoints remain unchanged: health, nearby discovery, direction detail,
 | GET | `/mobile/routes` | Paginated published routes, if needed for targeted refresh |
 | GET | `/mobile/stops` | Paginated published stops, if needed for targeted refresh |
 | GET | `/mobile/directions/{id}` | Published direction, ordered stops and shape |
-| GET | `/mobile/maps/manifest` | Available offline map packages and versions |
-| GET | `/mobile/maps/{package_id}` | Download metadata/authorized package location |
 
-The implemented first iteration uses `/mobile/manifest` and `/mobile/snapshot` with a SHA-256 content-addressed version and ETag. It intentionally downloads a full snapshot when the content changes. Incremental `/mobile/changes` is not implemented until a durable change log and tombstones are atomically integrated with all admin publication mutations. Targeted list/detail endpoints remain future options and should not create a second inconsistent synchronization model.
+The first iteration uses `/mobile/manifest` and `/mobile/snapshot` with a SHA-256 content-addressed version and ETag. It intentionally downloads a full snapshot when content changes. Incremental `/mobile/changes` is not implemented until a durable change log and tombstones are atomically integrated with all admin publication mutations.
 
-## Manifest response
+## Map package endpoints (approved contract; implementation pending)
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/mobile/maps/manifest` | Catalogue of approved Karachi-wide and area-level packages |
+| GET | `/mobile/maps/{package_id}` | Metadata for one package and an authorized download location |
 
-```json
-{
-  "success": true,
-  "data": {
-    "dataset_version": "sha256-content-hash",
-    "schema_version": 1,
-    "generated_at": "2026-11-15T12:00:00Z",
-    "minimum_supported_client": 1,
-    "checksum": "sha256:...",
-    "sync_mode": "full_snapshot",\n    "incremental_sync_available": false
-  }
-}
-```
+The manifest returns package summaries only. Package detail returns:
+- `package_id`, `name`, `kind` (`karachi_full` or `area`), stable area slug where applicable;
+- geographic bounds (WGS84), display zoom range and map-style compatibility;
+- `version`, `format`, `size_bytes`, `checksum_sha256`;
+- `attribution`, `source_name`, `licence_name`, `licence_url`, and explicit offline-download permission;
+- download URI issued by the backend/provider integration, expiry where signed, and minimum supported app version.
 
-Values above are illustrative, not current repository data.
+The backend must never accept an arbitrary URL supplied by the Android client. Only packages with verified source/licence metadata and a published status appear. A package is independent of the transport dataset version. The client validates byte count and SHA-256 before installation. A replacement is staged and activated atomically; the previous working package remains active if download or validation fails.
 
-## Incremental changes response
+## Illustrative map manifest shape
+This is a contract example, not a live response:
 
 ```json
 {
   "success": true,
   "data": {
-    "from_version": 100,
-    "to_version": 104,
-    "schema_version": 1,
-    "checksum": "sha256:...",
-    "changes": {
-      "routes": {"upsert": [], "delete": []},
-      "directions": {"upsert": [], "delete": []},
-      "stops": {"upsert": [], "delete": []},
-      "direction_stops": {"upsert": [], "delete": []},
-      "shapes": {"upsert": [], "delete": []}
-    }
+    "packages": [
+      {
+        "package_id": "karachi-full",
+        "name": "Karachi",
+        "kind": "karachi_full",
+        "version": "2026-11-01",
+        "bounds": [66.6, 24.7, 67.5, 25.5],
+        "format": "provider-defined",
+        "size_bytes": 0,
+        "checksum_sha256": "hex-digest",
+        "attribution": "Map data attribution supplied by provider",
+        "source_name": "approved-provider",
+        "licence_name": "provider licence",
+        "licence_url": "https://provider.example/licence",
+        "offline_download_allowed": true
+      }
+    ]
   }
 }
 ```
 
-A client with local version 100 must receive a complete, gap-free set of changes through version 104 or a response instructing it to fetch a full snapshot. Deletes are tombstones by stable server ID. The backend must include dependent relationship removals.
+Bounds and size above are placeholders for schema illustration only, not approved Karachi package extents or estimates.
 
 ## Snapshot response
-
 The snapshot must be a consistent view of the passenger-visible dataset at one dataset version. Include dataset version, schema version, generation timestamp, checksum and all required entities/relationships. Paginate or stream large payloads without allowing the client to combine pages from different dataset versions. Prefer compressed responses (gzip or Brotli where supported) and document the canonical checksum input.
 
 ## HTTP and error behaviour
-
 - `200`: successful manifest/snapshot/change response.
 - `304`: optional conditional response when ETag matches.
 - `400`: invalid version/query parameters.
@@ -81,8 +78,14 @@ The snapshot must be a consistent view of the passenger-visible dataset at one d
 
 Use ETag/If-None-Match for cache validation where appropriate. All production traffic must use HTTPS. Public endpoints are read-only; do not expose admin mutation APIs to the passenger app.
 
-## Backend implementation requirements
+## Provider, licensing and tile-source rules
+- MapLibre is the client renderer; it is not a tile-hosting service or a grant of offline rights.
+- Do not bulk download or prefetch from `tile.openstreetmap.org` or the public OSM vector tile service.
+- Online fallback and offline package delivery must use a provider whose terms explicitly allow the intended use, or infrastructure operated by the project.
+- Preserve required attribution and licence notices in map UI and package metadata.
+- Do not select a provider, publish package sizes or promise city-wide zoom coverage until licensing, real tile generation, hosting and device storage tests are complete.
 
+## Backend implementation requirements
 Before coding these endpoints, inspect the real migrations, model/query layer and existing API serializers. Reuse current route/direction/stop relationships rather than creating parallel transport tables. Add a durable published-dataset version and change log with tombstones. Ensure version advancement and change-log writes occur in the same database transaction as publication changes.
 
 The mobile API must:
@@ -93,7 +96,3 @@ The mobile API must:
 - support full snapshot fallback;
 - validate query parameters and cap response sizes;
 - have tests for publish, edit, unpublish, delete, missing change history, version gaps and checksum mismatch.
-
-## Offline maps
-
-Map package manifests should identify package ID, region/bounds, version, format, byte size, checksum, attribution and provider/license metadata. A route-data version change does not automatically change the map package version. Never promise a downloadable full Karachi map until the tile source, licensing, storage footprint and hosting are verified.
