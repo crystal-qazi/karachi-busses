@@ -10,11 +10,15 @@
 - [x] Define versioned incremental sync, snapshot fallback and tombstones.
 - [x] Define published/verified data visibility.
 - [x] Separate transport dataset sync from map package updates.
-- [ ] Validate the contract against all current backend migrations and serializers before implementation.
+- [x] Inspect the existing schema and serializers to align the first full-snapshot payload.
+- [ ] Add a durable change log and atomic publication-event integration before incremental sync.
 
 ## Phase 1 — Android foundation
 
-- [ ] Create Android Studio/Gradle project under `android/`.
+- [x] Create Android Studio/Gradle project under `android/`.
+- [x] Configure initial Compose application shell and Room schema.
+- [x] Add basic route search and local direct/one-transfer journey planner.
+- [x] Add manual full-snapshot sync and periodic WorkManager sync.
 - [ ] Configure Kotlin, Compose, Navigation Compose and centralized dependency versions.
 - [ ] Configure development and production API base URLs without embedding secrets.
 - [ ] Add Hilt, Retrofit/OkHttp, Room and DataStore.
@@ -28,7 +32,8 @@
 
 - [ ] Inspect current MySQL migrations, relationships, serializers and publication checks.
 - [ ] Design dataset version and durable change-log/tombstone schema.
-- [ ] Implement manifest and consistent full snapshot endpoints.
+- [x] Implement content-addressed manifest and consistent full snapshot endpoints.
+- [ ] Implement durable incremental change feed, tombstones and publication transaction hooks.
 - [ ] Implement incremental changes endpoint and snapshot fallback.
 - [ ] Add checksum, schema version, pagination/compression and ETag support.
 - [ ] Add API tests for publish/update/unpublish/delete and version continuity.
@@ -38,7 +43,8 @@
 
 ## Phase 3 — Room and synchronization
 
-- [ ] Map backend IDs and relationships into Room entities.
+- [x] Map core backend IDs and relationships into initial Room entities.
+- [ ] Add migration coverage, favourites and persisted saved journeys.
 - [ ] Add DAOs, indexes, foreign keys and database migrations.
 - [ ] Implement snapshot import in a transaction.
 - [ ] Implement incremental upserts and tombstones in a transaction.
@@ -63,7 +69,7 @@
 
 ## Phase 5 — Offline maps
 
-- [ ] Integrate MapLibre Native.
+- [ ] Integrate MapLibre Native after tile provider, licensing, storage and region package format are selected.
 - [ ] Choose a tile provider/self-hosted source and verify offline download rights.
 - [ ] Define Karachi-wide package bounds, zoom levels, attribution and storage estimate.
 - [ ] Implement map package manifest, download, checksum, install and update.
