@@ -38,7 +38,7 @@ def test_journeys_requires_origin_and_destination(client):
 
 
 def test_journeys_rejects_invalid_origin_and_destination(client):
-    response = client.get("/api/v1/journeys?origin_lat=91&origin_lng=67&destination=Saddar")
+    response = client.get("/api/v1/journeys?origin_lat=91&origin_lng=67&destination=Saddar&radius=100")
     assert response.status_code == 400
     response = client.get("/api/v1/journeys?origin_lat=24&origin_lng=67&destination=x")
     assert response.status_code == 400
