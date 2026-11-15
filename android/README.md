@@ -42,6 +42,8 @@ The map screen can render a configured style and download the currently visible 
 ## Current implementation
 - Compose application shell and route search screen.
 - Room local database for routes, directions, stops, stop order, route shapes and sync state.
+- Native MapLibre map screen with configurable style URL.
+- Neighbourhood offline map download with confirmation, progress, pause/resume and removal.
 - Versioned local map-package catalogue for full-Karachi and area packages, with a database migration; actual tile download/rendering is still pending.
 - Read-only full-snapshot fetch and transactional replacement of the local transport dataset.
 - Existing locally stored data is retained if the API request or Room transaction fails.
