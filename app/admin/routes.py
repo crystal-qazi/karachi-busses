@@ -101,6 +101,8 @@ def routes():
             status = request.form.get("status", "draft")
             if status not in {"draft", "active", "inactive", "under_review"}:
                 raise ValueError("Invalid route status.")
+            if status == "active":
+                raise ValueError("Create routes as draft, then activate after adding a mapped direction and at least two ordered stops.")
             with cursor_context(commit=True) as (_, cursor):
                 cursor.execute(
                     "INSERT INTO bus_routes (operator_id, route_code, route_name, description, status) VALUES (%s,%s,%s,%s,%s)",
