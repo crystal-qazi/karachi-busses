@@ -1,6 +1,6 @@
-const CACHE_NAME = "karachi-buses-shell-v3";
+const CACHE_NAME = "karachi-buses-shell-v4";
 const APP_SHELL = [
-  "/", "/offline", "/manifest.json", "/static/css/app.css",
+  "/", "/offline", "/privacy", "/manifest.json", "/static/css/app.css",
   "/static/js/app.js", "/static/images/bus.svg"
 ];
 
