@@ -23,7 +23,7 @@ The local development port is `http://127.0.0.1:8080`. Check the TileServer GL l
 
 ## Android configuration
 
-Set local, uncommitted properties in `android/gradle.properties`:
+Set local, uncommitted properties in your user-level Gradle properties file (`%USERPROFILE%\\.gradle\\gradle.properties` on Windows, or `~/.gradle/gradle.properties` on Linux/macOS):
 
 ```properties
 MAP_STYLE_URL=https://maps.your-domain.example/styles/karachi/style.json
