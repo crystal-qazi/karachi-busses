@@ -50,7 +50,12 @@ def update_source_verification(source_id):
         flash("Only a super administrator or data reviewer can verify a source.", "danger")
         return redirect(url_for("admin.data_sources"))
     with cursor_context(commit=True) as (_, cursor):
-        cursor.execute("UPDATE data_sources SET verification_status=%s WHERE id=%s", (status, source_id))
+        cursor.execute("""UPDATE data_sources
+                           SET verification_status=%s,
+                               verified_by=CASE WHEN %s='verified' THEN %s ELSE NULL END,
+                               verified_at=CASE WHEN %s='verified' THEN CURRENT_TIMESTAMP ELSE NULL END
+                           WHERE id=%s""",
+                           (status, status, session.get("admin_user_id"), status, source_id))
         if cursor.rowcount:
             cursor.execute(
                 "INSERT INTO audit_logs (admin_user_id, action, entity_type, entity_id, details) VALUES (%s,%s,%s,%s,%s)",
