@@ -233,21 +233,23 @@ fun MapScreen(container: AppContainer, onBack: () -> Unit) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("${item.displayName} • ${item.state} • ${item.sizeBytes / (1024 * 1024)} MB", style = MaterialTheme.typography.bodySmall)
                     androidx.compose.foundation.layout.Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(onClick = {
-                            val id = item.packageId.substringAfterLast("-").toLongOrNull()
-                            if (id != null) OfflineManager.getInstance(context).getOfflineRegion(id,
-                                object : OfflineManager.GetOfflineRegionCallback {
-                                    override fun onRegion(region: OfflineRegion) {
-                                        val next = if (item.state == "downloading") OfflineRegion.STATE_INACTIVE else OfflineRegion.STATE_ACTIVE
-                                        region.setDownloadState(next)
-                                        val state = if (next == OfflineRegion.STATE_ACTIVE) "downloading" else "paused"
-                                        scope.launch { container.database.mapPackageDao().updateState(item.packageId, state) }
-                                        message = if (state == "paused") "Offline map download paused." else "Offline map download resumed."
-                                    }
-                                    override fun onRegionNotFound() { message = "Offline region no longer exists in MapLibre storage." }
-                                    override fun onError(error: String) { message = error }
-                                })
-                        }) { Text(if (item.state == "downloading") "Pause" else "Resume") }
+                        if (item.state == "downloading" || item.state == "paused") {
+                            OutlinedButton(onClick = {
+                                val id = item.packageId.substringAfterLast("-").toLongOrNull()
+                                if (id != null) OfflineManager.getInstance(context).getOfflineRegion(id,
+                                    object : OfflineManager.GetOfflineRegionCallback {
+                                        override fun onRegion(region: OfflineRegion) {
+                                            val next = if (item.state == "downloading") OfflineRegion.STATE_INACTIVE else OfflineRegion.STATE_ACTIVE
+                                            region.setDownloadState(next)
+                                            val state = if (next == OfflineRegion.STATE_ACTIVE) "downloading" else "paused"
+                                            scope.launch { container.database.mapPackageDao().updateState(item.packageId, state) }
+                                            message = if (state == "paused") "Offline map download paused." else "Offline map download resumed."
+                                        }
+                                        override fun onRegionNotFound() { message = "Offline region no longer exists in MapLibre storage." }
+                                        override fun onError(error: String) { message = error }
+                                    })
+                            }) { Text(if (item.state == "downloading") "Pause" else "Resume") }
+                        }
                         OutlinedButton(onClick = {
                             val id = item.packageId.substringAfterLast("-").toLongOrNull()
                             if (id != null) OfflineManager.getInstance(context).getOfflineRegion(id,
