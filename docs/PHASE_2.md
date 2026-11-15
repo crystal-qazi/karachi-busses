@@ -8,7 +8,8 @@
 - Independent route directions with start/end labels.
 - Stop creation and editing with coordinate range validation.
 - Ordered stop linking for each direction.
-- Leaflet.Draw route LineString editor with GeoJSON persistence.
+- Leaflet.Draw route LineString editor with GeoJSON persistence and GeoJSON LineString file import.
+- CSV stop import with row validation and review status.
 - CSV stop import validation/preview and explicit import action (maximum 5,000 rows); imports are set to under review.
 - Protected admin map-data API.
 - Audit records for administrative writes.
