@@ -397,6 +397,9 @@ def update_stop(stop_id):
 @login_required
 def imports():
     preview = None
+    with cursor_context() as (_, cursor):
+        cursor.execute("SELECT id, source_name, verification_status FROM data_sources ORDER BY source_name")
+        sources = cursor.fetchall()
     if request.method == "POST":
         upload = request.files.get("file")
         if not upload or not upload.filename.lower().endswith(".csv"):
@@ -465,4 +468,4 @@ def imports():
                 flash(f"Validated {session_count} rows. Upload the file again and confirm to import.", "info")
             except Exception as exc:
                 flash(f"Import rejected: {exc}", "danger")
-    return render_template("admin/imports.html", preview=preview)
+    return render_template("admin/imports.html", preview=preview, sources=sources)
