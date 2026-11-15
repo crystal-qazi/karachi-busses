@@ -41,6 +41,9 @@ def journeys():
 
     try:
         with cursor_context() as (_, cursor):
+            lat_delta = radius / 111_320
+            lng_delta = min(radius / (111_320 * max(abs(math.cos(math.radians(origin_lat))), 0.01)), 180)
+            term = "%" + destination + "%"
             cursor.execute("""
                 SELECT d.id AS direction_id, d.direction_name, d.start_label, d.end_label,
                        r.id AS route_id, r.route_code, r.route_name, o.name AS operator_name,
@@ -49,12 +52,29 @@ def journeys():
                 FROM route_directions d
                 JOIN bus_routes r ON r.id=d.route_id AND r.status='active'
                 JOIN data_sources route_source ON route_source.id=r.source_id AND route_source.verification_status='verified'
-                JOIN data_sources stop_source ON stop_source.id=s.source_id AND stop_source.verification_status='verified'
                 LEFT JOIN bus_operators o ON o.id=r.operator_id AND o.is_active=1
                 JOIN route_stops rs ON rs.direction_id=d.id
                 JOIN bus_stops s ON s.id=rs.stop_id AND s.status='active'
+                JOIN data_sources stop_source ON stop_source.id=s.source_id AND stop_source.verification_status='verified'
+                WHERE EXISTS (
+                    SELECT 1 FROM route_stops origin_rs
+                    JOIN bus_stops origin_stop ON origin_stop.id=origin_rs.stop_id
+                    JOIN data_sources origin_source ON origin_source.id=origin_stop.source_id
+                      AND origin_source.verification_status='verified'
+                    WHERE origin_rs.direction_id=d.id AND origin_stop.status='active'
+                      AND origin_stop.latitude BETWEEN %s AND %s
+                      AND origin_stop.longitude BETWEEN %s AND %s
+                ) OR EXISTS (
+                    SELECT 1 FROM route_stops destination_rs
+                    JOIN bus_stops destination_stop ON destination_stop.id=destination_rs.stop_id
+                    JOIN data_sources destination_source ON destination_source.id=destination_stop.source_id
+                      AND destination_source.verification_status='verified'
+                    WHERE destination_rs.direction_id=d.id AND destination_stop.status='active'
+                      AND (destination_stop.stop_name LIKE %s OR destination_stop.address LIKE %s)
+                )
                 ORDER BY d.id, rs.stop_sequence
-            """)
+            """, (origin_lat-lat_delta, origin_lat+lat_delta,
+                  origin_lng-lng_delta, origin_lng+lng_delta, term, term))
             rows = cursor.fetchall()
     except Exception:
         return _error("Journey search is temporarily unavailable.", "DATABASE_UNAVAILABLE", 503)
