@@ -24,6 +24,9 @@
 - Route codes have a database uniqueness constraint.
 - Reviewers should still inspect aliases, spelling variants and route variants; near-duplicate text matching cannot establish that two physical stops are identical.
 
+## CSV route import
+Admin → Route CSV imports accepts one row per stop, with route_code, route_name, direction_name, stop_name, latitude, longitude and stop_sequence. Optional columns include operator_name, start_label, end_label and address. One CSV can contain multiple routes and directions (maximum 5,000 stop rows). Imported routes remain drafts and imported stops remain under review. Add route geometry in the direction editor before publication.
+
 ## CSV stop import
 UTF-8 CSV columns:
 - Required: stop_name, latitude, longitude
