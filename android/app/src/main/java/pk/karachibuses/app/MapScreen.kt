@@ -23,7 +23,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -72,8 +71,7 @@ fun MapScreen(container: AppContainer, onBack: () -> Unit) {
                 Lifecycle.Event.ON_RESUME -> view?.onResume()
                 Lifecycle.Event.ON_PAUSE -> view?.onPause()
                 Lifecycle.Event.ON_STOP -> view?.onStop()
-                Lifecycle.Event.ON_DESTROY -> view?.onDestroy()
-                else -> Unit
+                                else -> Unit
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -220,7 +218,7 @@ fun MapScreen(container: AppContainer, onBack: () -> Unit) {
                 }
             )
             Text(message, style = MaterialTheme.typography.bodySmall)
-            progress?.let { LinearProgressIndicator(progress = { it }, modifier = Modifier.fillMaxWidth()) }
+            progress?.let { LinearProgressIndicator(progress = it, modifier = Modifier.fillMaxWidth()) }
             Button(
                 onClick = { downloadVisibleArea() },
                 enabled = map != null && styleUrl.isNotBlank() && BuildConfig.MAP_OFFLINE_ALLOWED,
