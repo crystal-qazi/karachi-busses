@@ -23,7 +23,7 @@ Phase 1 foundation:
 - PWA manifest and service worker
 - Initial automated tests
 
-Route administration, imports, nearby discovery, journey planning and verified Karachi route data are subsequent phases.
+Phase 2 route administration is available on the `feature/phase-2-route-management` branch (admin login, operators, routes, directions, stops, route drawing and CSV stop imports). Nearby discovery, journey planning and verified Karachi route data are subsequent phases.
 
 ## Quick start
 1. Install Python 3.11 or newer and MySQL 8.
@@ -48,6 +48,10 @@ The browser map uses OpenStreetMap tiles and requires internet access. GPS acces
 
 ## Configuration
 See [.env.example](.env.example). Never commit real credentials. The configured MySQL database must already exist; migrations create application tables, not the database or MySQL user.
+
+## Admin route management (Phase 2 branch)
+
+After checking out `feature/phase-2-route-management`, install dependencies, apply migrations, then create an administrator with `python scripts/create_admin.py`. Sign in at `/admin/login`. The tool prompts for a username and a password of at least 12 characters; no default admin credentials are shipped. See [Phase 2 guide](docs/PHASE_2.md).
 
 ## API
 - `GET /api/v1/health` — application and database health.
