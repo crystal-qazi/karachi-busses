@@ -408,6 +408,13 @@ def imports():
                 required = {"stop_name", "latitude", "longitude"}
                 if not reader.fieldnames or not required.issubset(set(reader.fieldnames)):
                     raise ValueError("CSV columns required: stop_name, latitude, longitude. Optional: address.")
+                source_id = request.form.get("source_id", "").strip()
+                if not source_id.isdigit():
+                    raise ValueError("Select a data source for this import.")
+                with cursor_context() as (_, cursor):
+                    cursor.execute("SELECT id FROM data_sources WHERE id=%s", (int(source_id),))
+                    if not cursor.fetchone():
+                        raise ValueError("Selected data source does not exist.")
                 rows = []
                 for line_number, row in enumerate(reader, start=2):
                     if len(rows) >= 5000:
@@ -417,17 +424,37 @@ def imports():
                         "latitude": _coordinate(row.get("latitude"), f"Line {line_number} latitude", -90, 90),
                         "longitude": _coordinate(row.get("longitude"), f"Line {line_number} longitude", -180, 180),
                         "address": (row.get("address") or "").strip()[:500] or None,
+                        "source_id": int(source_id),
                     })
                     if not rows[-1]["stop_name"]:
                         raise ValueError(f"Line {line_number}: stop_name is required.")
                 if not rows:
                     raise ValueError("CSV contains no data rows.")
+                # Detect obvious duplicates in the upload before writing anything.
+                for index, row in enumerate(rows):
+                    for prior in rows[:index]:
+                        if row["stop_name"].casefold() == prior["stop_name"].casefold():
+                            lat_gap = abs(row["latitude"] - prior["latitude"])
+                            lng_gap = abs(row["longitude"] - prior["longitude"])
+                            if lat_gap <= 0.00025 and lng_gap <= 0.00025:
+                                raise ValueError(f"Duplicate stop near line {index + 2}: {row['stop_name']}.")
                 if request.form.get("confirm") == "yes":
                     with cursor_context(commit=True) as (_, cursor):
                         for row in rows:
+                            cursor.execute("""
+                                SELECT id FROM bus_stops
+                                WHERE LOWER(stop_name)=LOWER(%s)
+                                  AND latitude BETWEEN %s AND %s
+                                  AND longitude BETWEEN %s AND %s
+                                LIMIT 1
+                            """, (row["stop_name"], row["latitude"] - 0.00025,
+                                  row["latitude"] + 0.00025, row["longitude"] - 0.00025,
+                                  row["longitude"] + 0.00025))
+                            if cursor.fetchone():
+                                raise ValueError(f"A stop with the same name and nearby coordinates already exists: {row['stop_name']}.")
                             cursor.execute(
-                                "INSERT INTO bus_stops (stop_name, latitude, longitude, address, status) VALUES (%s,%s,%s,%s,'under_review')",
-                                (row["stop_name"], row["latitude"], row["longitude"], row["address"]),
+                                "INSERT INTO bus_stops (stop_name, latitude, longitude, address, source_id, status) VALUES (%s,%s,%s,%s,%s,'under_review')",
+                                (row["stop_name"], row["latitude"], row["longitude"], row["address"], row["source_id"]),
                             )
                         _audit(cursor, "csv_import", "bus_stop", None, {"rows": len(rows)})
                     flash(f"Imported {len(rows)} stops as under review.", "success")
