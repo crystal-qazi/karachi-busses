@@ -1,15 +1,15 @@
 package pk.karachibuses.app.data.local
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-@Entity(tableName="routes", indices=[Index(value=["routeCode"], unique=true)])
+@Entity(tableName="routes", indices=[Index("routeCode")])
 data class RouteEntity(@PrimaryKey val id:Long,val routeCode:String,val routeName:String,val description:String?,val operatorName:String?)
-@Entity(tableName="directions", indices=[Index("routeId")])
+@Entity(tableName="directions", foreignKeys=[ForeignKey(entity=RouteEntity::class,parentColumns=["id"],childColumns=["routeId"],onDelete=ForeignKey.CASCADE)], indices=[Index("routeId")])
 data class DirectionEntity(@PrimaryKey val id:Long,val routeId:Long,val directionName:String,val startLabel:String?,val endLabel:String?)
 @Entity(tableName="stops", indices=[Index("stopName")])
 data class StopEntity(@PrimaryKey val id:Long,val stopName:String,val latitude:Double,val longitude:Double,val address:String?)
-@Entity(tableName="direction_stops",primaryKeys=["directionId","stopId"],indices=[Index(value=["directionId","sequence"],unique=true),Index("stopId")])
+@Entity(tableName="direction_stops",primaryKeys=["directionId","stopId"],foreignKeys=[ForeignKey(entity=DirectionEntity::class,parentColumns=["id"],childColumns=["directionId"],onDelete=ForeignKey.CASCADE),ForeignKey(entity=StopEntity::class,parentColumns=["id"],childColumns=["stopId"],onDelete=ForeignKey.CASCADE)],indices=[Index(value=["directionId","sequence"],unique=true),Index("stopId")])
 data class DirectionStopEntity(val directionId:Long,val stopId:Long,val sequence:Int)
-@Entity(tableName="route_shapes")
+@Entity(tableName="route_shapes",foreignKeys=[ForeignKey(entity=DirectionEntity::class,parentColumns=["id"],childColumns=["directionId"],onDelete=ForeignKey.CASCADE)])
 data class RouteShapeEntity(@PrimaryKey val directionId:Long,val geoJson:String)
 @Entity(tableName="sync_state")
 data class SyncStateEntity(@PrimaryKey val id:Int=1,val datasetVersion:String,val checksum:String,val syncedAt:Long)
