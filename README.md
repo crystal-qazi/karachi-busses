@@ -31,7 +31,7 @@ A Karachi-wide public transport discovery PWA. Passengers can find nearby verifi
 - Direct journey suggestions.
 - One-transfer suggestions when two directions share the same stop record.
 - Admin data-source register, reviewer verification and route publication gate.
-- CSV stop import with source attribution and duplicate checks.
+- CSV stop import and multi-route/direction/stop import with source attribution and duplicate checks.
 - No storage of passenger GPS coordinates in the application database; hosting logs must be configured to omit them.
 
 ## Quick start (Windows / local)
