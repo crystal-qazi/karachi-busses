@@ -13,8 +13,8 @@ Existing endpoints remain unchanged: health, nearby discovery, direction detail,
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | `/mobile/manifest` | Current published dataset version and schema metadata |
-| GET | `/mobile/snapshot` | Complete passenger-visible dataset snapshot |
+| GET | `/mobile/manifest` | Current content-addressed published dataset version and schema metadata (implemented) |
+| GET | `/mobile/snapshot` | Complete passenger-visible dataset snapshot (implemented) |
 | GET | `/mobile/changes?since={version}` | Ordered changes after a local version |
 | GET | `/mobile/routes` | Paginated published routes, if needed for targeted refresh |
 | GET | `/mobile/stops` | Paginated published stops, if needed for targeted refresh |
@@ -22,7 +22,7 @@ Existing endpoints remain unchanged: health, nearby discovery, direction detail,
 | GET | `/mobile/maps/manifest` | Available offline map packages and versions |
 | GET | `/mobile/maps/{package_id}` | Download metadata/authorized package location |
 
-The snapshot/change endpoints are the canonical sync path. Targeted list/detail endpoints are optional and should not create a second inconsistent synchronization model.
+The implemented first iteration uses `/mobile/manifest` and `/mobile/snapshot` with a SHA-256 content-addressed version and ETag. It intentionally downloads a full snapshot when the content changes. Incremental `/mobile/changes` is not implemented until a durable change log and tombstones are atomically integrated with all admin publication mutations. Targeted list/detail endpoints remain future options and should not create a second inconsistent synchronization model.
 
 ## Manifest response
 
