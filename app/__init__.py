@@ -4,7 +4,7 @@ from config import Config
 
 
 def create_app(test_config: dict | None = None) -> Flask:
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, template_folder="../templates", static_folder="../static", instance_relative_config=True)
     app.config.from_object(Config)
 
     if test_config:
