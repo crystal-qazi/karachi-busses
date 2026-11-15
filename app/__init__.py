@@ -45,6 +45,10 @@ def create_app(test_config: dict | None = None) -> Flask:
             map_zoom=app.config["MAP_DEFAULT_ZOOM"],
         )
 
+    @app.get("/privacy")
+    def privacy():
+        return render_template("public/privacy.html")
+
     @app.get("/offline")
     def offline():
         return render_template("public/offline.html")
