@@ -1,71 +1,75 @@
 # Karachi Buses
 
-A Karachi-wide public transport discovery PWA. Users can find nearby bus routes using GPS, search routes and stops, and view verified route shapes and stops on OpenStreetMap.
+A Karachi-wide public transport discovery PWA. Passengers can find nearby verified bus stops, search published routes and plan direct or one-transfer journeys on an OpenStreetMap-based map.
 
-**No live vehicle tracking is implemented or planned.** Route geometry and stop locations are maintained in MySQL.
+**No live vehicle tracking, ETAs or live bus GPS are included.** Routes and stop sequences are static curated data stored in MySQL.
 
-## Technology
+## Stack
 - Python 3.11+
-- Flask
-- MySQL 8+
-- Bootstrap 5
-- Leaflet.js + OpenStreetMap
+- Flask + MySQL 8
+- Bootstrap 5 + vanilla JavaScript
+- Leaflet + OpenStreetMap
 - Browser Geolocation API
-- PWA manifest and service worker
+- PWA manifest + service worker
+- Gunicorn + Docker Compose for production
 
-## Current implementation
-### Phase 1 — Foundation
-- Flask application factory and configuration
-- MySQL connection helper and schema migrations
-- Versioned health API
-- Responsive Bootstrap/Leaflet map shell
-- PWA manifest and service worker
+## Delivery status
+| Phase | Scope | Implementation |
+|---|---|---|
+| 1 | Flask foundation, schema, migrations, map/PWA shell | Complete |
+| 2 | Admin operators/routes/stops/directions, geometry and CSV imports | Complete |
+| 3 | GPS/manual nearby discovery, route/stop search and route map | Complete |
+| 4 | Direct and one-transfer journey discovery | Implemented; data-dependent |
+| 5 | Data provenance, source review, publication gates and duplicate checks | Implemented; Karachi dataset still needs collection |
+| 6 | Production Docker/Gunicorn setup, secure settings and release guide | Implemented; deployment still needs operator setup |
 
-### Phase 2 — Route management
-- Protected admin authentication and dashboard
-- Operator, route, direction and stop management
-- Ordered route stops and Leaflet route geometry editor
-- GeoJSON route import and CSV stop import
-- Administrative audit log and CSRF protection
+## Features
+- GPS or manually selected origin.
+- Nearby verified stops and routes with configurable search radius.
+- Route direction map, stop sequence and saved GeoJSON geometry.
+- Search route numbers/names and published stops.
+- Direct journey suggestions.
+- One-transfer suggestions when two directions share the same stop record.
+- Admin data-source register, reviewer verification and route publication gate.
+- CSV stop import with source attribution and duplicate checks.
+- No storage of passenger GPS coordinates.
 
-### Phase 3 — Nearby discovery
-- GPS-based nearby stop search with configurable radius
-- Manual map selection fallback
-- Nearby stop cards with serving routes and directions
-- Route geometry and ordered stop display
-- Search for active route codes/names and active stop names
-- Public read-only discovery APIs
-- No GPS history or live vehicle tracking
-
-## Quick start
+## Quick start (Windows / local)
 1. Install Python 3.11+ and MySQL 8+.
 2. Create the database:
    \`CREATE DATABASE karachi_buses CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\`
-3. Create and activate a virtual environment:
-   \`python -m venv .venv\`
-   Windows PowerShell: \`.venv\\Scripts\\Activate.ps1\`
-4. Install dependencies: \`pip install -r requirements.txt\`
-5. Copy \`.env.example\` to \`.env\` and configure MySQL credentials.
-6. Apply migrations: \`python scripts/migrate.py\`
+3. Create/activate a virtual environment: \`python -m venv .venv\`
+4. Install: \`pip install -r requirements.txt\`
+5. Copy \`.env.example\` to \`.env\` and configure MySQL.
+6. Apply schema: \`python scripts/migrate.py\`
 7. Create an admin: \`python scripts/create_admin.py\`
-8. Start Flask: \`python run.py\`
-9. Open http://127.0.0.1:5000. Admin login is at /admin/login.
+8. Start: \`python run.py\`
+9. Open http://127.0.0.1:5000.
 
-The configured MySQL database must already exist. Never commit real credentials. Browser geolocation requires HTTPS in production; localhost is normally treated as secure.
+Run tests with \`pytest\`. Browser geolocation works on localhost and HTTPS deployments.
 
 ## API
 - GET /api/v1/health
 - GET /api/v1/discover/nearby?lat=24.8607&lng=67.0011&radius=1500
 - GET /api/v1/directions/{direction_id}
-- GET /api/v1/search?q={text}
+- GET /api/v1/search?q=Saddar
+- GET /api/v1/journeys?origin_lat=24.8607&origin_lng=67.0011&destination=Saddar
 
-See docs/API_DOCUMENTATION.md and docs/PHASE_3.md.
+See [API documentation](docs/API_DOCUMENTATION.md).
 
-## Data quality
-No sample or invented Karachi route data is published. Only active routes and active stops entered and verified by administrators are discoverable. Nearby distance is straight-line distance, not walking distance. Journey planning, transfers, ETAs and live vehicle tracking are not provided.
+## Data provenance and publication
+Public endpoints expose only active routes and stops with verified linked data sources. A route can be published only by a super administrator or data reviewer after it has a verified source, at least one direction, two or more active verified-source stops per direction and a saved shape for every direction.
 
-## Map attribution and tile usage
-Map data © OpenStreetMap contributors. The standard OpenStreetMap tile service is not an unlimited production tile service. Before public launch, choose an appropriate tile provider or self-hosted tile infrastructure and comply with its terms.
+Admin → Data sources & review records evidence. Imported stops remain under review until checked. See [Phase 5](docs/PHASE_5.md) and [data collection template](docs/PHASE_5_DATA_TEMPLATE.md).
 
-## License
-No license has been selected yet. Add one before accepting external contributions or distributing the project.
+## Production deployment
+See [Phase 6 deployment guide](docs/PHASE_6.md). Docker Compose starts MySQL and a Gunicorn web container. Production requires a unique secret, strong DB passwords, HTTPS reverse proxy, backups and an approved tile provider.
+
+## Known limitations / release blockers
+- No verified comprehensive Karachi bus-route dataset is bundled. The software is ready to receive reviewed data, but Karachi-wide coverage is not complete until the dataset is collected and validated.
+- Destination search matches known stop names/addresses; arbitrary-address geocoding is not included.
+- No fares, timetables, travel-time estimates, walking directions, transfer walk links or live vehicle tracking.
+- The standard OpenStreetMap tile endpoint is not an unlimited production tile service. Choose a suitable tile provider or self-host tiles, retain attribution and comply with its policy.
+- Add a privacy notice, support contact and selected open-source license before public launch.
+
+Map data © OpenStreetMap contributors.
