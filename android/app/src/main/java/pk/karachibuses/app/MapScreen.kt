@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -61,6 +63,7 @@ fun MapScreen(container: AppContainer, onBack: () -> Unit) {
         else "Online map ready. Pan and zoom to a neighbourhood, then download the visible area."
     ) }
     var progress by remember { mutableStateOf<Float?>(null) }
+    var showDownloadConfirmation by remember { mutableStateOf(false) }
     var mapView by remember { mutableStateOf<MapView?>(null) }
     val packages by container.database.mapPackageDao().observePackages().collectAsState(initial = emptyList())
 
@@ -189,6 +192,23 @@ fun MapScreen(container: AppContainer, onBack: () -> Unit) {
         )
     }
 
+    if (showDownloadConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDownloadConfirmation = false },
+            title = { Text("Download offline map area?") },
+            text = { Text("This downloads map tiles, fonts and style resources for the visible area. MapLibre cannot provide a reliable size estimate before download. Prefer Wi-Fi and make sure the device has enough free storage. Your map provider's data charges may apply.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDownloadConfirmation = false
+                    downloadVisibleArea()
+                }) { Text("Start download") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDownloadConfirmation = false }) { Text("Cancel") }
+            }
+        )
+    }
+
     Scaffold(topBar = {
         TopAppBar(title = { Text("Karachi map") }, navigationIcon = {
             OutlinedButton(onClick = onBack) { Text("Back") }
@@ -224,7 +244,7 @@ fun MapScreen(container: AppContainer, onBack: () -> Unit) {
             if (BuildConfig.MAP_ATTRIBUTION.isNotBlank()) Text(BuildConfig.MAP_ATTRIBUTION, style = MaterialTheme.typography.labelSmall)
             progress?.let { LinearProgressIndicator(progress = it, modifier = Modifier.fillMaxWidth()) }
             Button(
-                onClick = { downloadVisibleArea() },
+                onClick = { showDownloadConfirmation = true },
                 enabled = map != null && styleUrl.isNotBlank() && BuildConfig.MAP_OFFLINE_ALLOWED,
                 modifier = Modifier.fillMaxWidth()
             ) { Text("Download visible neighbourhood") }
