@@ -20,3 +20,13 @@ def test_service_worker_route_still_available(client):
     response = client.get("/service-worker.js")
     assert response.status_code == 200
     assert b"karachi-buses-shell" in response.data
+
+def test_admin_post_requires_csrf_token(client):
+    response = client.post("/admin/login", data={"username": "admin", "password": "secret"})
+    assert response.status_code == 400
+
+
+def test_stop_picker_asset_available(client):
+    response = client.get("/static/js/stop-picker.js")
+    assert response.status_code == 200
+    assert b"map.on(\"click\"" in response.data
