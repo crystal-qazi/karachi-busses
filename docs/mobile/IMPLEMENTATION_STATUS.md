@@ -21,6 +21,7 @@ Updated: 2026-11-15
 - Content-addressed dataset version/checksum and ETag.
 - Android CI workflow and setup instructions.
 - Local map-package catalogue entity/DAO and Room 1→2 migration for independently managed city/area packages.
+- Official MapLibre Native Android SDK integration, map screen navigation and bounded visible-neighbourhood offline download with progress and Room status persistence.
 
 ## Map architecture (approved; implementation pending)
 - Separate map-package catalogue from bus-data manifest and synchronization.
@@ -35,7 +36,8 @@ Updated: 2026-11-15
 
 ## Deliberate limitations
 - The API currently uses full snapshots. It does not claim incremental synchronization, because existing admin publication changes are not yet recorded in a durable change log with deletion tombstones.
-- MapLibre rendering, provider integration and offline tile package downloads are not implemented yet.
+- The native MapLibre renderer and OfflineManager visible-neighbourhood download flow are implemented behind explicit provider configuration and offline-rights flags. A provider/style has not been selected or configured, so the feature is not active in a stock build.
+- Full-Karachi package generation, city boundary approval and large-package delivery remain pending.
 - Runtime GPS permission/current-location flow, favourites, saved journeys, Urdu/RTL and map overlays remain to implement.
 - The current backend dataset is only as complete as the reviewed records entered by operators. No comprehensive Karachi route dataset is bundled.
 
