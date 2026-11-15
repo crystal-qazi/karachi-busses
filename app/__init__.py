@@ -38,7 +38,7 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     @app.errorhandler(404)
     def not_found(_error):
-        if app.request_class and _is_api_request():
+        if _is_api_request():
             return jsonify(success=False, error={"code": "NOT_FOUND", "message": "Resource not found"}), 404
         return render_template("public/error.html", status_code=404, message="Page not found"), 404
 
