@@ -23,6 +23,7 @@ class MainActivity:ComponentActivity(){
  val routes by vm.routes.collectAsStateWithLifecycle()
  val status by vm.status.collectAsStateWithLifecycle()
  val journeys by vm.journeys.collectAsStateWithLifecycle()
+ val nearby by vm.nearby.collectAsStateWithLifecycle()
  var query by remember{mutableStateOf("")}
  var originLat by remember{mutableStateOf("24.8607")}
  var originLng by remember{mutableStateOf("67.0011")}
@@ -41,6 +42,8 @@ class MainActivity:ComponentActivity(){
     OutlinedTextField(originLat,{originLat=it},Modifier.weight(1f),label={Text("Origin latitude")},singleLine=true)
     OutlinedTextField(originLng,{originLng=it},Modifier.weight(1f),label={Text("Origin longitude")},singleLine=true)
    }
+   OutlinedButton(onClick={vm.findNearby(originLat,originLng)}){Text("Find nearby stops offline")}
+   nearby.forEach { (stop,distance) -> Text(stop.stopName+" • "+distance.toInt()+" m") }
    OutlinedTextField(destination,{destination=it},Modifier.fillMaxWidth(),label={Text("Destination stop name")},singleLine=true)
    OutlinedButton(onClick={vm.plan(originLat,originLng,destination)}){Text("Find offline journey")}
    journeys.forEach { option ->
