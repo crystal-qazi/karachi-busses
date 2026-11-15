@@ -20,7 +20,7 @@ Updated: 2026-11-15
 - Flask read-only mobile manifest and full snapshot endpoints.
 - Content-addressed dataset version/checksum and ETag.
 - Android CI workflow and setup instructions.
-- Migration placeholder for mobile dataset schema metadata.
+- Local map-package catalogue entity/DAO and Room 1→2 migration for independently managed city/area packages.
 
 ## Map architecture (approved; implementation pending)
 - Separate map-package catalogue from bus-data manifest and synchronization.
