@@ -156,7 +156,7 @@ def journeys():
         for i, board in enumerate(first_stops):
             if board["id"] not in origin_ids:
                 continue
-            for j in range(i + 1, len(first_stops) - 1):
+            for j in range(i + 1, len(first_stops)):
                 interchange = first_stops[j]
                 for second in directions.values():
                     if second["id"] == first["id"]:
