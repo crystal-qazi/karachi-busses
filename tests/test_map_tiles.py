@@ -156,3 +156,44 @@ def test_service_worker_never_caches_osm_tiles():
         assert host in source, f"{host} must be in the forbidden tile host list"
     # Offline tile cache is opt-in: disabled unless a provider host is set.
     assert 'const OFFLINE_TILE_PROVIDER_HOST = "";' in source
+
+
+# ---------- CDN integrity and source-map CSP regressions ----------
+
+
+def test_leaflet_css_sri_hash_is_current_in_all_templates():
+    from pathlib import Path
+
+    expected = "sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H"
+    old = "sha384-EFZ0jt3DbvE1VivitkgNKHKPMhJcP7wjuPgyHHMVLhBd2fvDbmzAzT6Ia2y7qRuu"
+    paths = (
+        "templates/public/index.html",
+        "templates/admin/stops.html",
+        "templates/admin/direction_editor.html",
+        "templates/admin/historical_network.html",
+    )
+    for path in paths:
+        source = Path(path).read_text(encoding="utf-8")
+        assert expected in source, f"Correct Leaflet CSS SRI hash missing from {path}"
+        assert old not in source, f"Stale Leaflet CSS SRI hash remains in {path}"
+
+
+def test_csp_connect_src_allows_trusted_cdn_source_maps():
+    app = _html_app()
+    response = _client_get(app, "/")
+    csp = response.headers.get("Content-Security-Policy", "")
+    connect_src = next((part.strip() for part in csp.split(";") if part.strip().startswith("connect-src ")), "")
+    assert "'self'" in connect_src
+    assert "https://cdn.jsdelivr.net" in connect_src
+    assert "https://unpkg.com" in connect_src
+
+
+def test_referrer_policy_and_existing_security_headers_remain_intact_after_csp_change():
+    app = _html_app()
+    response = _client_get(app, "/")
+    assert response.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
+    assert response.headers.get("X-Content-Type-Options") == "nosniff"
+    assert response.headers.get("X-Frame-Options") == "SAMEORIGIN"
+    csp = response.headers.get("Content-Security-Policy", "")
+    assert "object-src 'none'" in csp
+    assert "frame-ancestors 'self'" in csp
