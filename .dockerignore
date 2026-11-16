@@ -10,3 +10,4 @@ __pycache__
 .env
 *.log
 tests
+data/rate_limits

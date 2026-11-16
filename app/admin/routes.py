@@ -8,6 +8,7 @@ from flask import flash, jsonify, redirect, render_template, request, session, u
 
 from app.admin import admin_bp
 from app.admin.auth import login_required
+from app.admin.errors import db_error_handler
 from app.database.helpers import cursor_context
 
 CODE_RE = re.compile(r"^[A-Za-z0-9._-]{1,60}$")
@@ -41,6 +42,7 @@ def _audit(cursor, action, entity_type, entity_id, details=None):
 
 @admin_bp.get("/")
 @login_required
+@db_error_handler
 def dashboard():
     with cursor_context() as (_, cursor):
         counts = {}
@@ -55,6 +57,7 @@ def dashboard():
 
 @admin_bp.route("/operators", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def operators():
     if request.method == "POST":
         try:
@@ -79,6 +82,7 @@ def operators():
 
 @admin_bp.post("/operators/<int:operator_id>/toggle")
 @login_required
+@db_error_handler
 def toggle_operator(operator_id):
     with cursor_context(commit=True) as (_, cursor):
         cursor.execute("UPDATE bus_operators SET is_active = NOT is_active WHERE id=%s", (operator_id,))
@@ -90,6 +94,7 @@ def toggle_operator(operator_id):
 
 @admin_bp.route("/routes", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def routes():
     if request.method == "POST":
         try:
@@ -133,6 +138,7 @@ def routes():
 
 @admin_bp.route("/routes/<int:route_id>", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def route_detail(route_id):
     if request.method == "POST":
         try:
@@ -185,6 +191,7 @@ def route_detail(route_id):
 
 @admin_bp.post("/routes/<int:route_id>/publish")
 @login_required
+@db_error_handler
 def publish_route(route_id):
     if session.get("admin_role") not in {"super_admin", "data_reviewer"}:
         flash("Only a super administrator or data reviewer can publish routes.", "danger")
@@ -229,6 +236,7 @@ def publish_route(route_id):
 
 @admin_bp.post("/routes/<int:route_id>/directions")
 @login_required
+@db_error_handler
 def create_direction(route_id):
     try:
         name = _text("direction_name", 100, True)
@@ -251,6 +259,7 @@ def create_direction(route_id):
 
 @admin_bp.get("/directions/<int:direction_id>")
 @login_required
+@db_error_handler
 def direction_editor(direction_id):
     with cursor_context() as (_, cursor):
         cursor.execute("""
@@ -273,11 +282,18 @@ def direction_editor(direction_id):
     shape = shape_row["geojson"] if shape_row else None
     if isinstance(shape, str):
         shape = json.loads(shape)
+    # Defensive: even though save_direction_shape validates the GeoJSON as a
+    # LineString, a hand-crafted row could contain anything. Only let a
+    # well-formed dict reach the template so the |safe filter in
+    # direction_editor.html is applied to validated JSON only.
+    if not (shape is None or (isinstance(shape, dict) and shape.get("type") == "LineString" and isinstance(shape.get("coordinates"), list))):
+        shape = None
     return render_template("admin/direction_editor.html", direction=direction, linked_stops=linked_stops, all_stops=all_stops, shape_json=json.dumps(shape) if shape else "null")
 
 
 @admin_bp.post("/directions/<int:direction_id>/stops")
 @login_required
+@db_error_handler
 def add_direction_stop(direction_id):
     try:
         stop_id = int(request.form.get("stop_id", ""))
@@ -298,6 +314,7 @@ def add_direction_stop(direction_id):
 
 @admin_bp.post("/directions/<int:direction_id>/stops/<int:stop_id>/remove")
 @login_required
+@db_error_handler
 def remove_direction_stop(direction_id, stop_id):
     with cursor_context(commit=True) as (_, cursor):
         cursor.execute("DELETE FROM route_stops WHERE direction_id=%s AND stop_id=%s", (direction_id, stop_id))
@@ -308,6 +325,7 @@ def remove_direction_stop(direction_id, stop_id):
 
 @admin_bp.post("/directions/<int:direction_id>/shape")
 @login_required
+@db_error_handler
 def save_direction_shape(direction_id):
     try:
         raw = request.form.get("geojson", "")
@@ -339,6 +357,7 @@ def save_direction_shape(direction_id):
 
 @admin_bp.route("/stops", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def stops():
     if request.method == "POST":
         try:
@@ -375,6 +394,7 @@ def stops():
 
 @admin_bp.post("/stops/<int:stop_id>/update")
 @login_required
+@db_error_handler
 def update_stop(stop_id):
     try:
         name = _text("stop_name", 180, True)
@@ -406,6 +426,7 @@ def update_stop(stop_id):
 
 @admin_bp.route("/imports/routes", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def route_imports():
     preview = None
     with cursor_context() as (_, cursor):
@@ -572,6 +593,7 @@ def route_imports():
 
 @admin_bp.route("/imports", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def imports():
     preview = None
     with cursor_context() as (_, cursor):
@@ -662,6 +684,7 @@ def historical_network():
 
 @admin_bp.get("/historical-network/data")
 @login_required
+@db_error_handler
 def historical_network_data():
     """Return only records belonging to the historical research source."""
     source_name = "Karachi Bus Network Research Dataset (user-provided cleaned files)"

@@ -15,3 +15,4 @@ htmlcov/
 Thumbs.db
 instance/
 *.log
+data/rate_limits/

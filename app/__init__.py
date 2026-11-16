@@ -1,6 +1,29 @@
-from flask import Flask, jsonify, render_template, send_from_directory
+import logging
+
+from flask import Flask, jsonify, render_template, request, send_from_directory
 
 from config import Config
+
+app_logger = logging.getLogger(__name__)
+
+
+# Content-Security-Policy that is compatible with the application's CDN usage
+# (Bootstrap 5.3.3, Leaflet 1.9.4 + markercluster 1.5.3 + leaflet.draw 1.0.4)
+# and the OSM tile endpoint. SRI hashes are the primary control; host
+# allow-lists are included so that the browser can fall back to host matching
+# when the SHA-384 integrity attribute is not enforced.
+CSP_DEFAULT = (
+    "default-src 'self'; "
+    "script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; "
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; "
+    "img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org; "
+    "connect-src 'self'; "
+    "frame-ancestors 'self'; "
+    "base-uri 'self'; "
+    "form-action 'self' https://www.openstreetmap.org; "
+    "object-src 'none'; "
+    "upgrade-insecure-requests"
+)
 
 
 def create_app(test_config: dict | None = None) -> Flask:
@@ -30,6 +53,24 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.register_blueprint(public_api_bp, url_prefix="/api/v1")
     app.register_blueprint(journey_api_bp, url_prefix="/api/v1")
     app.register_blueprint(admin_bp)
+
+    csp_policy = app.config.get("CSP_POLICY") or CSP_DEFAULT
+
+    @app.after_request
+    def apply_security_headers(response):
+        # Send CSP only on HTML responses. JSON/asset responses should not
+        # be constrained here (they are not subject to script-src etc.).
+        content_type = response.headers.get("Content-Type", "")
+        path = request.path
+        if "text/html" in content_type and path not in {"/manifest.json", "/service-worker.js"}:
+            response.headers.setdefault("Content-Security-Policy", csp_policy)
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        # SAMEORIGIN lets the PWA's service worker and manifest (same origin)
+        # keep working while blocking clickjacking from cross-origin frames.
+        if path not in {"/manifest.json", "/service-worker.js"}:
+            response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+        return response
 
     @app.context_processor
     def inject_csrf_token():
@@ -70,8 +111,11 @@ def create_app(test_config: dict | None = None) -> Flask:
         return render_template("public/error.html", status_code=404, message="Page not found"), 404
 
     @app.errorhandler(500)
-    def internal_error(_error):
-        return jsonify(success=False, error={"code": "INTERNAL_ERROR", "message": "An unexpected error occurred"}), 500
+    def internal_error(error):
+        app_logger.exception("Unhandled 500 on %s", getattr(error, "description", "unknown endpoint"))
+        if _is_api_request():
+            return jsonify(success=False, error={"code": "INTERNAL_ERROR", "message": "An unexpected error occurred"}), 500
+        return render_template("public/error.html", status_code=500, message="An unexpected error occurred. Please try again."), 500
 
     return app
 
