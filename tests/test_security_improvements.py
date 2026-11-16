@@ -334,3 +334,27 @@ def _count_audit_rows(app):
     n = cur.fetchone()["n"]
     conn.close()
     return n
+
+
+
+# ---------- Admin route integrity regressions ----------
+
+
+def test_admin_form_handlers_do_not_swallow_database_exceptions():
+    from pathlib import Path
+
+    source = Path("app/admin/routes.py").read_text(encoding="utf-8")
+    assert "except Exception as exc:" not in source
+    assert "except (ValueError, TypeError) as exc:" in source
+
+
+def test_active_route_edits_require_a_verified_data_source():
+    from pathlib import Path
+
+    source = Path("app/admin/routes.py").read_text(encoding="utf-8")
+    route_detail = source.split("def route_detail", 1)[1].split(
+        "@admin_bp.post(\"/routes/<int:route_id>/publish\")", 1
+    )[0]
+    assert 'if status == "active":' in route_detail
+    assert 'SELECT verification_status FROM data_sources WHERE id=%s' in route_detail
+    assert 'source["verification_status"] != "verified"' in route_detail
