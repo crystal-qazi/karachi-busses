@@ -65,9 +65,12 @@
           ));
         });
       } else {
-        stopLayer.addLayer(L.circleMarker([first.lat, first.lng], {
-          radius: 5, color: "#fff", weight: 1, fillColor: "#2478b8", fillOpacity: .9
-        }).bindPopup(popup));
+        const stopIcon = L.divIcon({
+          className: "",
+          html: "<span style='display:block;width:11px;height:11px;border:2px solid white;border-radius:50%;background:#2478b8;box-shadow:0 1px 4px #555'></span>",
+          iconSize: [11, 11], iconAnchor: [5, 5]
+        });
+        stopLayer.addLayer(L.marker([first.lat, first.lng], { icon: stopIcon }).bindPopup(popup));
       }
     });
     map.addLayer(stopLayer);
