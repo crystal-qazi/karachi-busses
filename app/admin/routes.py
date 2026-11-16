@@ -71,7 +71,7 @@ def operators():
                 )
                 _audit(cursor, "create", "bus_operator", cursor.lastrowid, {"name": name})
             flash("Operator added.", "success")
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.operators"))
     with cursor_context() as (_, cursor):
@@ -118,7 +118,7 @@ def routes():
                 route_id = cursor.lastrowid
                 _audit(cursor, "create", "bus_route", route_id, {"route_code": code})
             flash("Route created. Add its directions and stops next.", "success")
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.routes"))
     with cursor_context() as (_, cursor):
@@ -156,6 +156,21 @@ def route_detail(route_id):
                     allowed.add("active")
                 if status not in allowed:
                     raise ValueError("Routes can only be activated through the verification workflow.")
+
+                # An active route must always point to a verified source.
+                # Changing its source while keeping it active would otherwise
+                # bypass the publication verification gate.
+                if status == "active":
+                    if not source_id:
+                        raise ValueError("An active route must have a verified data source.")
+                    cursor.execute(
+                        "SELECT verification_status FROM data_sources WHERE id=%s",
+                        (source_id,),
+                    )
+                    source = cursor.fetchone()
+                    if not source or source["verification_status"] != "verified":
+                        raise ValueError("An active route must use a verified data source.")
+
                 cursor.execute(
                     "UPDATE bus_routes SET route_name=%s, description=%s, source_id=%s, status=%s WHERE id=%s",
                     (name, description, source_id, status, route_id),
@@ -164,7 +179,7 @@ def route_detail(route_id):
                     raise ValueError("Route not found.")
                 _audit(cursor, "update", "bus_route", route_id, {"status": status})
             flash("Route updated.", "success")
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.route_detail", route_id=route_id))
 
@@ -229,7 +244,7 @@ def publish_route(route_id):
             cursor.execute("UPDATE bus_routes SET status='active' WHERE id=%s", (route_id,))
             _audit(cursor, "publish", "bus_route", route_id, {"verified_source_id": route["source_id"]})
         flash("Route published. It is now visible in public discovery.", "success")
-    except Exception as exc:
+    except (ValueError, TypeError) as exc:
         flash(f"Route was not published: {exc}", "danger")
     return redirect(url_for("admin.route_detail", route_id=route_id))
 
@@ -252,7 +267,7 @@ def create_direction(route_id):
             )
             _audit(cursor, "create", "route_direction", cursor.lastrowid, {"route_id": route_id})
         flash("Direction added.", "success")
-    except Exception as exc:
+    except (ValueError, TypeError) as exc:
         flash(str(exc), "danger")
     return redirect(url_for("admin.route_detail", route_id=route_id))
 
@@ -307,7 +322,7 @@ def add_direction_stop(direction_id):
             cursor.execute("INSERT INTO route_stops (direction_id, stop_id, stop_sequence) VALUES (%s,%s,%s)", (direction_id, stop_id, sequence))
             _audit(cursor, "add_stop", "route_direction", direction_id, {"stop_id": stop_id, "sequence": sequence})
         flash("Stop linked to direction.", "success")
-    except Exception as exc:
+    except (ValueError, TypeError) as exc:
         flash(f"Could not add stop: {exc}", "danger")
     return redirect(url_for("admin.direction_editor", direction_id=direction_id))
 
@@ -350,7 +365,7 @@ def save_direction_shape(direction_id):
             """, (direction_id, json.dumps(geometry)))
             _audit(cursor, "save_shape", "route_direction", direction_id, {"point_count": len(coordinates)})
         flash("Route shape saved.", "success")
-    except Exception as exc:
+    except (ValueError, TypeError) as exc:
         flash(f"Shape was not saved: {exc}", "danger")
     return redirect(url_for("admin.direction_editor", direction_id=direction_id))
 
@@ -381,7 +396,7 @@ def stops():
                 )
                 _audit(cursor, "create", "bus_stop", cursor.lastrowid, {"name": name})
             flash("Stop created.", "success")
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.stops"))
     with cursor_context() as (_, cursor):
@@ -419,7 +434,7 @@ def update_stop(stop_id):
                 raise ValueError("Stop not found or unchanged.")
             _audit(cursor, "update", "bus_stop", stop_id)
         flash("Stop updated.", "success")
-    except Exception as exc:
+    except (ValueError, TypeError) as exc:
         flash(str(exc), "danger")
     return redirect(url_for("admin.stops"))
 
@@ -586,7 +601,7 @@ def route_imports():
                 "routes": list(grouped.keys())[:30],
             }
             flash("CSV validated. Upload the same file again and choose Import to create draft records.", "info")
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             flash(f"Route import rejected: {exc}", "danger")
     return render_template("admin/route_imports.html", sources=sources, preview=preview)
 
@@ -670,7 +685,7 @@ def imports():
                 session_count = len(rows)
                 # Do not hold an untrusted large upload in server-side session state.
                 flash(f"Validated {session_count} rows. Upload the file again and confirm to import.", "info")
-            except Exception as exc:
+            except (ValueError, TypeError) as exc:
                 flash(f"Import rejected: {exc}", "danger")
     return render_template("admin/imports.html", preview=preview, sources=sources)
 
