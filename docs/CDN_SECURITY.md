@@ -26,7 +26,7 @@ default-src 'self';
 script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com;
 style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com;
 img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org;
-connect-src 'self';
+connect-src 'self' https://cdn.jsdelivr.net https://unpkg.com;
 frame-ancestors 'self';
 base-uri 'self';
 form-action 'self' https://www.openstreetmap.org;
@@ -41,7 +41,7 @@ This is acceptable while those styles are static, server-rendered HTML.
 Additional headers on all HTML responses:
 
 - `X-Content-Type-Options: nosniff`
-- `Referrer-Policy: no-referrer`
+- `Referrer-Policy: strict-origin-when-cross-origin`
 - `X-Frame-Options: SAMEORIGIN` (PWA service worker stays functional)
 
 ## Resources that cannot use SRI
