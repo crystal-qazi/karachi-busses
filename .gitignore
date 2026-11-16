@@ -15,4 +15,11 @@ htmlcov/
 Thumbs.db
 instance/
 *.log
-data/rate_limits/
+
+# Android local SDK/provider configuration
+android/local.properties
+android/gradle.properties.local
+# Generated OSM extracts and vector-tile databases (never commit map data dumps)
+*.osm.pbf
+maps/tileserver/data/*.mbtiles
+maps/tileserver/data/*.pmtiles

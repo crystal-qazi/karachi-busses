@@ -73,3 +73,10 @@ See [Phase 6 deployment guide](docs/PHASE_6.md). Docker Compose starts MySQL and
 - Privacy notice is included; add the responsible operator's support contact and retention details before public launch.
 
 Map data © OpenStreetMap contributors.
+
+
+## Native Android application
+
+A fully native Kotlin Android application is planned alongside the existing PWA. The Android client will use an offline-first Room database, versioned synchronization from the Flask API and MapLibre Native for approved offline map packages. The Flask/MySQL backend remains the source of truth, and only verified, published transport data is distributed to passengers.
+
+The native Android foundation is in [`android/`](android/README.md). It includes a Compose app shell, Room offline storage, route search, local direct/one-transfer journey planning, full-snapshot synchronization and a periodic WorkManager sync. The Flask backend exposes read-only content-addressed mobile manifest and snapshot endpoints. The approved map strategy is hybrid: optional downloads for both a complete Karachi map and individual neighbourhood/area packages, with online fallback for undownloaded areas where the provider permits it. MapLibre rendering, provider integration and package downloads remain in progress. See the [implementation status](docs/mobile/IMPLEMENTATION_STATUS.md), [roadmap](docs/mobile/ROADMAP.md) and [map tile infrastructure decision](docs/mobile/MAP_TILES.md).
