@@ -3,11 +3,13 @@ import json
 from flask import flash, redirect, render_template, request, session, url_for
 from app.admin import admin_bp
 from app.admin.auth import login_required
+from app.admin.errors import db_error_handler
 from app.database.helpers import cursor_context
 
 
 @admin_bp.route("/data-sources", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def data_sources():
     if request.method == "POST":
         name = request.form.get("source_name", "").strip()
@@ -41,6 +43,7 @@ def data_sources():
 
 @admin_bp.post("/data-sources/<int:source_id>/verification")
 @login_required
+@db_error_handler
 def update_source_verification(source_id):
     status = request.form.get("verification_status", "")
     if status not in {"pending", "verified", "rejected", "unverified"}:

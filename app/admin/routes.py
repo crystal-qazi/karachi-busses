@@ -8,6 +8,7 @@ from flask import flash, jsonify, redirect, render_template, request, session, u
 
 from app.admin import admin_bp
 from app.admin.auth import login_required
+from app.admin.errors import db_error_handler
 from app.database.helpers import cursor_context
 
 CODE_RE = re.compile(r"^[A-Za-z0-9._-]{1,60}$")
@@ -41,6 +42,7 @@ def _audit(cursor, action, entity_type, entity_id, details=None):
 
 @admin_bp.get("/")
 @login_required
+@db_error_handler
 def dashboard():
     with cursor_context() as (_, cursor):
         counts = {}
@@ -55,6 +57,7 @@ def dashboard():
 
 @admin_bp.route("/operators", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def operators():
     if request.method == "POST":
         try:
@@ -68,7 +71,7 @@ def operators():
                 )
                 _audit(cursor, "create", "bus_operator", cursor.lastrowid, {"name": name})
             flash("Operator added.", "success")
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.operators"))
     with cursor_context() as (_, cursor):
@@ -79,6 +82,7 @@ def operators():
 
 @admin_bp.post("/operators/<int:operator_id>/toggle")
 @login_required
+@db_error_handler
 def toggle_operator(operator_id):
     with cursor_context(commit=True) as (_, cursor):
         cursor.execute("UPDATE bus_operators SET is_active = NOT is_active WHERE id=%s", (operator_id,))
@@ -90,6 +94,7 @@ def toggle_operator(operator_id):
 
 @admin_bp.route("/routes", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def routes():
     if request.method == "POST":
         try:
@@ -113,7 +118,7 @@ def routes():
                 route_id = cursor.lastrowid
                 _audit(cursor, "create", "bus_route", route_id, {"route_code": code})
             flash("Route created. Add its directions and stops next.", "success")
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.routes"))
     with cursor_context() as (_, cursor):
@@ -133,6 +138,7 @@ def routes():
 
 @admin_bp.route("/routes/<int:route_id>", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def route_detail(route_id):
     if request.method == "POST":
         try:
@@ -150,6 +156,21 @@ def route_detail(route_id):
                     allowed.add("active")
                 if status not in allowed:
                     raise ValueError("Routes can only be activated through the verification workflow.")
+
+                # An active route must always point to a verified source.
+                # Changing its source while keeping it active would otherwise
+                # bypass the publication verification gate.
+                if status == "active":
+                    if not source_id:
+                        raise ValueError("An active route must have a verified data source.")
+                    cursor.execute(
+                        "SELECT verification_status FROM data_sources WHERE id=%s",
+                        (source_id,),
+                    )
+                    source = cursor.fetchone()
+                    if not source or source["verification_status"] != "verified":
+                        raise ValueError("An active route must use a verified data source.")
+
                 cursor.execute(
                     "UPDATE bus_routes SET route_name=%s, description=%s, source_id=%s, status=%s WHERE id=%s",
                     (name, description, source_id, status, route_id),
@@ -158,7 +179,7 @@ def route_detail(route_id):
                     raise ValueError("Route not found.")
                 _audit(cursor, "update", "bus_route", route_id, {"status": status})
             flash("Route updated.", "success")
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.route_detail", route_id=route_id))
 
@@ -185,6 +206,7 @@ def route_detail(route_id):
 
 @admin_bp.post("/routes/<int:route_id>/publish")
 @login_required
+@db_error_handler
 def publish_route(route_id):
     if session.get("admin_role") not in {"super_admin", "data_reviewer"}:
         flash("Only a super administrator or data reviewer can publish routes.", "danger")
@@ -222,13 +244,14 @@ def publish_route(route_id):
             cursor.execute("UPDATE bus_routes SET status='active' WHERE id=%s", (route_id,))
             _audit(cursor, "publish", "bus_route", route_id, {"verified_source_id": route["source_id"]})
         flash("Route published. It is now visible in public discovery.", "success")
-    except Exception as exc:
+    except (ValueError, TypeError) as exc:
         flash(f"Route was not published: {exc}", "danger")
     return redirect(url_for("admin.route_detail", route_id=route_id))
 
 
 @admin_bp.post("/routes/<int:route_id>/directions")
 @login_required
+@db_error_handler
 def create_direction(route_id):
     try:
         name = _text("direction_name", 100, True)
@@ -244,13 +267,14 @@ def create_direction(route_id):
             )
             _audit(cursor, "create", "route_direction", cursor.lastrowid, {"route_id": route_id})
         flash("Direction added.", "success")
-    except Exception as exc:
+    except (ValueError, TypeError) as exc:
         flash(str(exc), "danger")
     return redirect(url_for("admin.route_detail", route_id=route_id))
 
 
 @admin_bp.get("/directions/<int:direction_id>")
 @login_required
+@db_error_handler
 def direction_editor(direction_id):
     with cursor_context() as (_, cursor):
         cursor.execute("""
@@ -273,11 +297,18 @@ def direction_editor(direction_id):
     shape = shape_row["geojson"] if shape_row else None
     if isinstance(shape, str):
         shape = json.loads(shape)
+    # Defensive: even though save_direction_shape validates the GeoJSON as a
+    # LineString, a hand-crafted row could contain anything. Only let a
+    # well-formed dict reach the template so the |safe filter in
+    # direction_editor.html is applied to validated JSON only.
+    if not (shape is None or (isinstance(shape, dict) and shape.get("type") == "LineString" and isinstance(shape.get("coordinates"), list))):
+        shape = None
     return render_template("admin/direction_editor.html", direction=direction, linked_stops=linked_stops, all_stops=all_stops, shape_json=json.dumps(shape) if shape else "null")
 
 
 @admin_bp.post("/directions/<int:direction_id>/stops")
 @login_required
+@db_error_handler
 def add_direction_stop(direction_id):
     try:
         stop_id = int(request.form.get("stop_id", ""))
@@ -291,13 +322,14 @@ def add_direction_stop(direction_id):
             cursor.execute("INSERT INTO route_stops (direction_id, stop_id, stop_sequence) VALUES (%s,%s,%s)", (direction_id, stop_id, sequence))
             _audit(cursor, "add_stop", "route_direction", direction_id, {"stop_id": stop_id, "sequence": sequence})
         flash("Stop linked to direction.", "success")
-    except Exception as exc:
+    except (ValueError, TypeError) as exc:
         flash(f"Could not add stop: {exc}", "danger")
     return redirect(url_for("admin.direction_editor", direction_id=direction_id))
 
 
 @admin_bp.post("/directions/<int:direction_id>/stops/<int:stop_id>/remove")
 @login_required
+@db_error_handler
 def remove_direction_stop(direction_id, stop_id):
     with cursor_context(commit=True) as (_, cursor):
         cursor.execute("DELETE FROM route_stops WHERE direction_id=%s AND stop_id=%s", (direction_id, stop_id))
@@ -308,6 +340,7 @@ def remove_direction_stop(direction_id, stop_id):
 
 @admin_bp.post("/directions/<int:direction_id>/shape")
 @login_required
+@db_error_handler
 def save_direction_shape(direction_id):
     try:
         raw = request.form.get("geojson", "")
@@ -332,13 +365,14 @@ def save_direction_shape(direction_id):
             """, (direction_id, json.dumps(geometry)))
             _audit(cursor, "save_shape", "route_direction", direction_id, {"point_count": len(coordinates)})
         flash("Route shape saved.", "success")
-    except Exception as exc:
+    except (ValueError, TypeError) as exc:
         flash(f"Shape was not saved: {exc}", "danger")
     return redirect(url_for("admin.direction_editor", direction_id=direction_id))
 
 
 @admin_bp.route("/stops", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def stops():
     if request.method == "POST":
         try:
@@ -362,7 +396,7 @@ def stops():
                 )
                 _audit(cursor, "create", "bus_stop", cursor.lastrowid, {"name": name})
             flash("Stop created.", "success")
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.stops"))
     with cursor_context() as (_, cursor):
@@ -375,6 +409,7 @@ def stops():
 
 @admin_bp.post("/stops/<int:stop_id>/update")
 @login_required
+@db_error_handler
 def update_stop(stop_id):
     try:
         name = _text("stop_name", 180, True)
@@ -399,13 +434,14 @@ def update_stop(stop_id):
                 raise ValueError("Stop not found or unchanged.")
             _audit(cursor, "update", "bus_stop", stop_id)
         flash("Stop updated.", "success")
-    except Exception as exc:
+    except (ValueError, TypeError) as exc:
         flash(str(exc), "danger")
     return redirect(url_for("admin.stops"))
 
 
 @admin_bp.route("/imports/routes", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def route_imports():
     preview = None
     with cursor_context() as (_, cursor):
@@ -565,13 +601,14 @@ def route_imports():
                 "routes": list(grouped.keys())[:30],
             }
             flash("CSV validated. Upload the same file again and choose Import to create draft records.", "info")
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             flash(f"Route import rejected: {exc}", "danger")
     return render_template("admin/route_imports.html", sources=sources, preview=preview)
 
 
 @admin_bp.route("/imports", methods=["GET", "POST"])
 @login_required
+@db_error_handler
 def imports():
     preview = None
     with cursor_context() as (_, cursor):
@@ -648,6 +685,99 @@ def imports():
                 session_count = len(rows)
                 # Do not hold an untrusted large upload in server-side session state.
                 flash(f"Validated {session_count} rows. Upload the file again and confirm to import.", "info")
-            except Exception as exc:
+            except (ValueError, TypeError) as exc:
                 flash(f"Import rejected: {exc}", "danger")
     return render_template("admin/imports.html", preview=preview, sources=sources)
+
+
+@admin_bp.get("/historical-network")
+@login_required
+def historical_network():
+    """Read-only QA map for the user-provided, unverified historical network."""
+    return render_template("admin/historical_network.html")
+
+
+@admin_bp.get("/historical-network/data")
+@login_required
+@db_error_handler
+def historical_network_data():
+    """Return only records belonging to the historical research source."""
+    source_name = "Karachi Bus Network Research Dataset (user-provided cleaned files)"
+    with cursor_context() as (_, cursor):
+        cursor.execute(
+            "SELECT id, source_name, verification_status FROM data_sources WHERE source_name=%s",
+            (source_name,),
+        )
+        source = cursor.fetchone()
+        if not source:
+            return jsonify(success=False, error="Historical research source not found."), 404
+
+        source_id = int(source["id"])
+        cursor.execute(
+            """SELECT id, stop_name, latitude, longitude, status
+               FROM bus_stops WHERE source_id=%s ORDER BY stop_name, id""",
+            (source_id,),
+        )
+        stops = [
+            {"id": int(row["id"]), "name": row["stop_name"],
+             "lat": float(row["latitude"]), "lng": float(row["longitude"]),
+             "status": row["status"]}
+            for row in cursor.fetchall()
+        ]
+
+        cursor.execute(
+            """SELECT r.id, r.route_code, r.route_name, r.status, d.id AS direction_id,
+                      d.direction_name,
+                      (SELECT COUNT(*) FROM route_segments sg
+                       WHERE sg.direction_id=d.id AND sg.source_id=%s) AS segment_count,
+                      (SELECT COUNT(*) FROM route_segments sg
+                       WHERE sg.direction_id=d.id AND sg.source_id=%s
+                         AND sg.from_stop_id=sg.to_stop_id) AS self_loop_count,
+                      (SELECT COUNT(*) FROM route_stops rs WHERE rs.direction_id=d.id) AS ordered_stop_count
+               FROM bus_routes r JOIN route_directions d ON d.route_id=r.id
+               WHERE r.source_id=%s ORDER BY r.route_code""",
+            (source_id, source_id, source_id),
+        )
+        routes = [
+            {"id": int(row["id"]), "code": row["route_code"], "name": row["route_name"],
+             "status": row["status"], "direction_id": int(row["direction_id"]),
+             "direction": row["direction_name"], "segment_count": int(row["segment_count"]),
+             "self_loop_count": int(row["self_loop_count"]),
+             "ordered_stop_count": int(row["ordered_stop_count"])}
+            for row in cursor.fetchall()
+        ]
+
+        cursor.execute(
+            """SELECT sg.id, sg.segment_sequence, sg.direction_id, r.route_code,
+                      sf.id AS from_id, sf.stop_name AS from_name,
+                      sf.latitude AS from_lat, sf.longitude AS from_lng,
+                      st.id AS to_id, st.stop_name AS to_name,
+                      st.latitude AS to_lat, st.longitude AS to_lng
+               FROM route_segments sg
+               JOIN route_directions d ON d.id=sg.direction_id
+               JOIN bus_routes r ON r.id=d.route_id
+               JOIN bus_stops sf ON sf.id=sg.from_stop_id
+               JOIN bus_stops st ON st.id=sg.to_stop_id
+               WHERE sg.source_id=%s AND r.source_id=%s
+               ORDER BY r.route_code, sg.segment_sequence""",
+            (source_id, source_id),
+        )
+        segments = [
+            {"id": int(row["id"]), "sequence": int(row["segment_sequence"]),
+             "direction_id": int(row["direction_id"]), "route_code": row["route_code"],
+             "from": {"id": int(row["from_id"]), "name": row["from_name"],
+                      "lat": float(row["from_lat"]), "lng": float(row["from_lng"])},
+             "to": {"id": int(row["to_id"]), "name": row["to_name"],
+                    "lat": float(row["to_lat"]), "lng": float(row["to_lng"])},
+             "self_loop": int(row["from_id"]) == int(row["to_id"])}
+            for row in cursor.fetchall()
+        ]
+
+    return jsonify(
+        success=True,
+        source={"id": source_id, "name": source["source_name"],
+                "verification_status": source["verification_status"]},
+        counts={"stops": len(stops), "routes": len(routes), "segments": len(segments),
+                "self_loops": sum(1 for segment in segments if segment["self_loop"])},
+        stops=stops, routes=routes, segments=segments,
+    )

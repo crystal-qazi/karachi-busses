@@ -3,9 +3,13 @@
   const el = document.getElementById("route-map");
   if (!el || !window.L || !L.Control.Draw) return;
   const map = L.map(el).setView([24.8607, 67.0011], 11);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+  const tileUrl = el.dataset.tileUrl
+    || "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const tileAttribution = el.dataset.tileAttribution
+    || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>';
+  L.tileLayer(tileUrl, {
+    maxZoom: Number(el.dataset.tileMaxZoom || 19),
+    attribution: tileAttribution
   }).addTo(map);
 
   const drawn = new L.FeatureGroup().addTo(map);

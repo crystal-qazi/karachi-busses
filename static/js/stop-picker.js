@@ -5,9 +5,13 @@
   const latInput = document.querySelector('input[name="latitude"]');
   const lngInput = document.querySelector('input[name="longitude"]');
   const map = L.map(element).setView([24.8607, 67.0011], 11);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+  const tileUrl = element.dataset.tileUrl
+    || "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const tileAttribution = element.dataset.tileAttribution
+    || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>';
+  L.tileLayer(tileUrl, {
+    maxZoom: Number(element.dataset.tileMaxZoom || 19),
+    attribution: tileAttribution
   }).addTo(map);
   let marker;
   function setPoint(lat, lng) {

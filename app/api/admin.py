@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 
 from app.admin.auth import login_required
+from app.admin.errors import db_error_handler
 from app.database.helpers import cursor_context
 
 admin_api_bp = Blueprint("admin_api", __name__)
@@ -8,6 +9,7 @@ admin_api_bp = Blueprint("admin_api", __name__)
 
 @admin_api_bp.get("/admin/routes/<int:route_id>/directions/<int:direction_id>/map-data")
 @login_required
+@db_error_handler
 def direction_map_data(route_id, direction_id):
     with cursor_context() as (_, cursor):
         cursor.execute("""

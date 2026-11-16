@@ -9,11 +9,29 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: karachi_buses
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
     env:
       PYTHONPATH: ${{ github.workspace }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: karachi_buses
+      DB_USER: root
+      DB_PASSWORD: root
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -24,6 +42,12 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements.txt
+      - name: Initialize test database schema
+        run: |
+          mysql --host=127.0.0.1 --port=3306 --user=root --password=root karachi_buses < migrations/001_initial_schema.sql
+          mysql --host=127.0.0.1 --port=3306 --user=root --password=root karachi_buses < migrations/002_unique_route_code.sql
+          mysql --host=127.0.0.1 --port=3306 --user=root --password=root karachi_buses < migrations/003_data_provenance.sql
+          mysql --host=127.0.0.1 --port=3306 --user=root --password=root karachi_buses < migrations/004_route_segments.sql
       - name: Run tests
         run: pytest
 
