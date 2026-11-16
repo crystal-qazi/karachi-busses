@@ -651,3 +651,95 @@ def imports():
             except Exception as exc:
                 flash(f"Import rejected: {exc}", "danger")
     return render_template("admin/imports.html", preview=preview, sources=sources)
+
+
+@admin_bp.get("/historical-network")
+@login_required
+def historical_network():
+    """Read-only QA map for the user-provided, unverified historical network."""
+    return render_template("admin/historical_network.html")
+
+
+@admin_bp.get("/historical-network/data")
+@login_required
+def historical_network_data():
+    """Return only records belonging to the historical research source."""
+    source_name = "Karachi Bus Network Research Dataset (user-provided cleaned files)"
+    with cursor_context() as (_, cursor):
+        cursor.execute(
+            "SELECT id, source_name, verification_status FROM data_sources WHERE source_name=%s",
+            (source_name,),
+        )
+        source = cursor.fetchone()
+        if not source:
+            return jsonify(success=False, error="Historical research source not found."), 404
+
+        source_id = int(source["id"])
+        cursor.execute(
+            """SELECT id, stop_name, latitude, longitude, status
+               FROM bus_stops WHERE source_id=%s ORDER BY stop_name, id""",
+            (source_id,),
+        )
+        stops = [
+            {"id": int(row["id"]), "name": row["stop_name"],
+             "lat": float(row["latitude"]), "lng": float(row["longitude"]),
+             "status": row["status"]}
+            for row in cursor.fetchall()
+        ]
+
+        cursor.execute(
+            """SELECT r.id, r.route_code, r.route_name, r.status, d.id AS direction_id,
+                      d.direction_name,
+                      (SELECT COUNT(*) FROM route_segments sg
+                       WHERE sg.direction_id=d.id AND sg.source_id=%s) AS segment_count,
+                      (SELECT COUNT(*) FROM route_segments sg
+                       WHERE sg.direction_id=d.id AND sg.source_id=%s
+                         AND sg.from_stop_id=sg.to_stop_id) AS self_loop_count,
+                      (SELECT COUNT(*) FROM route_stops rs WHERE rs.direction_id=d.id) AS ordered_stop_count
+               FROM bus_routes r JOIN route_directions d ON d.route_id=r.id
+               WHERE r.source_id=%s ORDER BY r.route_code""",
+            (source_id, source_id, source_id),
+        )
+        routes = [
+            {"id": int(row["id"]), "code": row["route_code"], "name": row["route_name"],
+             "status": row["status"], "direction_id": int(row["direction_id"]),
+             "direction": row["direction_name"], "segment_count": int(row["segment_count"]),
+             "self_loop_count": int(row["self_loop_count"]),
+             "ordered_stop_count": int(row["ordered_stop_count"])}
+            for row in cursor.fetchall()
+        ]
+
+        cursor.execute(
+            """SELECT sg.id, sg.segment_sequence, sg.direction_id, r.route_code,
+                      sf.id AS from_id, sf.stop_name AS from_name,
+                      sf.latitude AS from_lat, sf.longitude AS from_lng,
+                      st.id AS to_id, st.stop_name AS to_name,
+                      st.latitude AS to_lat, st.longitude AS to_lng
+               FROM route_segments sg
+               JOIN route_directions d ON d.id=sg.direction_id
+               JOIN bus_routes r ON r.id=d.route_id
+               JOIN bus_stops sf ON sf.id=sg.from_stop_id
+               JOIN bus_stops st ON st.id=sg.to_stop_id
+               WHERE sg.source_id=%s AND r.source_id=%s
+               ORDER BY r.route_code, sg.segment_sequence""",
+            (source_id, source_id),
+        )
+        segments = [
+            {"id": int(row["id"]), "sequence": int(row["segment_sequence"]),
+             "direction_id": int(row["direction_id"]), "route_code": row["route_code"],
+             "from": {"id": int(row["from_id"]), "name": row["from_name"],
+                      "lat": float(row["from_lat"]), "lng": float(row["from_lng"])},
+             "to": {"id": int(row["to_id"]), "name": row["to_name"],
+                    "lat": float(row["to_lat"]), "lng": float(row["to_lng"])},
+             "self_loop": int(row["from_id"]) == int(row["to_id"])}
+            for row in cursor.fetchall()
+        ]
+
+    return jsonify(
+        success=True,
+        source={"id": source_id, "name": source["source_name"],
+                "verification_status": source["verification_status"]},
+        counts={"stops": len(stops), "routes": len(routes), "segments": len(segments),
+                "self_loops": sum(1 for segment in segments if segment["self_loop"])},
+        stops=stops, routes=routes, segments=segments,
+    )
