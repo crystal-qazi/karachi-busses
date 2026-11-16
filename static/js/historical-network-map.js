@@ -80,7 +80,7 @@
   function buildSegments() {
     segmentLayer.clearLayers();
     anomalyLayer.clearLayers();
-    if (!showSegments.checked) return;
+    if (!showSegments.checked && !showAnomalies.checked) return;
     const selected = routeFilter.value;
     dataset.segments.forEach((segment) => {
       if (selected && segment.route_code !== selected) return;
@@ -91,11 +91,13 @@
         escapeHtml(segment.to.name) +
         "<br><small>Source-listed straight connector; not road geometry.</small>";
       if (segment.self_loop) {
-        const marker = L.circleMarker(from, {
-          radius: 10, color: "#8e1b16", weight: 3, fillColor: "#e74c3c", fillOpacity: .9
-        }).bindPopup(detail + "<br><strong>Review anomaly: self-loop</strong>");
-        anomalyLayer.addLayer(marker);
-      } else {
+        if (showAnomalies.checked) {
+          const marker = L.circleMarker(from, {
+            radius: 10, color: "#8e1b16", weight: 3, fillColor: "#e74c3c", fillOpacity: .9
+          }).bindPopup(detail + "<br><strong>Review anomaly: self-loop</strong>");
+          anomalyLayer.addLayer(marker);
+        }
+      } else if (showSegments.checked) {
         const line = L.polyline([from, to], {
           color: routeColor(segment.route_code), weight: 2.5, opacity: .72,
           dashArray: "7 6"
