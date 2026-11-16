@@ -4,9 +4,13 @@
   if (!mapElement || !window.L) return;
 
   const map = L.map(mapElement).setView([24.8607, 67.0011], 11);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  const tileUrl = mapElement.dataset.tileUrl
+    || "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const tileAttribution = mapElement.dataset.tileAttribution
+    || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+  L.tileLayer(tileUrl, {
+    maxZoom: Number(mapElement.dataset.tileMaxZoom || 19),
+    attribution: tileAttribution
   }).addTo(map);
 
   const stopLayer = L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 42 });

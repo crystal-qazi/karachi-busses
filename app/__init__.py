@@ -65,7 +65,7 @@ def create_app(test_config: dict | None = None) -> Flask:
         if "text/html" in content_type and path not in {"/manifest.json", "/service-worker.js"}:
             response.headers.setdefault("Content-Security-Policy", csp_policy)
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
-        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
         # SAMEORIGIN lets the PWA's service worker and manifest (same origin)
         # keep working while blocking clickjacking from cross-origin frames.
         if path not in {"/manifest.json", "/service-worker.js"}:
@@ -76,6 +76,19 @@ def create_app(test_config: dict | None = None) -> Flask:
     def inject_csrf_token():
         from flask_wtf.csrf import generate_csrf
         return {"csrf_token": generate_csrf}
+
+    @app.context_processor
+    def inject_map_config():
+        # Server-driven, validated tile config shared by every map page
+        # (public index and admin map templates). Templates render it into
+        # data-* attributes consumed by the Leaflet layers.
+        from app.maps import online_map_config
+        tile_config = online_map_config(app.config)
+        return {
+            "map_tile_url": tile_config["url"],
+            "map_tile_max_zoom": tile_config["maxZoom"],
+            "map_attribution": tile_config["attribution"],
+        }
 
     @app.get("/")
     def index():

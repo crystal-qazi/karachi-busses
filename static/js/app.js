@@ -7,9 +7,13 @@
     [Number(mapElement.dataset.lat), Number(mapElement.dataset.lng)],
     Number(mapElement.dataset.zoom)
   );
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+  const tileUrl = mapElement.dataset.tileUrl
+    || "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const tileAttribution = mapElement.dataset.tileAttribution
+    || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>';
+  L.tileLayer(tileUrl, {
+    maxZoom: Number(mapElement.dataset.tileMaxZoom || 19),
+    attribution: tileAttribution
   }).addTo(map);
 
   const status = document.getElementById("location-status");

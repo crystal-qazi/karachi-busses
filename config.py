@@ -62,5 +62,25 @@ class Config:
     MAP_DEFAULT_LAT = float(os.getenv("MAP_DEFAULT_LAT", "24.8607"))
     MAP_DEFAULT_LNG = float(os.getenv("MAP_DEFAULT_LNG", "67.0011"))
     MAP_DEFAULT_ZOOM = int(os.getenv("MAP_DEFAULT_ZOOM", "11"))
+
+    # Online tile provider used by the interactive Leaflet layers. HTTPS
+    # only; must be a provider whose tile policy permits online use.
+    MAP_TILE_URL = os.getenv(
+        "MAP_TILE_URL",
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    )
+    MAP_TILE_MAX_ZOOM = int(os.getenv("MAP_TILE_MAX_ZOOM", "19"))
+    MAP_ATTRIBUTION = os.getenv(
+        "MAP_ATTRIBUTION",
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+    )
+
+    # Offline tile provider (optional). OSM's tile.openstreetmap.org policy
+    # does NOT permit offline tile downloads / prefetching / archives, so an
+    # offline provider must be a separate, explicitly-licensed source. Leave
+    # unset to keep offline tiling disabled.
+    OFFLINE_TILE_PROVIDER_URL = os.getenv("OFFLINE_TILE_PROVIDER_URL", "")
+    OFFLINE_TILE_MAX_ZOOM = int(os.getenv("OFFLINE_TILE_MAX_ZOOM", "19"))
+    OFFLINE_TILE_ATTRIBUTION = os.getenv("OFFLINE_TILE_ATTRIBUTION", "")
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
     JSON_SORT_KEYS = False

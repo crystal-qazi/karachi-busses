@@ -42,7 +42,7 @@
   <span><i class="legend-dot legend-anomaly"></i> Self-loop anomaly</span><span>Dashed line = source-listed connection</span>
  </div>
 </div>
-<div class="card p-2"><div id="historical-map" role="img" aria-label="Map of unverified historical Karachi bus stops and selected route connections"></div></div>
+<div class="card p-2"><div id="historical-map" role="img" aria-label="Map of unverified historical Karachi bus stops and selected route connections" data-tile-url="{{ map_tile_url }}" data-tile-max-zoom="{{ map_tile_max_zoom }}" data-tile-attribution="{{ map_attribution }}"></div></div>
 <p class="small text-secondary mt-2" id="map-message" aria-live="polite">Loading historical network records…</p>
 {% endblock %}
 {% block scripts %}
