@@ -62,6 +62,10 @@ def main() -> int:
             print("DRY RUN ONLY. No records written. Review the catalogue, then rerun with --apply --confirm-database <exact database name>.")
             return 0
 
+        # Connector/Python starts an implicit transaction for the earlier SELECTs
+        # when autocommit is disabled. End that read-only transaction before
+        # explicitly opening the write transaction for the import.
+        connection.commit()
         connection.start_transaction()
         source_ids = {}
         for source in data["sources"]:
