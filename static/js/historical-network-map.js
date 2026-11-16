@@ -96,14 +96,11 @@
         }).bindPopup(detail + "<br><strong>Review anomaly: self-loop</strong>");
         anomalyLayer.addLayer(marker);
       } else {
-        L.polyline([from, to], {
+        const line = L.polyline([from, to], {
           color: routeColor(segment.route_code), weight: 2.5, opacity: .72,
           dashArray: "7 6"
-        }).bindTooltip(detail, { sticky: true });
-        segmentLayer.addLayer(L.polyline([from, to], {
-          color: routeColor(segment.route_code), weight: 2.5, opacity: .72,
-          dashArray: "7 6"
-        }).bindPopup(detail));
+        }).bindTooltip(detail, { sticky: true }).bindPopup(detail);
+        segmentLayer.addLayer(line);
       }
     });
     if (showAnomalies.checked) map.addLayer(anomalyLayer);
