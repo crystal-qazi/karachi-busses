@@ -23,6 +23,13 @@ from config import Config  # noqa: E402
 CATALOG = ROOT / "data" / "imports" / "smta_karachi_route_catalog.json"
 
 
+def database_route_code(code: str) -> str:
+    """Use the official R1..R14 spelling in the database, even if the seed key is zero-padded."""
+    if len(code) == 3 and code.startswith("R0") and code[2].isdigit():
+        return "R" + code[2]
+    return code
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="write records; otherwise perform a dry run")
@@ -82,7 +89,8 @@ def main() -> int:
         inserted = skipped = directions_added = 0
         for route in data["routes"]:
             source_id = source_ids[route["source"]]
-            cursor.execute("SELECT id FROM bus_routes WHERE route_code=%s", (route["code"],))
+            route_code = database_route_code(route["code"])
+            cursor.execute("SELECT id FROM bus_routes WHERE route_code=%s", (route_code,))
             existing = cursor.fetchone()
             if existing:
                 route_id = existing["id"]
@@ -97,7 +105,7 @@ def main() -> int:
                 }, ensure_ascii=False)
                 cursor.execute(
                     "INSERT INTO bus_routes (operator_id, source_id, route_code, route_name, description, status) VALUES (%s,%s,%s,%s,%s,%s)",
-                    (assigned_operator, source_id, route["code"], route["name"], description, route["status"]),
+                    (assigned_operator, source_id, route_code, route["name"], description, route["status"]),
                 )
                 route_id = cursor.lastrowid
                 inserted += 1
