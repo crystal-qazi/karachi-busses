@@ -23,12 +23,14 @@ def create_app(test_config: dict | None = None) -> Flask:
     from app.api.public import public_api_bp
     from app.api.journeys import journey_api_bp
     from app.api.admin import admin_api_bp
+    from app.api.mobile import mobile_api_bp
     from app.admin import admin_bp
     from app.admin import auth, routes, sources  # noqa: F401
     app.register_blueprint(health_bp, url_prefix="/api/v1")
     app.register_blueprint(admin_api_bp, url_prefix="/api/v1")
     app.register_blueprint(public_api_bp, url_prefix="/api/v1")
     app.register_blueprint(journey_api_bp, url_prefix="/api/v1")
+    app.register_blueprint(mobile_api_bp, url_prefix="/api/v1")
     app.register_blueprint(admin_bp)
 
     @app.context_processor
