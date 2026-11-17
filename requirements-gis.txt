@@ -1,3 +1,1 @@
-# Optional research GIS dependencies; not installed in the passenger application image.
-shapely>=2.0,<3.0
-pyproj>=3.6,<4.0
+# Optional research GIS dependencies; pip-installable Python packages only.\nosmium>=4.0,<5.0\nshapely>=2.0,<3.0\npyproj>=3.6,<4.0\n
