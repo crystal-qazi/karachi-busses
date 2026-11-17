@@ -1,0 +1,10 @@
+boundary_level,canonical_name,candidate_source,source_url,feature_type,feature_id,admin_level,official_crosscheck,source_timestamp,geometry_crs,geometry_sha256,topology_status,reviewer,review_date,approval_status,notes
+division,Karachi Division,Commissioner Karachi,https://www.commissionerkarachi.gos.pk/area-maps,official_map,,,,,,,,,,pending,"Official map/listing is a reference; downloadable polygon not yet located."
+division,Karachi Division,OpenStreetMap,https://www.openstreetmap.org/,relation,,,,,,,,,,candidate_only,"Exact relation ID must be discovered and reviewed from a dated extract; do not guess."
+district,Karachi Central,OpenStreetMap,https://www.openstreetmap.org/,relation,,,,,,,,,,candidate_only,"Exact relation ID must be discovered and reviewed from a dated extract; do not guess."
+district,Karachi East,OpenStreetMap,https://www.openstreetmap.org/,relation,,,,,,,,,,candidate_only,"Exact relation ID must be discovered and reviewed from a dated extract; do not guess."
+district,Karachi South,OpenStreetMap,https://www.openstreetmap.org/,relation,,,,,,,,,,candidate_only,"Exact relation ID must be discovered and reviewed from a dated extract; do not guess."
+district,Karachi West,OpenStreetMap,https://www.openstreetmap.org/,relation,,,,,,,,,,candidate_only,"Exact relation ID must be discovered and reviewed from a dated extract; do not guess."
+district,Keamari,OpenStreetMap,https://www.openstreetmap.org/,relation,,,,,,,,,,candidate_only,"Exact relation ID must be discovered and reviewed from a dated extract; do not guess."
+district,Korangi,OpenStreetMap,https://www.openstreetmap.org/,relation,,,,,,,,,,candidate_only,"Exact relation ID must be discovered and reviewed from a dated extract; do not guess."
+district,Malir,OpenStreetMap,https://www.openstreetmap.org/,relation,,,,,,,,,,candidate_only,"Exact relation ID must be discovered and reviewed from a dated extract; do not guess."
