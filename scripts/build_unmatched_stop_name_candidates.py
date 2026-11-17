@@ -62,6 +62,12 @@ def score_names(stop_name: str, node_id: str) -> float:
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
+def display_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return path.name
+
 def build() -> tuple[int, int]:
     with CROSSWALK.open(encoding="utf-8-sig", newline="") as f:
         crosswalk = list(csv.DictReader(f))
@@ -109,11 +115,11 @@ def build() -> tuple[int, int]:
             writer.writerow(out)
     report = {
         "status": "name_candidate_register_built_not_stop_verification",
-        "source_crosswalk": str(CROSSWALK.relative_to(ROOT)),
+        "source_crosswalk": display_path(CROSSWALK),
         "source_crosswalk_sha256": sha256(CROSSWALK),
-        "source_node_audit": str(NODES.relative_to(ROOT)),
+        "source_node_audit": display_path(NODES),
         "source_node_audit_sha256": sha256(NODES),
-        "output_csv": str(OUTPUT.relative_to(ROOT)),
+        "output_csv": display_path(OUTPUT),
         "output_csv_sha256": sha256(OUTPUT),
         "crosswalk_rows": len(crosswalk),
         "unmatched_rows_reviewed": len(unmatched),
