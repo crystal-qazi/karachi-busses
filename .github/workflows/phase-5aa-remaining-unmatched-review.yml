@@ -1,0 +1,42 @@
+name: Phase 5AA Remaining Unmatched Stop Review
+
+on:
+  push:
+    branches: [research/phase-5aa-remaining-unmatched-review]
+    paths:
+      - '.github/workflows/phase-5aa-remaining-unmatched-review.yml'
+      - 'scripts/build_unmatched_stop_name_candidates.py'
+      - 'scripts/build_phase5aa_remaining_unmatched_review.py'
+      - 'data/research/PHASE_5_STOP_NODE_CROSSWALK.csv'
+      - 'data/research/PHASE_5_NODE_AUDIT.csv'
+      - 'data/research/PHASE_5X_SPELLING_ALIAS_CANDIDATE_SHORTLIST.csv'
+      - 'data/research/PHASE_5Y_USER_CONFIRMED_NAME_ALIASES.csv'
+      - 'tests/test_phase5aa_remaining_unmatched_review.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-review-queue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Rebuild Phase 5W name-only candidates
+        run: python scripts/build_unmatched_stop_name_candidates.py --build
+      - name: Build Phase 5AA residual unmatched queue
+        run: python scripts/build_phase5aa_remaining_unmatched_review.py --build
+      - name: Run Phase 5AA tests
+        run: python -m unittest discover -s tests -p 'test_phase5aa_remaining_unmatched_review.py' -v
+      - name: Upload residual review outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-5aa-remaining-unmatched-stop-review
+          path: |
+            data/research/PHASE_5AA_REMAINING_UNMATCHED_STOP_CANDIDATES.csv
+            data/research/PHASE_5AA_REMAINING_UNMATCHED_STOP_CANDIDATES_REPORT.json
+          if-no-files-found: error
+          retention-days: 30
