@@ -41,7 +41,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-gis.txt
       - name: Initialize test database schema
         run: |
           mysql --host=127.0.0.1 --port=3306 --user=root --password=root karachi_buses < migrations/001_initial_schema.sql
