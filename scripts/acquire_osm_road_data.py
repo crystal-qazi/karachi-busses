@@ -59,25 +59,35 @@ def fetch(url: str, destination: Path) -> None:
 def acquire(output_dir: Path) -> dict:
     output_dir.mkdir(parents=True, exist_ok=True)
     pbf = output_dir / "pakistan-latest.osm.pbf"
-    checksum_file = output_dir / "pakistan-latest.osm.pbf.md5"
-    fetch(CHECKSUM_URL, checksum_file)
-    expected = parse_md5(checksum_file.read_text(encoding="ascii", errors="replace"))
     fetch(DATA_URL, pbf)
-    md5 = hashlib.md5()
-    with pbf.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            md5.update(chunk)
-    actual_md5 = md5.hexdigest()
-    if actual_md5 != expected:
-        pbf.unlink(missing_ok=True)
-        raise ValueError(f"MD5 mismatch: expected {expected}, received {actual_md5}. PBF deleted.")
+    # Geofabrik lists MD5 sidecars for some dated extracts; do not assume the
+    # moving latest endpoint always publishes one. SHA-256 is always computed.
+    expected_md5 = None
+    actual_md5 = None
+    try:
+        checksum_file = output_dir / "pakistan-latest.osm.pbf.md5"
+        fetch(CHECKSUM_URL, checksum_file)
+        expected_md5 = parse_md5(checksum_file.read_text(encoding="ascii", errors="replace"))
+        md5 = hashlib.md5()
+        with pbf.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                md5.update(chunk)
+        actual_md5 = md5.hexdigest()
+        if actual_md5 != expected_md5:
+            pbf.unlink(missing_ok=True)
+            raise ValueError(f"MD5 mismatch: expected {expected_md5}, received {actual_md5}. PBF deleted.")
+    except urllib.error.HTTPError as exc:
+        if exc.code != 404:
+            pbf.unlink(missing_ok=True)
+            raise
     metadata = {
         "provider": "Geofabrik",
         "source_url": DATA_URL,
         "checksum_url": CHECKSUM_URL,
         "retrieved_at_utc": datetime.now(timezone.utc).isoformat(),
-        "source_checksum_algorithm": "MD5 (transport integrity only)",
-        "source_md5": actual_md5,
+        "source_checksum_algorithm": "MD5 (when provider sidecar is available; transport integrity only)",
+        "source_md5_expected": expected_md5,
+        "source_md5_actual": actual_md5,
         "file_sha256": sha256_file(pbf),
         "file_name": pbf.name,
         "file_size_bytes": pbf.stat().st_size,
