@@ -1,0 +1,55 @@
+name: Phase 5C Stop Text Crosswalk
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/build_phase5c_stop_text_crosswalk.py"
+      - "data/research/PHASE_5_STOP_NODE_CROSSWALK.csv"
+      - "data/research/PHASE_5C_PUBLISHED_ROUTE_STOPS.csv"
+      - ".github/workflows/phase5c-stop-text-crosswalk.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-stop-text-crosswalk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate text-only stop crosswalk
+        run: python scripts/build_phase5c_stop_text_crosswalk.py
+
+      - name: Validate evidence boundaries
+        run: |
+          python - <<'PY'
+          import csv
+          from pathlib import Path
+
+          path = Path("reports/phase5c/stop_text_crosswalk.csv")
+          with path.open(encoding="utf-8-sig", newline="") as f:
+              rows = list(csv.DictReader(f))
+          assert len(rows) == 191, len(rows)
+          assert all(row["coordinate_approval"] == "not_approved" for row in rows)
+          assert all(row["text_source_url"] == "https://smta.gos.pk/route-map" for row in rows)
+          assert any(row["route_code"] == "R11" and
+                     row["text_evidence_status"] == "route_identity_conflict" for row in rows)
+          print(f"Validated {len(rows)} text-only stop records.")
+          PY
+
+      - name: Upload Phase 5C register
+        uses: actions/upload-artifact@v4
+        with:
+          name: karachi-phase5c-stop-text-crosswalk
+          path: reports/phase5c/stop_text_crosswalk.csv
+          if-no-files-found: error
+          retention-days: 30
