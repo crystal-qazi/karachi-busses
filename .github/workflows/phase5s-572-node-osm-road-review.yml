@@ -1,6 +1,13 @@
 name: Phase 5S — 572-node OSM road review
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/phase5s-572-node-osm-road-review.yml"
+      - "scripts/build_572_node_osm_road_review.py"
+      - "data/research/PHASE_5_NODE_AUDIT.csv"
+      - "data/research/PHASE_5_STOP_NODE_CROSSWALK.csv"
   workflow_dispatch:
     inputs:
       source_run_id:
@@ -32,7 +39,7 @@ jobs:
           name: karachi-osm-road-network-research
           path: ${{ runner.temp }}/osm-road-network
           repository: ${{ github.repository }}
-          run-id: ${{ inputs.source_run_id }}
+          run-id: ${{ inputs.source_run_id || '44156081494' }}
           github-token: ${{ github.token }}
       - name: Build all-572-node proximity register
         run: |
