@@ -1,0 +1,60 @@
+name: Extract Karachi OSM Road Network
+
+on:
+  push:
+    branches: [research/phase-5n-osm-karachi-road-network]
+    paths:
+      - '.github/workflows/osm-karachi-road-extraction.yml'
+      - 'scripts/extract_osm_karachi_roads.py'
+      - 'scripts/build_osm_boundary.py'
+      - 'scripts/acquire_osm_road_data.py'
+      - 'requirements-gis.txt'
+      - 'tests/test_osm_road_extraction.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extract-karachi-roads:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install Python GIS dependencies (pip only)
+        run: python -m pip install -r requirements-gis.txt
+      - name: Download Geofabrik Pakistan extract
+        run: python scripts/acquire_osm_road_data.py --download
+      - name: Build and validate OSM Karachi Division parent boundary
+        run: python scripts/build_osm_boundary.py --build
+      - name: Extract candidate roads clipped to parent boundary
+        run: python scripts/extract_osm_karachi_roads.py --build
+      - name: Upload derived research outputs only (not raw regional PBF)
+        uses: actions/upload-artifact@v4
+        with:
+          name: karachi-osm-road-network-research
+          path: |
+            data/osm_source/source-metadata.json
+            data/osm_boundary/karachi-division-6080948.geojson
+            data/osm_boundary/boundary-validation.json
+            data/osm_roads/karachi-osm-bus-roads.geojson
+            data/osm_roads/karachi-osm-bus-roads.geojson.gz
+            data/osm_roads/road-extraction-report.json
+          if-no-files-found: error
+          retention-days: 14
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install -r requirements-gis.txt
+      - run: python -m pip install pytest
+      - run: python -m pytest -q
