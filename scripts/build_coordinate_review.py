@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import html
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -58,7 +57,6 @@ def main() -> int:
     edges = read_csv(EDGES, {"stop1", "stop2", "bus_name"})
 
     node_by_id: dict[str, dict[str, str]] = {}
-    route_labels: dict[str, set[str]] = defaultdict(set)
     collision_groups: dict[str, list[str]] = defaultdict(list)
     for row in nodes:
         node_id = row["node_id"].strip()
@@ -70,8 +68,6 @@ def main() -> int:
         node_by_id[node_id] = row
         if row["coordinate_collision_group"]:
             collision_groups[row["coordinate_collision_group"]].append(node_id)
-        for label in filter(None, row["historical_route_labels"].split(";")):
-            route_labels[node_id].add(label)
 
     candidate_refs: dict[str, list[str]] = defaultdict(list)
     unmatched = []
