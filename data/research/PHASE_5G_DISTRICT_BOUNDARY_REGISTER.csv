@@ -1,0 +1,8 @@
+district_name,commissioner_listing_name,division,source_url,source_type,boundary_feature_id,boundary_source,boundary_effective_date,geometry_crs,geometry_sha256,geometry_validity,reviewer,review_date,approval_status,notes
+Karachi Central,District Central,Karachi Division,https://www.commissionerkarachi.gos.pk/area-maps,official_administrative_listing,,,,,,,,,pending,"District listed by Commissioner Karachi; GIS polygon not yet acquired."
+Karachi East,District East,Karachi Division,https://www.commissionerkarachi.gos.pk/area-maps,official_administrative_listing,,,,,,,,,pending,"District listed by Commissioner Karachi; GIS polygon not yet acquired."
+Karachi South,Karachi South,Karachi Division,https://www.commissionerkarachi.gos.pk/area-maps,official_administrative_listing,,,,,,,,,pending,"District listed by Commissioner Karachi; GIS polygon not yet acquired."
+Karachi West,Karachi West,Karachi Division,https://www.commissionerkarachi.gos.pk/area-maps,official_administrative_listing,,,,,,,,,pending,"District listed by Commissioner Karachi; GIS polygon not yet acquired."
+Keamari,Keamari,Karachi Division,https://www.commissionerkarachi.gos.pk/area-maps,official_administrative_listing,,,,,,,,,pending,"District listed by Commissioner Karachi; GIS polygon not yet acquired."
+Korangi,Korangi,Karachi Division,https://www.commissionerkarachi.gos.pk/area-maps,official_administrative_listing,,,,,,,,,pending,"District listed by Commissioner Karachi; GIS polygon not yet acquired."
+Malir,Malir,Karachi Division,https://www.commissionerkarachi.gos.pk/area-maps,official_administrative_listing,,,,,,,,,pending,"District listed by Commissioner Karachi; GIS polygon not yet acquired."
