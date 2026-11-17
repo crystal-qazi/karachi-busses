@@ -166,6 +166,11 @@
     }
   }
 
+  // Re-run nearby discovery when the user changes radius after choosing an origin.
+  radiusSelect.addEventListener("change", () => {
+    if (currentOrigin) discover(currentOrigin.lat, currentOrigin.lng);
+  });
+
   locateButton.addEventListener("click", () => {
     if (!navigator.geolocation) {
       setStatus("Location is not supported. Tap the map to choose a location manually.");
