@@ -5,6 +5,9 @@ on:
     branches: [research/phase-5l-osm-boundary-build-workflow]
     paths:
       - '.github/workflows/osm-boundary-build.yml'
+      - 'scripts/build_osm_boundary.py'
+      - 'scripts/acquire_osm_road_data.py'
+      - 'requirements-gis.txt'
   workflow_dispatch:
     inputs:
       confirm_source_review:
