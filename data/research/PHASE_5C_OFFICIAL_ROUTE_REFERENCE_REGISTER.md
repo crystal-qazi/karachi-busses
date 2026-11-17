@@ -111,3 +111,21 @@ For each of the 102 currently unmatched source-stop rows:
 5. Only then perform road-network snapping and route-shape generation.
 
 No database changes, coordinate edits, route activation, geocoding, or routing API calls were made in Phase 5C.
+
+## Machine-readable stop-name cross-check
+
+`PHASE_5C_PUBLISHED_ROUTE_STOPS.csv` contains the route-stop names transcribed from the current SMTA route directory for the researched routes. It preserves repeated names and published sequence positions rather than deduplicating them.
+
+Run:
+
+```bash
+python scripts/build_phase5c_stop_text_crosswalk.py
+```
+
+The script creates `reports/phase5c/stop_text_crosswalk.csv` with 191 historical crosswalk rows and one of three evidence statuses:
+
+- `published_name_confirmed` — exact normalized name occurs in the published route description; coordinate remains unapproved.
+- `route_identity_conflict` — name occurs in published text, but the route/direction discrepancy must be resolved first.
+- `not_found_in_published_text` — no exact normalized match; aliases or better evidence are still needed.
+
+This is a text-only cross-check. It deliberately does not infer coordinates, approve candidate nodes, or build route geometry. The accompanying test verifies all 191 rows are retained and every coordinate approval remains `not_approved`.
