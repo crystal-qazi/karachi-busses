@@ -1,6 +1,10 @@
 name: Build Karachi OSM Boundary
 
 on:
+  push:
+    branches: [research/phase-5l-osm-boundary-build-workflow]
+    paths:
+      - '.github/workflows/osm-boundary-build.yml'
   workflow_dispatch:
     inputs:
       confirm_source_review:
@@ -14,7 +18,7 @@ permissions:
 
 jobs:
   build-boundary:
-    if: inputs.confirm_source_review == true
+    if: github.event_name == 'push' || inputs.confirm_source_review == true
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
