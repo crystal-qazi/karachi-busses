@@ -8,7 +8,7 @@ Compare existing historical coordinate candidates in `PHASE_5_STOP_NODE_CROSSWAL
 
 A proximity result is not a verified stop. The coordinate crosswalk is based on exact normalized name candidates against a historical 572-node dataset. It does not establish a current physical boarding point, platform, road side, or operator-approved route. No automatic geocoding, snapping, route construction, stop relocation, or database write is performed.
 
-Unmatched source stops remain unmatched. Rows with no coordinate candidate are explicitly retained with `no_coordinate_candidate`.
+Unmatched source stops remain unmatched. Rows with no coordinate candidate are explicitly retained with `no_coordinate_candidate`. Historical candidate coordinates outside OSM parent relation 6080948 are separately flagged and are not assigned a nearby road.
 
 ## Distance bands
 
@@ -18,7 +18,7 @@ Unmatched source stops remain unmatched. Rows with no coordinate candidate are e
 - 100–250 m
 - over 250 m
 
-These are triage bands only, not pass/fail acceptance thresholds. The report includes up to five nearby distinct OSM way candidates within 250 m where available. The nearest candidate is selected geometrically, not by bus suitability.
+These are triage bands only, not pass/fail acceptance thresholds. The report includes up to five nearby distinct OSM way candidates within 250 m where available. Coordinates outside the parent boundary are excluded before proximity analysis. The nearest candidate is selected geometrically, not by bus suitability.
 
 ## Python-only workflow
 
