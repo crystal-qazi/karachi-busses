@@ -1,0 +1,38 @@
+name: Build Unmatched Stop Name Candidate Review
+
+on:
+  push:
+    branches: [research/phase-5w-unmatched-stop-name-candidates]
+    paths:
+      - 'scripts/build_unmatched_stop_name_candidates.py'
+      - 'tests/test_unmatched_stop_name_candidates.py'
+      - 'data/research/PHASE_5_STOP_NODE_CROSSWALK.csv'
+      - 'data/research/PHASE_5_NODE_AUDIT.csv'
+      - 'docs/PHASE_5W_UNMATCHED_STOP_NAME_CANDIDATES.md'
+      - '.github/workflows/phase-5w-unmatched-stop-name-candidates.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-review-register:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build name-only candidate register
+        run: python scripts/build_unmatched_stop_name_candidates.py --build
+      - name: Run focused tests
+        run: python -m unittest discover -s tests -p 'test_unmatched_stop_name_candidates.py' -v
+      - name: Upload review-only outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-5w-unmatched-stop-name-candidates
+          path: |
+            data/research/PHASE_5W_UNMATCHED_STOP_NAME_CANDIDATES.csv
+            data/research/PHASE_5W_UNMATCHED_STOP_NAME_CANDIDATES_REPORT.json
+          if-no-files-found: error
+          retention-days: 14
