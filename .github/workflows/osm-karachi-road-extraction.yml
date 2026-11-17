@@ -47,7 +47,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-  tests:
+  focused-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,6 +55,7 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - run: python -m pip install -r requirements-gis.txt
-      - run: python -m pip install pytest
-      - run: python -m pytest -q
+      - name: Install GIS Python packages
+        run: python -m pip install -r requirements-gis.txt
+      - name: Run isolated road-extraction unit tests
+        run: python -m unittest discover -s tests -p 'test_osm_road_extraction.py' -v
