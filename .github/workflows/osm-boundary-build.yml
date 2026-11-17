@@ -1,0 +1,55 @@
+name: Build Karachi OSM Boundary
+
+on:
+  push:
+    branches: [research/phase-5l-osm-boundary-build-workflow]
+    paths:
+      - '.github/workflows/osm-boundary-build.yml'
+      - 'scripts/build_osm_boundary.py'
+      - 'scripts/acquire_osm_road_data.py'
+      - 'requirements-gis.txt'
+  workflow_dispatch:
+    inputs:
+      confirm_source_review:
+        description: "I have reviewed the Geofabrik Pakistan source and ODbL attribution requirements"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-boundary:
+    if: github.event_name == 'push' || inputs.confirm_source_review == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install pip-only GIS dependencies
+        run: python -m pip install -r requirements-gis.txt
+
+      - name: Download Geofabrik Pakistan extract with Python
+        run: python scripts/acquire_osm_road_data.py --download
+
+      - name: Build and validate Karachi Division boundary
+        run: python scripts/build_osm_boundary.py --build
+
+      - name: Upload research outputs (never upload the regional PBF)
+        uses: actions/upload-artifact@v4
+        with:
+          name: karachi-osm-boundary-research
+          path: |
+            data/osm_source/source-metadata.json
+            data/osm_boundary/karachi-division-6080948.geojson
+            data/osm_boundary/boundary-validation.json
+          if-no-files-found: error
+          retention-days: 14
