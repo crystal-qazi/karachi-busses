@@ -196,6 +196,8 @@ map.fitBounds(division.getBounds());L.control.layers(null,{'Division boundary':d
 
     report = {
         "status": "district_subarea_audit_complete",
+        "primary_boundary_source": "OpenStreetMap relation 6080948 (Karachi Division)",
+        "boundary_source_policy": "OSM is primary for this project. Government area figures are contextual references only and are not geometry targets.",
         "parent_relation_id": PARENT_RELATION_ID,
         "child_relation_ids": sorted(child_ids),
         "expected_official_districts": sorted(EXPECTED_DISTRICTS),
@@ -217,8 +219,8 @@ map.fitBounds(division.getBounds());L.control.layers(null,{'Division boundary':d
         ],
         "limitations": [
             "OSM subarea membership and names require comparison with official district sources.",
-            "Area figures from different sources may reflect different administrative vintages or extents.",
-            "Do not clip roads or publish as an authoritative boundary until gaps, overlaps and area discrepancy are resolved.",
+            "Government area figures are contextual references only; differing administrative vintages or extents do not override OSM.",
+            "Do not distort OSM geometry to match government area figures. Resolve OSM-internal topology, coverage and district identity issues before clipping roads.",
         ],
         "attribution": "© OpenStreetMap contributors",
         "license": "Open Database License 1.0 (ODbL)",
