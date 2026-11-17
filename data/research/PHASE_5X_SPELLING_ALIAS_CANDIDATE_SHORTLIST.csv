@@ -1,0 +1,21 @@
+route_code,source_stop_sequence,source_stop_name,candidate_node_id,text_similarity_score,candidate_class,verification_status,review_instruction
+R1,1,Khokharapar 04,khokrapar_no_4,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R1,2,Suadabad,saudabad,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R2,4,Sorab Goth,sohrab_goth,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R3,3,Five Star Chowrangi,5_star_chowrangi,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R4,4,Sorab Goth,sohrab_goth,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R4,9,Guru Mandar,gurumandir,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R4,15,Kemari,keamari,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R11,1,Mera Naka,mira_naka,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R11,6,Punjabi Chowrangi,punjab_chowrangi,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R12,5,Qaidabad,quaidabad,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R13,2,Maripur,mauripur,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R14,8,Sorab Goth,sohrab_goth,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+R14,13,Guru Mandar,gurumandir,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+EV-02,3,Domba Goth,damba_goth,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+EV-03,8,Mosamiyat,mosmayat,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+EV-03,11,Millennium Mall,millenium_mall,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+EV-04,4,Domba Goth,damba_goth,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+EV-04,10,Sorab Goth,sohrab_goth,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+EV-05,5,Domba Goth,damba_goth,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
+EV-05,11,Sorab Goth,sohrab_goth,1.0000,exact_after_text_normalization,unverified,Confirm same physical stop and boarding point before crosswalk update
