@@ -15,6 +15,23 @@ def sha256_file(path):
             digest.update(chunk)
     return digest.hexdigest()
 
+def validate_relation_identity(tags):
+    """Validate the administrative identity using English name when available.
+
+    OSM's primary name tag is language-dependent; Karachi Division's primary
+    name is Urdu, while name:en carries the English label.
+    """
+    if tags.get("boundary") != "administrative":
+        raise ValueError(f"Relation is not an administrative boundary: {tags}")
+    if tags.get("admin_level") != "5":
+        raise ValueError(f"Unexpected Karachi Division admin_level: {tags.get('admin_level')!r}")
+    english_name = tags.get("name:en")
+    primary_name = tags.get("name")
+    accepted_names = {"Karachi Division", "Karachi"}
+    if english_name not in accepted_names and primary_name not in accepted_names:
+        raise ValueError(f"Unexpected relation name; name={primary_name!r}, name:en={english_name!r}")
+    return english_name or primary_name
+
 def validate_geometry(geometry_data):
     geometry_type = geometry_data.get("type")
     if geometry_type not in {"Polygon", "MultiPolygon"}:
@@ -85,8 +102,7 @@ def build_boundary(input_pbf, output_dir):
     if relation is None:
         raise ValueError(f"Relation {RELATION_ID} not found in regional PBF.")
     tags = relation["tags"]
-    if tags.get("boundary") != "administrative" or tags.get("name") not in {"Karachi Division", "Karachi"}:
-        raise ValueError(f"Unexpected relation tags/name: {tags}")
+    english_name = validate_relation_identity(tags)
     if handler.geometry is None:
         raise ValueError("PyOsmium could not assemble the relation multipolygon.")
     validation = validate_geometry(handler.geometry)
@@ -94,7 +110,7 @@ def build_boundary(input_pbf, output_dir):
     geojson_path = output_dir / f"karachi-division-{RELATION_ID}.geojson"
     feature = {"type": "Feature", "properties": {
         "@type": "relation", "@id": RELATION_ID, "version": relation["version"],
-        "timestamp": relation["timestamp"], **tags}, "geometry": handler.geometry}
+        "timestamp": relation["timestamp"], "display_name_en": english_name, **tags}, "geometry": handler.geometry}
     geojson = {"type": "FeatureCollection", "name": "Karachi Division — OSM operational study boundary", "features": [feature]}
     geojson_path.write_text(json.dumps(geojson, ensure_ascii=False) + "\n", encoding="utf-8")
     metadata = {
