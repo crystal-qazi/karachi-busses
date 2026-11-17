@@ -2,16 +2,19 @@ name: Audit Stop to OSM Road Proximity
 
 on:
   push:
-    branches: [research/phase-5o-stop-road-proximity-audit]
+    branches: [research/phase-5p-stop-review-register]
     paths:
       - '.github/workflows/osm-stop-road-proximity-audit.yml'
       - 'scripts/audit_stop_road_proximity.py'
+      - 'scripts/build_stop_review_register.py'
       - 'scripts/extract_osm_karachi_roads.py'
       - 'scripts/build_osm_boundary.py'
       - 'scripts/acquire_osm_road_data.py'
       - 'requirements-gis.txt'
       - 'data/research/PHASE_5_STOP_NODE_CROSSWALK.csv'
       - 'tests/test_osm_stop_road_proximity.py'
+      - 'tests/test_stop_review_register.py'
+      - 'docs/PHASE_5P_CONSOLIDATED_STOP_REVIEW_REGISTER.md'
   workflow_dispatch:
 
 permissions:
@@ -37,13 +40,17 @@ jobs:
         run: python scripts/extract_osm_karachi_roads.py --build
       - name: Audit historical stop coordinate candidates against nearby roads
         run: python scripts/audit_stop_road_proximity.py --build
-      - name: Upload research audit only
+      - name: Build consolidated stop review register
+        run: python scripts/build_stop_review_register.py --build
+      - name: Upload research audit and review register
         uses: actions/upload-artifact@v4
         with:
           name: karachi-stop-road-proximity-audit
           path: |
             data/osm_roads/stop-road-proximity-audit.csv
             data/osm_roads/stop-road-proximity-report.json
+            data/research/karachi-stop-review-register.csv
+            data/research/karachi-stop-review-register-report.json
           if-no-files-found: error
           retention-days: 14
   focused-tests:
@@ -55,3 +62,4 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install -r requirements-gis.txt
       - run: python -m unittest discover -s tests -p 'test_osm_stop_road_proximity.py' -v
+      - run: python -m unittest discover -s tests -p 'test_stop_review_register.py' -v
