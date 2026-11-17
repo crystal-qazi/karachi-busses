@@ -195,7 +195,7 @@ map.fitBounds(division.getBounds());L.control.layers(null,{'Division boundary':d
     preview_path.write_text(preview_html, encoding="utf-8")
 
     report = {
-        "status": "district_subarea_audit_complete",
+        "status": "osm_subarea_geometry_audit_complete_identity_partial",
         "primary_boundary_source": "OpenStreetMap relation 6080948 (Karachi Division)",
         "boundary_source_policy": "OSM is primary for this project. Government area figures are contextual references only and are not geometry targets.",
         "parent_relation_id": PARENT_RELATION_ID,
@@ -205,6 +205,10 @@ map.fitBounds(division.getBounds());L.control.layers(null,{'Division boundary':d
         "missing_official_districts": missing_official,
         "duplicate_official_matches": duplicates,
         "district_count": len(rows),
+        "osm_subarea_geometry_valid": all(row["valid"] for row in rows),
+        "district_identity_status": "partial_unresolved" if missing_official else "matched",
+        "district_level_aggregation_enabled": not bool(missing_official),
+        "road_extraction_boundary": "parent_relation_6080948",
         "districts": rows,
         "parent_area_km2_epsg32642": round(parent_projected.area / 1_000_000, 6),
         "district_union_area_km2_epsg32642": round(union_projected.area / 1_000_000, 6),
@@ -218,7 +222,9 @@ map.fitBounds(division.getBounds());L.control.layers(null,{'Division boundary':d
             {"area_km2": 7134.669, "source": "Geoview OSM relation summary; secondary, non-official", "url": "https://pk.geoview.info/krachy_dwyzhn%2C6080948r"},
         ],
         "limitations": [
-            "OSM subarea membership and names require comparison with official district sources.",
+            "The seven OSM subareas are not proven to be a one-to-one representation of the seven currently listed administrative districts.",
+            "Unmatched OSM names (including Orangi District, Gulshan District and Karachi District) must remain as OSM labels; do not relabel them as Karachi West, East or South without independent evidence.",
+            "Road extraction may use the validated parent relation 6080948 boundary; district-level route aggregation remains disabled until identities are resolved.",
             "Government area figures are contextual references only; differing administrative vintages or extents do not override OSM.",
             "Do not distort OSM geometry to match government area figures. Resolve OSM-internal topology, coverage and district identity issues before clipping roads.",
         ],
