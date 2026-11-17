@@ -12,7 +12,7 @@
 - Mnzil EV-03: https://mnzil.app/vehicles/EV-03
 - Mnzil R-03: https://mnzil.app/vehicles/R-03
 - Mnzil R-04: https://mnzil.app/vehicles/R-04
-- Habib University dataset: https://zenodo.org/records/13932672 (CC BY 4.0; cite original authors when redistributing)
+- Habib University dataset: https://zenodo.org/records/13951512 (CC BY 4.0; cite original authors when redistributing)
 
 ## Uploaded dataset facts
 - 572 stop-node records with coordinates.
