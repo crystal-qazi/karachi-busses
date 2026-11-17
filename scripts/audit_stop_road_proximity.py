@@ -26,15 +26,20 @@ def proximity_band(distance_m):
         if distance_m <= upper: return label
     return ">250m"
 
-def audit_stops(crosswalk_path, roads_path, road_report_path, output_dir):
+def audit_stops(crosswalk_path, roads_path, road_report_path, boundary_path, output_dir):
     from pyproj import Transformer
     from shapely.geometry import Point, shape
     from shapely.ops import transform
     from shapely.strtree import STRtree
 
-    crosswalk_path,roads_path,road_report_path,output_dir=map(Path,(crosswalk_path,roads_path,road_report_path,output_dir))
-    for path in (crosswalk_path,roads_path,road_report_path):
+    crosswalk_path,roads_path,road_report_path,boundary_path,output_dir=map(Path,(crosswalk_path,roads_path,road_report_path,boundary_path,output_dir))
+    for path in (crosswalk_path,roads_path,road_report_path,boundary_path):
         if not path.is_file(): raise FileNotFoundError(path)
+    boundary_data=json.loads(boundary_path.read_text(encoding="utf-8"))
+    parent_features=[f for f in boundary_data.get("features",[]) if f.get("properties",{}).get("@id")==6080948]
+    if len(parent_features)!=1: raise ValueError("Expected exactly one validated OSM parent relation 6080948.")
+    parent_boundary=shape(parent_features[0]["geometry"])
+    if parent_boundary.is_empty or not parent_boundary.is_valid: raise ValueError("OSM parent boundary is invalid.")
     transformer=Transformer.from_crs("EPSG:4326",AREA_CRS,always_xy=True)
     road_data=json.loads(roads_path.read_text(encoding="utf-8"))
     lines=[]; props=[]
@@ -71,12 +76,19 @@ def audit_stops(crosswalk_path, roads_path, road_report_path, output_dir):
                 counts["no_coordinate_candidate"]+=1
                 writer.writerow(out); continue
             try:
-                point=transform(transformer.transform,Point(float(lon),float(lat)))
+                source_point=Point(float(lon),float(lat))
+                if not source_point.is_valid or source_point.is_empty: raise ValueError("invalid point")
             except (ValueError,TypeError):
                 out["audit_status"]="invalid_candidate_coordinate"
                 out["review_note"]="Coordinate could not be parsed; manual source review required."
                 counts["invalid_candidate_coordinate"]+=1
                 writer.writerow(out); continue
+            if not parent_boundary.covers(source_point):
+                out["audit_status"]="candidate_outside_parent_boundary"
+                out["review_note"]="Historical coordinate candidate falls outside OSM parent relation 6080948; no road proximity assigned."
+                counts["candidate_outside_parent_boundary"]+=1
+                writer.writerow(out); continue
+            point=transform(transformer.transform,source_point)
             indexes=tree.query(point.buffer(SEARCH_RADIUS_M))
             candidates=[]
             for idx in indexes:
@@ -125,6 +137,8 @@ def audit_stops(crosswalk_path, roads_path, road_report_path, output_dir):
       "coordinate_source_sha256":sha256_file(crosswalk_path),
       "road_source":"OpenStreetMap candidate roads clipped to parent relation 6080948",
       "road_geojson_sha256":sha256_file(roads_path),
+      "parent_boundary_source": "OpenStreetMap relation 6080948",
+      "parent_boundary_sha256":sha256_file(boundary_path),
       "road_report_input":road_report_path.name,
       "road_source_pbf_sha256":road_report.get("input_pbf_sha256"),
       "search_radius_m":SEARCH_RADIUS_M,
@@ -150,13 +164,14 @@ def main():
     parser.add_argument("--crosswalk",type=Path,default=Path("data/research/PHASE_5_STOP_NODE_CROSSWALK.csv"))
     parser.add_argument("--roads",type=Path,default=Path("data/osm_roads/karachi-osm-bus-roads.geojson"))
     parser.add_argument("--road-report",type=Path,default=Path("data/osm_roads/road-extraction-report.json"))
+    parser.add_argument("--boundary",type=Path,default=Path("data/osm_boundary/karachi-division-6080948.geojson"))
     parser.add_argument("--output-dir",type=Path,default=Path("data/osm_roads"))
     parser.add_argument("--build",action="store_true")
     args=parser.parse_args()
     if not args.build:
         print("DRY RUN: no files changed; pass --build to run proximity audit.")
         return 0
-    try: print(json.dumps(audit_stops(args.crosswalk,args.roads,args.road_report,args.output_dir),indent=2))
+    try: print(json.dumps(audit_stops(args.crosswalk,args.roads,args.road_report,args.boundary,args.output_dir),indent=2))
     except (OSError,ValueError,RuntimeError) as exc:
         print(f"ERROR: {exc}",file=sys.stderr); return 1
     return 0
