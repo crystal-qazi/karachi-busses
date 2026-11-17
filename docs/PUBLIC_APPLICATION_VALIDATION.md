@@ -6,7 +6,8 @@
   - `d74fca2` — *fix(map): refresh nearby results when radius changes*
   - `5d3f567` — *fix(api): generate timezone-aware UTC timestamps*
   - `6772ba4` — *test(api): assert mobile timestamps are timezone-aware*
-- **Latest commit:** `6772ba43028e5bf2a160a9abf4d18887ef71fc10`
+- **Latest code commit tested:** `6772ba43028e5bf2a160a9abf4d18887ef71fc10`
+- **Validation documentation commit:** `87396f1dec8f091a359d18afcb2deaea59edf470` (this file)
 - **Environment:**
   - Windows 11 / Git Bash / Python 3.11.0
   - Flask 3.0.3, PyMySQL, Leaflet 1.9.4 (CDN), Bootstrap 5.3.3 (CDN)
@@ -137,7 +138,7 @@ No files modified. No fixes applied. The three commits in scope are correct and 
 
 ## Known Limitations
 
-1. **No verified data in local DB.** All 4 `data_sources` rows are `verification_status='pending'`, all 95 routes are `under_review` / `inactive`, all 572 stops are `under_review`, and `route_shapes` has 0 rows. As a result:
+1. **No verified data in local DB.** All 4 `data_sources` rows are `verification_status='pending'`, all 572 stops are `under_review`, and `route_shapes` has 0 rows. The report contains two different route counts: the before/after table records 98 `bus_routes` rows, while the status summary records 95 routes as `under_review` / `inactive`. The available validation notes do not explain this difference; it remains an open data-audit question and must be reconciled against the database before any route data is published. As a result:
    - Search returns 0 routes / 0 stops for every query.
    - Nearby discovery returns 0 stops at every radius.
    - Journey planner returns 0 journeys for every destination.
