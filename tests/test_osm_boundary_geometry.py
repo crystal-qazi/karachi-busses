@@ -9,6 +9,25 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 class BoundaryTests(unittest.TestCase):
+    def test_accepts_localized_karachi_division_name(self):
+        tags = {
+            "boundary": "administrative",
+            "admin_level": "5",
+            "name": "کراچی ڈویژن",
+            "name:en": "Karachi Division",
+        }
+        self.assertEqual(MODULE.validate_relation_identity(tags), "Karachi Division")
+
+    def test_rejects_wrong_admin_level(self):
+        tags = {
+            "boundary": "administrative",
+            "admin_level": "6",
+            "name": "کراچی ڈویژن",
+            "name:en": "Karachi Division",
+        }
+        with self.assertRaisesRegex(ValueError, "admin_level"):
+            MODULE.validate_relation_identity(tags)
+
     def test_valid_polygon_and_area(self):
         try:
             import shapely
