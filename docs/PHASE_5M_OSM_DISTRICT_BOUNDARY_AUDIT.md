@@ -6,7 +6,7 @@ OpenStreetMap (OSM) is the project's primary and operational boundary source. Us
 
 Government area figures are retained as contextual comparison references. They may reflect older administrative vintages, different definitions, or different extents; disagreement alone does not override OSM. Record the discrepancy and investigate it, but do not treat government figures as acceptance targets.
 
-Audit the seven relation members tagged as `subarea` in OSM relation 6080948. This phase does not authorize road clipping or production use.
+Audit the seven relation members tagged as `subarea` in OSM relation 6080948. The latest audit confirms complete geometric coverage of the parent but does not confirm that these seven OSM labels correspond one-to-one with the seven currently listed administrative districts. Names such as Orangi District, Gulshan District and Karachi District must remain unchanged until independently verified. The parent relation may be used for Karachi-wide OSM road extraction after parent geometry validation; district-level aggregation remains disabled until identity mapping is resolved.
 
 ## Run (Python packages only)
 
@@ -32,7 +32,7 @@ The HTML preview uses Leaflet and OpenStreetMap tiles; an internet connection is
 - Parent relation has exactly seven relation members with role `subarea`.
 - Each child relation is an administrative boundary at admin_level=6.
 - Each district geometry is assembled from the regional PBF and validated.
-- English names are matched conservatively to the seven official district names; unmatched labels are reported, not guessed.
+- English names are matched conservatively; unmatched labels are reported, not guessed or renamed. OSM subareas are not assumed to be the current official district set.
 - District union is compared with the OSM parent polygon; gaps, excess area and overlaps are quantified. This OSM-internal consistency check is the primary geometry acceptance test.
 - Both EPSG:32642 projected area and WGS84 geodesic area are reported.
 
@@ -51,4 +51,4 @@ These sources may represent different administrative vintages, definitions or ex
 
 ## Acceptance gate
 
-Road extraction may use the OSM parent boundary as the primary project boundary once the OSM parent and district geometries pass validity and internal consistency checks, and district identities are adequately resolved. A mismatch with government-published area figures alone is not a blocker and must not be 'corrected' by distorting OSM geometry. Keep unresolved district identity or topology issues explicit. OSM data attribution and ODbL obligations must be retained.
+Road extraction may use the validated OSM parent relation 6080948 boundary as the primary Karachi-wide clip. District-level aggregation or district-specific route claims remain disabled until the OSM subarea identities are independently resolved. A mismatch with government-published area figures alone is not a blocker and must not be 'corrected' by distorting OSM geometry. Keep unresolved district identity or topology issues explicit. OSM data attribution and ODbL obligations must be retained.
