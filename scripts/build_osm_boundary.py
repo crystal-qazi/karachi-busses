@@ -16,6 +16,9 @@ def sha256_file(path):
     return digest.hexdigest()
 
 def validate_geometry(geometry_data):
+    geometry_type = geometry_data.get("type")
+    if geometry_type not in {"Polygon", "MultiPolygon"}:
+        raise ValueError("Expected a non-empty Polygon or MultiPolygon.")
     try:
         from shapely.geometry import shape
         from shapely.validation import explain_validity
