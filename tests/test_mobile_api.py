@@ -19,6 +19,9 @@ def test_mobile_manifest_is_content_addressed():
     assert data["incremental_sync_available"] is False
     assert data["checksum"] == "sha256:" + data["dataset_version"]
     assert response.headers["ETag"] == '"' + data["dataset_version"] + '"'
+    from datetime import datetime
+    generated_at = datetime.fromisoformat(data["generated_at"].replace("Z", "+00:00"))
+    assert generated_at.utcoffset() is not None
 
 
 def test_mobile_snapshot_contains_same_version_and_data():
