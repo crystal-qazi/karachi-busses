@@ -1,0 +1,14 @@
+source_stop_name,historical_node_id,route_codes,occurrence_count,name_alias_status,confirmation_basis,physical_stop_verification,coordinate_assignment
+Khokharapar 04,khokrapar_no_4,R1,1,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Suadabad,saudabad,R1,1,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Sorab Goth,sohrab_goth,"R2;R4;R14;EV-04;EV-05",5,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Five Star Chowrangi,5_star_chowrangi,R3,1,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Guru Mandar,gurumandir,R4;R14,2,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Kemari,keamari,R4,1,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Mera Naka,mira_naka,R11,1,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Punjabi Chowrangi,punjab_chowrangi,R11,1,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Qaidabad,quaidabad,R12,1,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Maripur,mauripur,R13,1,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Domba Goth,damba_goth,"EV-02;EV-04;EV-05",3,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Mosamiyat,mosmayat,EV-03,1,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
+Millennium Mall,millenium_mall,EV-03,1,confirmed_by_user,user_confirmed_in_chat,unverified,not_assigned
