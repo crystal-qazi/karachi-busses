@@ -13,7 +13,7 @@
 - EV-01–EV-05 now have SMTA-published stop/area sequences and distances. The 76-route Habib coordinate dataset only has plausible corridor candidates for EV-01–EV-03; EV-04/05 are absent as distinct labels.
 - The Green Line coordinate-dataset chain is not accepted as current station truth. Its 22-node chain terminates at Karachi City Station and includes Aga Khan Hospital/Aurangzeb Market, unlike the commonly published 22-station Surjani–Numaish operational sequence.
 - Orange Line official material provides four station names (OL-1–OL-4), but the project page and agreement contain different descriptions of corridor extension/connection. The local coordinate file has only three edges and four nodes; it does not yet establish a complete, verified current route.
-- The exact-name crosswalk was generated for 191 source-described bus-route stop rows against 572 coordinate nodes. Exact normalized name matches are only candidate name matches, not verified physical stops. No fuzzy matches were silently accepted.
+- The exact-name crosswalk was generated for 191 source-described bus-route stop rows against 572 coordinate nodes: **89 exact normalized name candidates** and **102 unmatched rows**. Exact matches are only candidate name matches, not verified physical stops. No fuzzy matches were silently accepted. The companion `PHASE_5_NODE_AUDIT.csv` inventories all 572 node IDs, coordinates, historical route-label membership and coordinate-collision flags.
 - Road-following GeoJSON was **not fabricated**. The source CSV edges are named-node links, not authoritative road-centreline geometry. Stops need coordinate/boarding-side review before routing/snapping and route-shape production.
 
 ## Evidence hierarchy and source register
@@ -176,7 +176,7 @@ The agreement describes a TMA Orangi–Board Office operating service with Orang
 
 ## 572-node coordinate crosswalk
 
-The generated companion CSV `PHASE_5_STOP_NODE_CROSSWALK.csv` has one row per SMTA-published stop/area for R1–R4, R8, R11–R14 and EV-01–EV-05.
+The generated companion CSV `PHASE_5_STOP_NODE_CROSSWALK.csv` has one row per SMTA-published stop/area for R1–R4, R8, R11–R14 and EV-01–EV-05. The companion `PHASE_5_NODE_AUDIT.csv` has all 572 source nodes with coordinates, historical route-label membership and collision flags.
 
 Matching policy:
 - Only exact normalized name equality was used (case and punctuation normalization only).
