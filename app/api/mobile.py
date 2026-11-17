@@ -6,7 +6,7 @@ a durable change log; a timestamp-only cursor is not safe for deletions.
 """
 import hashlib
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from decimal import Decimal
 
 from flask import Blueprint, jsonify, make_response
@@ -110,7 +110,7 @@ def _manifest_for(snapshot):
         "dataset_version": digest,
         "schema_version": 1,
         "checksum": "sha256:" + digest,
-        "generated_at": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+        "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "sync_mode": "full_snapshot",
         "incremental_sync_available": False,
     }
