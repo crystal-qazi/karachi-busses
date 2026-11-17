@@ -1,0 +1,61 @@
+name: Phase 5B Coordinate Review Package
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/build_coordinate_review.py"
+      - "data/research/PHASE_5_NODE_AUDIT.csv"
+      - "data/research/PHASE_5_STOP_NODE_CROSSWALK.csv"
+      - "data/imports/karachi_bus_network_cleaned_edges.csv"
+      - ".github/workflows/phase5b-coordinate-review.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-coordinate-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate coordinate review package
+        run: python scripts/build_coordinate_review.py
+
+      - name: Validate generated package
+        run: |
+          python - <<'PY'
+          import csv
+          import json
+          from pathlib import Path
+
+          out = Path("reports/phase5b")
+          report = json.loads((out / "coordinate_qa_report.json").read_text())
+          geojson = json.loads((out / "coordinate_nodes.geojson").read_text())
+          with (out / "stop_review_queue.csv").open(encoding="utf-8-sig", newline="") as f:
+              rows = list(csv.DictReader(f))
+          assert report["node_count"] == 572, report
+          assert report["crosswalk_row_count"] == 191, report
+          assert len(geojson["features"]) == 572
+          assert len(rows) == 191
+          assert all(x["review_decision"] == "" for x in rows)
+          assert report["database_writes"] is False
+          assert report["external_geocoding_or_routing_calls"] is False
+          print("Coordinate review package validated.")
+          PY
+
+      - name: Upload review package
+        uses: actions/upload-artifact@v4
+        with:
+          name: karachi-phase5b-coordinate-review
+          path: reports/phase5b/
+          if-no-files-found: error
+          retention-days: 30
