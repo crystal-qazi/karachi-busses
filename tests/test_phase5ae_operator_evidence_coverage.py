@@ -1,0 +1,35 @@
+import csv
+import io
+import unittest
+
+DATA = """route_code,route_family,official_source_status,official_source_url,source_statement_or_coverage,numbered_stop_sequence_count,sequence_scope,verification_limit,next_action
+R1,Red People Bus,launch_endpoint_announcement_only,https://smta.sindh.gov.pk/news/procurement-of-buses,""2021 SMTA announcement: initial Route 1 Model Colony to Tower; 29.5 km"",,not_published_in_cited_announcement,""Does not verify current operation, intermediate stops, direction, boarding side, or exact coordinates"",""Obtain current operator stop schedule or retrieve route alignment attachment""
+R2,Red People Bus,route_alignment_attachment_not_retrieved,https://smta.sindh.gov.pk/people-bus-service,""SMTA People Bus page lists a Route Alignment attachment; attachment retrieval timed out during review"",,not_retrieved,""No stop identity or route sequence can be extracted from an inaccessible attachment"",""Retry official attachment retrieval or request route schedule from SMTA/NRTC""
+R3,Red People Bus,launch_endpoint_announcement_only,https://smta.sindh.gov.pk/news/procurement-of-buses,""2021 SMTA announcement: initial Route 3 Nagan Chowrangi to Singer Chowrangi; 33 km"",,not_published_in_cited_announcement,""Does not verify current operation, intermediate stops, direction, boarding side, or exact coordinates"",""Obtain current operator stop schedule or retrieve route alignment attachment""
+R4,Red People Bus,route_alignment_attachment_not_retrieved,https://smta.sindh.gov.pk/people-bus-service,""SMTA People Bus page lists a Route Alignment attachment; attachment retrieval timed out during review"",,not_retrieved,""No stop identity or route sequence can be extracted from an inaccessible attachment"",""Retry official attachment retrieval or request route schedule from SMTA/NRTC""
+R8,Red People Bus,route_alignment_attachment_not_retrieved,https://smta.sindh.gov.pk/people-bus-service,""SMTA People Bus page lists a Route Alignment attachment; attachment retrieval timed out during review"",,not_retrieved,""No stop identity or route sequence can be extracted from an inaccessible attachment"",""Retry official attachment retrieval or request route schedule from SMTA/NRTC""
+R11,Red People Bus,route_alignment_attachment_not_retrieved,https://smta.sindh.gov.pk/people-bus-service,""SMTA People Bus page lists a Route Alignment attachment; attachment retrieval timed out during review"",,not_retrieved,""No stop identity or route sequence can be extracted from an inaccessible attachment"",""Retry official attachment retrieval or request route schedule from SMTA/NRTC""
+R12,Red People Bus,route_alignment_attachment_not_retrieved,https://smta.sindh.gov.pk/people-bus-service,""SMTA People Bus page lists a Route Alignment attachment; attachment retrieval timed out during review"",,not_retrieved,""No stop identity or route sequence can be extracted from an inaccessible attachment"",""Retry official attachment retrieval or request route schedule from SMTA/NRTC""
+R13,Red People Bus,route_alignment_attachment_not_retrieved,https://smta.sindh.gov.pk/people-bus-service,""SMTA People Bus page lists a Route Alignment attachment; attachment retrieval timed out during review"",,not_retrieved,""No stop identity or route sequence can be extracted from an inaccessible attachment"",""Retry official attachment retrieval or request route schedule from SMTA/NRTC""
+R14,Red People Bus,route_alignment_attachment_not_retrieved,https://smta.sindh.gov.pk/people-bus-service,""SMTA People Bus page lists a Route Alignment attachment; attachment retrieval timed out during review"",,not_retrieved,""No stop identity or route sequence can be extracted from an inaccessible attachment"",""Retry official attachment retrieval or request route schedule from SMTA/NRTC""
+EV-01,Electric Bus,official_numbered_stop_sequence_published,https://smta.sindh.gov.pk/routes/15,""SMTA route detail page lists 18 numbered stops, 41 km, 12 m bus, and labels the route Active"",18,numbered_route_page_sequence,""Published page is operator evidence for listed names/order; does not independently verify current field boarding coordinates or live dispatch"",""Retain published sequence; field-check stop coordinates and boarding sides before geometry""
+EV-02,Electric Bus,official_numbered_stop_sequence_published,https://smta.sindh.gov.pk/routes/16,""SMTA route detail page lists 8 numbered stops, 44 km, 12 m bus, and labels the route Active"",8,numbered_route_page_sequence,""Published page is operator evidence for listed names/order; does not independently verify current field boarding coordinates or live dispatch"",""Retain published sequence; field-check stop coordinates and boarding sides before geometry""
+EV-03,Electric Bus,official_numbered_stop_sequence_published,https://smta.sindh.gov.pk/routes/17,""SMTA route detail page lists 16 numbered stops, 23 km, 9 m bus, and labels the route Active"",16,numbered_route_page_sequence,""Published page is operator evidence for listed names/order; does not independently verify current field boarding coordinates or live dispatch"",""Retain published sequence; field-check stop coordinates and boarding sides before geometry""
+EV-04,Electric Bus,official_numbered_stop_sequence_published,https://smta.sindh.gov.pk/routes/18,""SMTA route detail page lists 10 numbered stops, 58 km, 12 m bus, and labels the route Active"",10,numbered_route_page_sequence,""Published page is operator evidence for listed names/order; does not independently verify current field boarding coordinates or live dispatch"",""Retain published sequence; field-check stop coordinates and boarding sides before geometry""
+EV-05,Electric Bus,official_numbered_stop_sequence_published,https://smta.sindh.gov.pk/routes/19,""SMTA route detail page lists 10 numbered stops, 48 km, 12 m bus, and labels the route Active"",10,numbered_route_page_sequence,""Published page is operator evidence for listed names/order; does not independently verify current field boarding coordinates or live dispatch"",""Retain published sequence; field-check stop coordinates and boarding sides before geometry"""""
+
+class Phase5AETests(unittest.TestCase):
+    def test_register_has_all_target_routes_and_no_false_sequence_counts(self):
+        rows = list(csv.DictReader(io.StringIO(DATA)))
+        self.assertEqual(len(rows), 14)
+        self.assertEqual({r["route_code"] for r in rows}, {
+            "R1","R2","R3","R4","R8","R11","R12","R13","R14",
+            "EV-01","EV-02","EV-03","EV-04","EV-05"
+        })
+        red = [r for r in rows if r["route_code"].startswith("R")]
+        self.assertTrue(all(not r["numbered_stop_sequence_count"] for r in red))
+        ev = {r["route_code"]: r["numbered_stop_sequence_count"] for r in rows if r["route_code"].startswith("EV-")}
+        self.assertEqual(ev, {"EV-01":"18","EV-02":"8","EV-03":"16","EV-04":"10","EV-05":"10"})
+
+if __name__ == "__main__":
+    unittest.main()
