@@ -93,6 +93,7 @@ def reconcile(
     counts = Counter()
     route_counts: dict[str, Counter] = {}
     named_entries = 0
+    output_rows = 0
     with output_path.open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields)
         writer.writeheader()
@@ -165,6 +166,7 @@ def reconcile(
                     "coordinate_assignment": "not_assigned",
                     "route_assignment": "not_assigned",
                 })
+                output_rows += 1
 
     report = {
         "status": "name_only_osm_candidate_crosswalk_not_stop_or_route_verification",
