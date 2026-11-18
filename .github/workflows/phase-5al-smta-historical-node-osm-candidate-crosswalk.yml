@@ -1,0 +1,66 @@
+name: Phase 5AL SMTA Historical Node and OSM Candidate Crosswalk
+
+on:
+  workflow_run:
+    workflows: ["Phase 5AI OSM Bus Stop Candidate Inventory"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      artifact_run_id:
+        description: "Successful Phase 5AI workflow run ID containing the OSM proximity audit"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build-crosswalk:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download Phase 5AI audit artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: phase-5ai-osm-bus-stop-candidate-inventory
+          run-id: ${{ github.event_name == 'workflow_dispatch' && inputs.artifact_run_id || github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: data/phase5ai_artifact
+      - name: Place Phase 5AJ proximity audit at expected path
+        shell: bash
+        run: |
+          mkdir -p data/osm_stops
+          audit="$(find data/phase5ai_artifact -type f -name 'PHASE_5AJ_HISTORICAL_NODE_OSM_STOP_CANDIDATE_AUDIT.csv' -print -quit)"
+          test -n "$audit"
+          cp "$audit" data/osm_stops/PHASE_5AJ_HISTORICAL_NODE_OSM_STOP_CANDIDATE_AUDIT.csv
+      - name: Build Phase 5AL crosswalk
+        run: python scripts/build_phase5al_smta_historical_node_osm_candidate_crosswalk.py --build
+      - name: Upload Phase 5AL review outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-5al-smta-historical-node-osm-candidate-crosswalk
+          path: |
+            data/osm_stops/PHASE_5AL_SMTA_HISTORICAL_NODE_OSM_CANDIDATE_CROSSWALK.csv
+            data/osm_stops/PHASE_5AL_SMTA_HISTORICAL_NODE_OSM_CANDIDATE_CROSSWALK_REPORT.json
+          if-no-files-found: error
+          retention-days: 14
+
+  focused-tests:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run Phase 5AL unit tests
+        run: python -m unittest discover -s tests -p 'test_phase5al_smta_historical_node_osm_candidate_crosswalk.py' -v
