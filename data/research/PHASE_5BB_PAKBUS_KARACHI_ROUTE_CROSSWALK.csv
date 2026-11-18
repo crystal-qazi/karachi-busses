@@ -1,0 +1,21 @@
+pakbus_code,pakbus_route_name,network,stops_reported,pakbus_forward_or_summary_endpoints,think_kml_route_match,cross_source_observation,project_decision
+1,Green Line,Karachi Breeze,22,Abdullah Chowk to Numaish,No,22 ordered stops published; sequence aligns with one secondary passenger-facing list but not other published list,Secondary stop-sequence candidate only
+2,Orange Line,Karachi Breeze,5,TMA Orangi Town to Board Office,No,forward direction lists 5 stops while reverse page lists 15 including a loop via Hyderi Five Star Juma Bazar Erum Shopping and Nagan,Do not use as verified sequence; flag direction asymmetry
+3-Exp,Abdullah Chowk to Numaish,Karachi Breeze,7,Abdullah Chowk to Numaish,No,Express variant not in Think KML 15-route inventory,Secondary route candidate only
+4-PB,Pink Bus Abdullah Chowk to Numaish,Karachi Breeze,22,Abdullah Chowk to Numaish,No,Women-only Pink Bus service not in Think KML route inventory,Secondary route candidate only
+EV-03,Malir Cantt to Numaish,People's Bus Service,27,Malir Cantt to Numaish,Yes,Think endpoint includes Malir Cantt Check Post 5; PakBus uses broader Malir Cantt label,Endpoint identity needs validation
+Pink-1,Khokhrapar No 1 to Tower,People's Bus Service,36,Khokhrapar No 1 to Tower,Partial,Corresponds broadly to R1 corridor but separate women-only route record,Do not merge with R1 without operator confirmation
+Pink-2,Power House Chowrangi to Korangi Crossing,People's Bus Service,37,Power House Chowrangi to Korangi Crossing,No,Separate women-only route record; PakBus R2 has same endpoint pair,Keep separate service identity
+Pink-3,Power House Chowrangi to Nasir Jump,People's Bus Service,42,Power House Chowrangi to Nasir Jump,No,Separate women-only route record; PakBus R3 has same endpoint pair,Keep separate service identity
+Pink-9,Gulshan-e-Hadeed to Tower,People's Bus Service,53,Gulshan-e-Hadeed to Tower,Partial,Same corridor identity as R9 but separately labelled Pink service,Keep separate service identity
+Pink10,Quaid e Azam Mazar to Ibrahim Hyderi,People's Bus Service,43,Quaid e Azam Mazar to Ibrahim Hyderi,Partial,Think uses Numaish Chowrangi origin; no alias accepted,Keep endpoint alias unresolved
+R1,Khokhrapar No 1 to Dockyard Stop,People's Bus Service,40,Khokhrapar No 1 to Dockyard,Yes,Endpoint pair broadly agrees with Think R1,Secondary cross-check only
+R10,Quaid e Azam Mazar to Ibrahim Hyderi,People's Bus Service,43,Quaid e Azam Mazar to Ibrahim Hyderi,Yes,Think uses Numaish Chowrangi origin; do not assume equivalence to Quaid e Azam Mazar,Secondary cross-check only
+R11,Shireen Jinnah Colony to Miran Naka,People's Bus Service,32,Shireen Jinnah Colony to Miran Naka,Yes,Same endpoint pair as Think with opposite display direction,Direction normalization only; stop order still unverified
+R12,Khokhrapar Chaman Colony to Lucky Star,People's Bus Service,47,Khokhrapar Chaman Colony to Lucky Star,Yes,SMTA and Think use Naddi Kinara as origin; PakBus differs,Unresolved origin conflict
+R13,Tower to Hawks Bay Bus Stop,People's Bus Service,17,Tower to Hawks Bay,Yes,Same broad endpoint pair as Think with opposite display direction,Direction normalization only; stop order still unverified
+R2,Power House Chowrangi to Korangi Crossing,People's Bus Service,37,Power House Chowrangi to Korangi Crossing,Yes,Think and SMTA endpoint is Indus Hospital; PakBus ends at Korangi Crossing,Unresolved terminal conflict
+R3,Power House Chowrangi to Nasir Jump,People's Bus Service,42,Power House Chowrangi to Nasir Jump,Yes,Endpoint pair agrees with Think,Secondary cross-check only
+R4,Power House Chowrangi to Jackson Market,People's Bus Service,35,Power House Chowrangi to Jackson Market,Yes,Think and SMTA endpoint is Keamari; PakBus ends at Jackson Market,Unresolved terminal conflict
+R8,Tower to Yousuf Goth Bus Stop,People's Bus Service,23,Tower to Yousuf Goth,Yes,Same endpoint pair as Think with opposite display direction,Direction normalization only; stop order still unverified
+R9,Gulshan-e-Hadeed to Tower,People's Bus Service,53,Gulshan-e-Hadeed to Tower,Yes,Endpoint pair broadly agrees with Think,Secondary cross-check only
