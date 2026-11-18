@@ -24,9 +24,9 @@ SET
         'The Zenodo description says 76 Karachi public bus routes (BRT and minibuses) were compiled from ',
         'Travel Culture and HamariWeb, with stop coordinates extracted using Google Maps. ',
         'The node/edge files are historical secondary research, not current operator GPS or proof of current service. ',
-        'No per-stop source pins or capture dates are supplied. Repository documentation previously recorded CC BY 4.0, ',
-        'but verify the exact machine-readable Zenodo Rights value before relying on redistribution. ',
-        'Keep verification_status pending until source scope and rights are reviewed.'
+        'No per-stop source pins or capture dates are supplied. The publisher companion project page declares CC BY 4.0; ',
+        'the Zenodo record visible Rights section has no displayed value, so preserve this distinction in attribution notes. ',
+        'Keep verification_status pending because this is historical secondary data, not current operator evidence.'
     )
 WHERE source_name = 'Karachi Bus Network Research Dataset (user-provided cleaned files)';
 
