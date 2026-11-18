@@ -1,0 +1,45 @@
+name: Phase 5AD Unmatched Stop Triage
+
+on:
+  push:
+    branches: [research/phase-5ad-unmatched-stop-triage]
+    paths:
+      - '.github/workflows/phase-5ad-unmatched-stop-triage.yml'
+      - 'scripts/build_unmatched_stop_name_candidates.py'
+      - 'scripts/build_phase5aa_remaining_unmatched_review.py'
+      - 'scripts/build_phase5ad_unmatched_stop_triage.py'
+      - 'data/research/PHASE_5_STOP_NODE_CROSSWALK.csv'
+      - 'data/research/PHASE_5_NODE_AUDIT.csv'
+      - 'data/research/PHASE_5X_SPELLING_ALIAS_CANDIDATE_SHORTLIST.csv'
+      - 'data/research/PHASE_5Y_USER_CONFIRMED_NAME_ALIASES.csv'
+      - 'tests/test_phase5ad_unmatched_stop_triage.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Rebuild Phase 5W name candidates
+        run: python scripts/build_unmatched_stop_name_candidates.py --build
+      - name: Rebuild Phase 5AA residual queue
+        run: python scripts/build_phase5aa_remaining_unmatched_review.py --build
+      - name: Build Phase 5AD triage
+        run: python scripts/build_phase5ad_unmatched_stop_triage.py --build
+      - name: Run focused tests
+        run: python -m unittest discover -s tests -p 'test_phase5ad_unmatched_stop_triage.py' -v
+      - name: Upload triage register
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-5ad-unmatched-stop-triage
+          path: |
+            data/research/PHASE_5AD_UNMATCHED_STOP_TRIAGE.csv
+            data/research/PHASE_5AD_UNMATCHED_STOP_TRIAGE_REPORT.json
+          if-no-files-found: error
+          retention-days: 30
