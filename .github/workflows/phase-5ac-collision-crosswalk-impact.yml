@@ -1,0 +1,37 @@
+name: Phase 5AC Collision Crosswalk Impact Audit
+
+on:
+  push:
+    branches: [research/phase-5ac-collision-crosswalk-impact]
+    paths:
+      - '.github/workflows/phase-5ac-collision-crosswalk-impact.yml'
+      - 'scripts/audit_phase5ac_collision_crosswalk_impact.py'
+      - 'data/research/PHASE_5_NODE_AUDIT.csv'
+      - 'data/research/PHASE_5_STOP_NODE_CROSSWALK.csv'
+      - 'tests/test_phase5ac_collision_crosswalk_impact.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build crosswalk impact audit
+        run: python scripts/audit_phase5ac_collision_crosswalk_impact.py --build
+      - name: Run focused tests
+        run: python -m unittest discover -s tests -p 'test_phase5ac_collision_crosswalk_impact.py' -v
+      - name: Upload review outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-5ac-collision-crosswalk-impact
+          path: |
+            data/research/PHASE_5AC_COLLISION_CROSSWALK_IMPACT.csv
+            data/research/PHASE_5AC_COLLISION_CROSSWALK_IMPACT_REPORT.json
+          if-no-files-found: error
+          retention-days: 30
