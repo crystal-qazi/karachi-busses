@@ -170,7 +170,7 @@ def reconcile(
         "status": "name_only_osm_candidate_crosswalk_not_stop_or_route_verification",
         "official_named_entries": named_entries,
         "direction_descriptors_excluded": counts["direction_descriptors_excluded"],
-        "output_rows": sum(route_counts[route][kind] for route in route_counts for kind in route_counts[route]),
+        "output_rows": output_rows,
         "counts_by_match_type": {
             key: counts[key] for key in (
                 "exact_normalized_name",
