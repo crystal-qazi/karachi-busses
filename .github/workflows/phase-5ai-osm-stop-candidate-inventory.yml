@@ -4,6 +4,14 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened]
+    paths:
+      - 'scripts/acquire_osm_road_data.py'
+      - 'scripts/build_osm_boundary.py'
+      - 'scripts/extract_osm_karachi_stop_candidates.py'
+      - 'scripts/audit_phase5aj_historical_nodes_to_osm_stop_candidates.py'
+      - 'requirements-gis.txt'
+      - 'tests/test_osm_karachi_stop_candidates.py'
+      - 'tests/test_phase5aj_historical_nodes_to_osm_stop_candidates.py'
   push:
     branches: [research/phase-5ai-osm-stop-candidate-inventory]
     paths:
