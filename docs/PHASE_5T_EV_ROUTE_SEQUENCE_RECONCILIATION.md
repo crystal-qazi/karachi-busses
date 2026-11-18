@@ -35,7 +35,7 @@ The CSV retains every original crosswalk row and its candidate node/coordinates,
 
 All 62 passenger-stop rows remain coordinate-unverified. A historical name match does not confirm the physical boarding point, platform side, direction, or current operator use. The five route sequences can now be used as the latest published reference for further cross-checking, but road-following geometry remains blocked pending operator confirmation and physical boarding-point verification.
 
-OSM remains the primary geographic base. The Phase 5N OSM road network may be used for proximity review only; it does not establish that a bus is permitted to use a road. OSM one-way, access, bus/PSV and conditional restrictions require separate review.
+Think Transportation KML is the primary route-line geometry reference where a route is present; preserve its original coordinates, order and direction. SMTA remains authoritative for published route status, names and stop sequences. OSM and the Phase 5N road network are supporting geographic/road context only; they do not replace KML geometry or establish that a bus is permitted to use a road. OSM one-way, access, bus/PSV and conditional restrictions require separate review.
 
 ## Safety / scope
 
