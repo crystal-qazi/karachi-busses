@@ -109,7 +109,12 @@ def build(input_path: Path = INPUT, output_path: Path = OUTPUT, report_path: Pat
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "input": str(input_path),
         "output": {"csv": str(output_path), "rows": len(rows)},
-        "counts": {\n            "rows": len(rows),\n            "top_candidate_bands": dict(sorted(top_bands.items())),\n            "ambiguity": dict(sorted(ambiguities.items())),\n            "triage_priority": dict(sorted(priorities.items())),\n        },
+        "counts": {
+            "rows": len(rows),
+            "top_candidate_bands": dict(sorted(top_bands.items())),
+            "ambiguity": dict(sorted(ambiguities.items())),
+            "triage_priority": dict(sorted(priorities.items())),
+        },
         "by_route": {route: dict(sorted(c.items())) for route, c in sorted(routes.items())},
         "method": {
             "strong": "top score >= 0.85",
