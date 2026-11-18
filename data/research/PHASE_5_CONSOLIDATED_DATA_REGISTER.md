@@ -239,3 +239,23 @@ The 1,415 edge CSV is a historical graph of links between named places. A straig
 - [JICA Karachi Transportation Improvement Project, 2012](https://openjicareport.jica.go.jp/pdf/12086393_01.pdf)
 - [Passenger-facing Green Line station list (secondary)](https://busupdate.com/pakistan/karachi/bus-routes/route-green-line/)
 - [Habib University coordinate dataset](https://zenodo.org/records/13951512)
+
+
+## BRT source reconciliation update — Phase 5AV / 5AW (18 November 2026)
+
+### Green Line
+- Government/PIDCL project evidence: 25 stations reported; 2016 presentation names 29 corridor points. The 2021 employer response confirms the count but not the station IDs.
+- Two passenger-facing 2026 lists claim 22 stations but differ materially. Neither is an operator-issued station register; do not merge or adopt either as verified.
+- Think Transportation KHI-MAP-08 (01-Jan-2025), hosted on the SMTA route-map page, visually depicts the Green Line corridor and labels multiple locations. Treat these as schematic map annotations, not verified current passenger platforms, station IDs, stop coordinates or road-following geometry.
+- Municipal Park remains an extension endpoint reported for FY 2026–27, not a verified current operating passenger stop.
+
+### Orange Line
+- Provincial Assembly answer (19-May-2026) reports the 4 km service operating from TMA Office Orangi Town to Jinnah University for Women near Matriculation Board Office.
+- Sindh Transport Department project page reports 3.88 km and five bus stations; SMTA project page reports four BRT stations plus one depot; 2021 Facility Management Agreement lists four contract station IDs (OL-1 to OL-4). These are different published scope claims and are not reconciled by assumption.
+- KHI-MAP-08 provides a dated schematic depiction but no current operator station-ID register or unambiguous physical platform sequence.
+- Retain OL-1 to OL-4 as contractual identities only. Do not invent a fifth station or infer which station is missing from the contract list.
+
+### Publication gate
+No Green or Orange BRT station coordinate, passenger stop status, route shape, or database record is approved by these phases. The project still requires a current SIDCL/SMTA operator station register or official operational drawing before BRT stop publication.
+
+Sources: [Provincial Assembly answer](https://pas.gov.pk/business/questios-details/33/2019); [Sindh Transport Department Orange Line](https://transport.sindh.gov.pk/orange-line); [SMTA Orange Line](https://smta.sindh.gov.pk/brt-abdul-sattar-edhi-line-orange-line); [Think Transportation KHI-MAP-08](https://smta.gos.pk/downloads/karachi-bus-route-map.pdf); [PIDCL Green Line 2016 presentation](https://pidcl.com.pk/wp-content/uploads/2016/08/Updated-Progress-Presentation-Green-Line-16-8-16.pdf); [SIDCL/PIDCL 2021 response](https://pidcl.com.pk/wp-content/uploads/2021/03/2021-03-19-Response-Document-Final-Version-.pdf).
