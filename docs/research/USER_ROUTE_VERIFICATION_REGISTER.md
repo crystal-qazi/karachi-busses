@@ -242,6 +242,36 @@
 17. Parco
 18. Ibrahim Hyderi
 
+## R11 — Miran Nakka to Shireen Jinnah Colony
+
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed
+- **Corrections supplied:** None; all 16 displayed entries accepted.
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-18
+- **Reference used for the displayed sequence:** Think Transportation, New Red Bus Karachi route page (published route description; accessed 2026-11-18): https://thinktransportation.net/red-bus-karachi/
+- **Important distinction:** The owner confirmed the displayed Think Transportation sequence. This does not independently verify physical boarding poles, GPS coordinates, current dispatch, return-direction sequence, or permission to redistribute Think Transportation's KML geometry.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Owner-confirmed forward stop sequence
+
+1. Miran Nakka
+2. Gulistan Colony
+3. Bihar Colony
+4. Agra Taj
+5. Daryabad
+6. Jinnah Bridge
+7. Bahria Complex
+8. M.T. Khan Road
+9. PICD
+10. Submarine Chowk
+11. Bahria Complex 3
+12. Khadda Market
+13. Abdullah Shah Ghazi
+14. Bilawal Chowrangi
+15. Ziauddin Hospital
+16. Shireen Jinnah Colony
+
 ## Next route awaiting owner review
 
-R11 — Miran Nakka to Shireen Jinnah Colony. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
+R12 — Naddi Kinara to Lucky Star. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
