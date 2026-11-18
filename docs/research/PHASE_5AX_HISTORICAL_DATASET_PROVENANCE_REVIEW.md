@@ -76,3 +76,8 @@ These are source-coordinate QA flags only. They do not authorize coordinate corr
 ## Importer metadata behaviour
 
 The importer retains the existing source name `Karachi Bus Network Research Dataset (user-provided cleaned files)` so a future explicit `--apply` run can find and update the existing source row rather than create a duplicate. It writes the Zenodo record URL and the confirmed provenance note, while leaving `verification_status` untouched. The importer remains dry-run by default; no database connection or write was made during this review.
+
+
+## Optional database metadata correction
+
+A metadata-only SQL script is provided at `sql/updates/phase5ax_historical_dataset_source_provenance.sql`. It selects and updates only the existing historical dataset row by its existing source name, setting the Zenodo record URL and provenance notes. It does not insert or delete records, change `verification_status`, or touch routes, stops, directions, segments or shapes. Review the selected row before committing. The source remains pending because the licence and current-service scope are not fully verified.
