@@ -104,6 +104,40 @@
 20. Korangi Crossing
 21. Nasir Jump
 
+## R4 — Power House to Keamari
+
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed
+- **Corrections supplied:** None
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-18
+- **Reference used for the displayed sequence:** Think Transportation, New Red Bus Karachi route page (published route description; accessed 2026-11-18): https://thinktransportation.net/red-bus-karachi/
+- **Important distinction:** The owner confirmed the displayed stop list and order, including the source's combined final entry "Tower and Keamari". This does not independently verify physical boarding poles, GPS coordinates, current dispatch, return-direction sequence, or permission to redistribute Think Transportation's KML geometry.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Owner-confirmed forward stop sequence
+
+1. Power House
+2. UP Mor
+3. Nagan Chowrangi
+4. Shafiq Mor
+5. Sohrab Goth
+6. Water Pump
+7. Ayesha Manzil
+8. Karimabad
+9. Liaquatabad 10
+10. Laloo Khait
+11. Teen Hati
+12. Jehangir Road
+13. Numaish
+14. Mobile Market
+15. Urdu Bazar
+16. Civil Hospital
+17. City Court
+18. Light House
+19. Bolton Market
+20. Tower and Keamari (combined entry in the published source)
+
 ## Next route awaiting owner review
 
-R4 — Power House to Keamari. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
+R8 — Yousuf Goth to Tower. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
