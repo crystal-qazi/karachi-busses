@@ -71,3 +71,8 @@ These are source-coordinate QA flags only. They do not authorize coordinate corr
 - [Zenodo edge CSV](https://zenodo.org/records/13951512/files/karachi_bus_network_edge_list.csv?download=1)
 - [Project Phase 5B coordinate review](../../docs/PHASE_5B_COORDINATE_REVIEW.md)
 - [Phase 5AS EV coordinate-to-KML audit](./PHASE_5AS_THINK_EV_CANDIDATE_COORDINATE_TO_KML_AUDIT.md)
+
+
+## Importer metadata behaviour
+
+The importer retains the existing source name `Karachi Bus Network Research Dataset (user-provided cleaned files)` so a future explicit `--apply` run can find and update the existing source row rather than create a duplicate. It writes the Zenodo record URL and the confirmed provenance note, while leaving `verification_status` untouched. The importer remains dry-run by default; no database connection or write was made during this review.
