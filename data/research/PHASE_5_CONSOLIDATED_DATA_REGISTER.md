@@ -242,3 +242,10 @@ The 1,415 edge CSV is a historical graph of links between named places. A straig
 - [JICA Karachi Transportation Improvement Project, 2012](https://openjicareport.jica.go.jp/pdf/12086393_01.pdf)
 - [Passenger-facing Green Line station list (secondary)](https://busupdate.com/pakistan/karachi/bus-routes/route-green-line/)
 - [Habib University coordinate dataset](https://zenodo.org/records/13951512)
+
+
+## Historical dataset provenance update — Phase 5AX (18 November 2026)
+
+The original historical Karachi Bus Network dataset is published as [Zenodo DOI 10.5281/zenodo.13951512](https://zenodo.org/records/13951512), Version v1, 18 October 2024, by Data Research Lab Pakistan. Creators: Muhammad Qasim Pasta (curator), Moid Raza Khan and Fatima Aslam (collectors), Habib University. The record describes a compilation of 76 public bus routes (BRT and minibuses) from Travel Culture and HamariWeb, with stop coordinates extracted from Google Maps. The published node CSV contains 572 node rows; the route network includes edge records.
+
+This confirms publication, creators, date, publisher and broad coordinate collection method. It does not provide per-stop Google Maps pins, capture dates, operator GPS or current service validation. The dataset remains historical secondary research only. The existing Phase 5B document had stated CC BY 4.0, but the current reviewed Zenodo page extraction did not expose a readable Rights/License value; verify machine-readable rights metadata before relying on redistribution. Preserve the existing source row's identity, add the DOI/source notes through the importer only when the user runs it, and keep its status pending. All imported stops/routes remain under_review.
