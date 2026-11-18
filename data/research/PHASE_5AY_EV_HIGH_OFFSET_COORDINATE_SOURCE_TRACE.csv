@@ -1,0 +1,11 @@
+route_code,think_sequence,think_stop_name,node_id,source_latitude,source_longitude,kml_offset_m,source_file,source_row_match,coordinate_decision
+EV-01,9,PAF Base Faisal,paf_base_faisal,24.96898395,67.22331802,2411.4,data/imports/karachi_bus_network_cleaned_nodes.csv,exact,retain_under_review_no_change
+EV-01,12,Nursery,nursery,24.9163873,67.1224255,3281.9,data/imports/karachi_bus_network_cleaned_nodes.csv,exact,retain_under_review_no_change
+EV-02,3,Toll Plaza,toll_plaza,24.9793624,66.9091871,27471.3,data/imports/karachi_bus_network_cleaned_nodes.csv,exact,retain_under_review_no_change
+EV-02,4,Baqai University,baqai_university,24.9160963,67.0308507,14894.4,data/imports/karachi_bus_network_cleaned_nodes.csv,exact,retain_under_review_no_change
+EV-02,5,Malir Cantt Gate 5,malir_cantt_gate_5,24.9268502,67.1615432,1747.4,data/imports/karachi_bus_network_cleaned_nodes.csv,exact,retain_under_review_no_change
+EV-02,6,Malir Cantt Gate 6,malir_cantt_gate_6,24.91310604,67.19857737,1007.4,data/imports/karachi_bus_network_cleaned_nodes.csv,exact,retain_under_review_no_change
+EV-03,3,Safoora Chowrangi,safoora_chowrangi,24.88227667,67.14885261,3849.2,data/imports/karachi_bus_network_cleaned_nodes.csv,exact,retain_under_review_no_change
+EV-03,14,Liaquat National Hospital,liaquat_national_hospital,24.9139086,67.0308414,4063.5,data/imports/karachi_bus_network_cleaned_nodes.csv,exact,retain_under_review_no_change
+EV-04,8,Water Pump,water_pump,24.874899,67.1673,11217.2,data/imports/karachi_bus_network_cleaned_nodes.csv,exact,retain_under_review_no_change
+EV-04,9,Ayesha Manzil,ayesha_manzil,24.85579905,67.01541425,9324.9,data/imports/karachi_bus_network_cleaned_nodes.csv,exact,retain_under_review_no_change
