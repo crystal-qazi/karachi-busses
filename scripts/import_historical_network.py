@@ -1,14 +1,19 @@
-"""Import the supplied historical Karachi network CSVs without asserting current service.
+"""Import the published 2024 historical Karachi network dataset without asserting current service.
 
 Required files:
   data/imports/karachi_bus_network_cleaned_nodes.csv
   data/imports/karachi_bus_network_cleaned_edges.csv
 
+Dataset provenance: Zenodo DOI 10.5281/zenodo.13951512 (Data Research Lab Pakistan,
+published 2024-10-18). The authors describe route compilation from Travel Culture and
+HamariWeb and coordinate extraction from Google Maps. No per-stop source pins or
+current operator validation are supplied. Verify the exact licence metadata before
+redistribution; the importer records the source as pending.
+
 Dry-run by default. Apply only after backup:
   python scripts/import_historical_network.py --apply --confirm-database karachi_buses
 
-The original dataset attribution/licence has not yet been independently confirmed.
-All created stops/routes/data source remain under_review/pending. No route is activated.
+All created stops/routes remain under_review; the source remains pending. No route is activated.
 """
 from __future__ import annotations
 
@@ -30,6 +35,17 @@ from config import Config  # noqa: E402
 NODES_FILE = ROOT / "data" / "imports" / "karachi_bus_network_cleaned_nodes.csv"
 EDGES_FILE = ROOT / "data" / "imports" / "karachi_bus_network_cleaned_edges.csv"
 SOURCE_NAME = "Karachi Bus Network Research Dataset (user-provided cleaned files)"
+SOURCE_URL = "https://zenodo.org/records/13951512"
+SOURCE_NOTES = (
+    "Historical 2024 research dataset, Version v1, published 2024-10-18 by Data Research Lab Pakistan; "
+    "creators: Muhammad Qasim Pasta (curator), Moid Raza Khan and Fatima Aslam (collectors), Habib University. "
+    "The Zenodo description says 76 Karachi public bus routes (BRT and minibuses) were compiled from "
+    "Travel Culture and HamariWeb, with stop coordinates extracted using Google Maps. "
+    "The node/edge files are historical secondary research, not current operator GPS or proof of current service. "
+    "No per-stop source pins or capture dates are supplied. Repository documentation records CC BY 4.0, "
+    "but the exact machine-readable Rights value must be verified before redistribution. "
+    "Keep verification_status pending and imported stops/routes under_review."
+)
 CATEGORY_NAME = "Historical / Unverified Network"
 DIRECTION_NAME = "Source-listed network (unverified)"
 
@@ -158,19 +174,19 @@ def main() -> int:
         if source_row:
             source_id = source_row["id"]
         else:
-            notes = (
-                "User-provided cleaned research files: 572 stop-node coordinates and 1,415 directed "
-                "stop-to-stop edges across 76 route identifiers. Original publication, author, date "
-                "and redistribution licence have not yet been independently confirmed. Dataset may "
-                "contain historical/private services and must not be treated as proof of current operation. "
-                "Imported records remain pending review."
-            )
             cursor.execute(
                 "INSERT INTO data_sources (source_name, source_url, notes, verification_status) "
-                "VALUES (%s,NULL,%s,'pending')",
-                (SOURCE_NAME, notes),
+                "VALUES (%s,%s,%s,'pending')",
+                (SOURCE_NAME, SOURCE_URL, SOURCE_NOTES),
             )
             source_id = cursor.lastrowid
+
+        # Refresh provenance metadata for an existing matching source row without
+        # changing its verification_status. This runs only with --apply.
+        cursor.execute(
+            "UPDATE data_sources SET source_url=%s, notes=%s WHERE id=%s",
+            (SOURCE_URL, SOURCE_NOTES, source_id),
+        )
 
         stop_ids: dict[str, int] = {}
         new_stops = 0

@@ -71,6 +71,8 @@ The existing 1,415 historical edges represent named-node graph connections, not 
 
 This phase does not connect to MySQL, call a geocoder or routing service, mutate the source CSVs, change source verification states, or publish stops/routes. The review CSV is a working copy. Approval and any eventual import remain separate controlled steps.
 
-## Source attribution
+## Source attribution and rights
 
-Pasta, Muhammad Qasim; Khan, Moid Raza; Aslam, Fatima. *Karachi Bus Network*, Data Research Lab Pakistan / Habib University, version 1, published 2024-10-18. DOI: https://doi.org/10.5281/zenodo.13951512. License: CC BY 4.0.
+Pasta, Muhammad Qasim (data curator); Khan, Moid Raza and Aslam, Fatima (data collectors). *Karachi Bus Network*, Data Research Lab Pakistan / Habib University, Version v1, published 18 October 2024. DOI: https://doi.org/10.5281/zenodo.13951512.
+
+The Zenodo description says route data for 76 Karachi public buses (BRT and minibuses) was compiled from Travel Culture and HamariWeb, with stop coordinates extracted from Google Maps. The repository's earlier documentation recorded CC BY 4.0, but the Rights/License value was not readable in the current page extraction. Verify the record's machine-readable licence metadata before relying on redistribution rights. This source is historical secondary research, not current operator evidence; it provides no per-stop source pins or capture dates.
