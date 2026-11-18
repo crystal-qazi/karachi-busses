@@ -39,8 +39,15 @@ def build() -> dict:
     aliases = read(ALIASES)
     if len(residual) != 82:
         raise ValueError(f"Expected 82 residual unmatched rows, found {len(residual)}")
-    if any(r.get("entry_type") != "operator_published_named_entry" for r in sequences):
-        raise ValueError("Official sequence register contains non-stop descriptors or unknown entry types")
+    allowed_types = {"direction_descriptor", "operator_published_named_entry"}
+    if any(r.get("entry_type") not in allowed_types for r in sequences):
+        raise ValueError("Official sequence register contains an unknown entry type")
+    for route in {r["route_code"] for r in sequences}:
+        route_rows = [r for r in sequences if r["route_code"] == route]
+        if sum(r["entry_type"] == "direction_descriptor" for r in route_rows) != 1:
+            raise ValueError(f"{route} must contain exactly one direction descriptor")
+        if route_rows[0]["entry_type"] != "direction_descriptor":
+            raise ValueError(f"{route} direction descriptor must be sequence 1")
 
     # Only explicit Phase 5Y user-confirmed equivalences may bridge spellings.
     alias_by_route: dict[str, dict[str, str]] = {}
