@@ -1,7 +1,7 @@
 # Phase 5AX — Historical Karachi Bus Network dataset provenance review
 
 **Review date:** 2026-11-18  
-**Status:** Publisher and source-method metadata confirmed; individual coordinate accuracy and reuse licence remain subject to record-level verification.
+**Status:** Canonical dataset DOI and publisher provenance confirmed; publisher companion page declares CC BY 4.0, while the Zenodo Rights field is visibly blank. Individual coordinate accuracy remains unverified.
 
 ## Primary record
 
@@ -29,7 +29,7 @@ This confirms the research dataset's publication provenance and the broad coordi
 
 The repository's historical node inventory contains 572 nodes and 1,415 directed edges across 76 route labels. These correspond to the published dataset's node/edge network model. The source attribution already present in `docs/PHASE_5B_COORDINATE_REVIEW.md` is therefore supported by the Zenodo record.
 
-The importer `scripts/import_historical_network.py` currently says the original publication, author, date and redistribution licence have not been independently confirmed. The first three items are now confirmed by the Zenodo record. The licence needs careful treatment: the current Zenodo page extraction exposes a Rights/License section but did not expose a readable licence value in the reviewed page text, while the repository's Phase 5B documentation records CC BY 4.0. Do not silently change the database's rights note until the machine-readable record rights value or an explicit source licence statement is checked.
+The DOI conflict is resolved in Phase 5AZ: `10.5281/zenodo.13951512` is the Karachi Bus Network dataset. The other DOI previously mentioned in issue #13, `10.5281/zenodo.13932672`, resolves to an unrelated software record named xIndices (Jivesh Dixit, Version 1.2.1), not this dataset. The Data Research Lab Pakistan companion project page explicitly declares the Karachi Bus Network dataset as CC BY 4.0. The Zenodo dataset page's visible Rights section currently shows the License heading without a displayed value. Record the publisher's licence statement and the Zenodo metadata gap separately; do not claim the Zenodo record itself exposes a machine-readable `cc-by-4.0` value.
 
 ## Coordinate-quality implications
 
@@ -60,15 +60,18 @@ These are source-coordinate QA flags only. They do not authorize coordinate corr
 1. Replace the stale statement that publication, creators and publication date are unknown with the confirmed Zenodo citation in research documentation.
 2. Keep the historical network classified as a 2024 secondary research dataset, not current operator evidence.
 3. Keep the 572 node coordinates, 1,415 directed edges and all derived route records unchanged.
-4. Keep all imported bus stops and routes under review; keep the source record pending until its exact rights value and scope are confirmed.
+4. Record the publisher companion page's CC BY 4.0 declaration with attribution; note that the Zenodo record's visible Rights field is blank. Keep all imported bus stops and routes under review and the source record pending because it is historical secondary data, not current operator evidence.
 5. Do not update MySQL or execute the importer. A future metadata-only source-record correction can set the Zenodo DOI and confirmed provenance while preserving `verification_status='pending'`.
-6. Do not claim the licence is confirmed until the Zenodo machine-readable Rights metadata or a clear licence statement is inspected.
+6. Do not state that the Zenodo record displays a machine-readable license value. The publisher's companion project page explicitly declares CC BY 4.0; retain this distinction in attribution and redistribution notes.
 
 ## References
 
 - [Zenodo record — Karachi Bus Network](https://zenodo.org/records/13951512)
 - [Zenodo node CSV](https://zenodo.org/records/13951512/files/karachi_bus_network_node_data.csv?download=1)
 - [Zenodo edge CSV](https://zenodo.org/records/13951512/files/karachi_bus_network_edge_list.csv?download=1)
+- [Data Research Lab Pakistan companion project page — declares CC BY 4.0](https://darlab-pakistan.github.io/karachi-bus-network/)
+- [Unrelated Zenodo DOI 10.5281/zenodo.13932672 — xIndices software](https://zenodo.org/records/13932672)
+- [Phase 5AZ DOI and licence reconciliation](./PHASE_5AZ_ZENODO_DOI_LICENSE_RECONCILIATION.md)
 - [Project Phase 5B coordinate review](../../docs/PHASE_5B_COORDINATE_REVIEW.md)
 - [Phase 5AS EV coordinate-to-KML audit](./PHASE_5AS_THINK_EV_CANDIDATE_COORDINATE_TO_KML_AUDIT.md)
 
@@ -80,4 +83,4 @@ The importer retains the existing source name `Karachi Bus Network Research Data
 
 ## Optional database metadata correction
 
-A metadata-only SQL script is provided at `sql/updates/phase5ax_historical_dataset_source_provenance.sql`. It selects and updates only the existing historical dataset row by its existing source name, setting the Zenodo record URL and provenance notes. It does not insert or delete records, change `verification_status`, or touch routes, stops, directions, segments or shapes. Review the selected row before committing. The source remains pending because the licence and current-service scope are not fully verified.
+A metadata-only SQL script is provided at `sql/updates/phase5ax_historical_dataset_source_provenance.sql`. It selects and updates only the existing historical dataset row by its existing source name, setting the Zenodo record URL and provenance notes. It does not insert or delete records, change `verification_status`, or touch routes, stops, directions, segments or shapes. Review the selected row before committing. The source remains pending because it is historical secondary research and does not establish current service, even though the publisher's companion page declares CC BY 4.0.
