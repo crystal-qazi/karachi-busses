@@ -197,7 +197,7 @@ The script requires the repository's existing 572-row historical node CSV and do
 6. Keep all 572 historical stops under_review, all data sources pending, and route_shapes empty.
 7. No MySQL import, route activation, stop approval, coordinate change or public API update was performed.
 
-## 10. Sources
+## 11. Sources
 
 - PakBus Karachi city route inventory: https://pakbus.app/cities/karachi
 - PakBus Green Line route and ordered stops: https://pakbus.app/routes/karachi-green-line
