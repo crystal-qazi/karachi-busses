@@ -69,13 +69,16 @@ def build() -> dict:
                     mapping[key] = target
 
     official_by_route: dict[str, list[dict[str, str]]] = {}
+    descriptors_by_route: dict[str, list[dict[str, str]]] = {}
     for row in sequences:
         if row.get("entry_type") == "operator_published_named_entry":
             official_by_route.setdefault(row["route_code"], []).append(row)
+        elif row.get("entry_type") == "direction_descriptor":
+            descriptors_by_route.setdefault(row["route_code"], []).append(row)
 
     fields = [
         "route_code", "source_stop_sequence", "source_stop_name",
-        "official_sequence_number", "official_entry_name", "official_source_url",
+        "official_sequence_number", "official_entry_name", "official_entry_type", "official_source_url",
         "name_match_type", "match_count_for_source_row",
         "physical_stop_verification", "coordinate_assignment", "route_approval_status",
         "review_note",
@@ -99,12 +102,38 @@ def build() -> dict:
                     match_type = "exact_normalized_name" if base == official_base else "user_confirmed_spelling_alias"
                     matches.append((official, match_type))
             if not matches:
+                descriptor_matches = []
+                for descriptor in descriptors_by_route.get(route, []):
+                    descriptor_name = normalize(descriptor["entry_name"])
+                    if base and f" {base} " in f" {descriptor_name} ":
+                        descriptor_matches.append(descriptor)
+                if descriptor_matches:
+                    for descriptor in descriptor_matches:
+                        writer.writerow({
+                            "route_code": route,
+                            "source_stop_sequence": source["source_stop_sequence"],
+                            "source_stop_name": source_name,
+                            "official_sequence_number": descriptor["sequence_number"],
+                            "official_entry_name": descriptor["entry_name"],
+                            "official_entry_type": "direction_descriptor",
+                            "official_source_url": descriptor["official_source_url"],
+                            "name_match_type": "direction_descriptor_reference_only",
+                            "match_count_for_source_row": str(len(descriptor_matches)),
+                            "physical_stop_verification": "unverified",
+                            "coordinate_assignment": "not_assigned",
+                            "route_approval_status": "not_approved",
+                            "review_note": "Name appears only within the route direction descriptor (e.g. terminal/via corridor); not a separately numbered passenger stop",
+                        })
+                        counts["direction_descriptor_reference_only"] += 1
+                        by_route[route] += 1
+                    continue
                 writer.writerow({
                     "route_code": route,
                     "source_stop_sequence": source["source_stop_sequence"],
                     "source_stop_name": source_name,
                     "official_sequence_number": "",
                     "official_entry_name": "",
+                    "official_entry_type": "",
                     "official_source_url": "",
                     "name_match_type": "no_exact_sequence_name_match",
                     "match_count_for_source_row": "0",
@@ -123,6 +152,7 @@ def build() -> dict:
                         "source_stop_name": source_name,
                         "official_sequence_number": official["sequence_number"],
                         "official_entry_name": official["entry_name"],
+                        "official_entry_type": official["entry_type"],
                         "official_source_url": official["official_source_url"],
                         "name_match_type": match_type,
                         "match_count_for_source_row": str(len(matches)),
