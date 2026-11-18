@@ -1,58 +1,65 @@
-# Phase 5AM — Think Transportation KML Geometry and SMTA Route Register Alignment
+# Phase 5AM — Think Transportation KML and route register alignment
 
-**Review date:** 2026-11-18  
-**Status:** Source hierarchy adopted; route inventory and published sequence register updated. No geometry or database records changed.
+**Original review date:** 2026-11-18  
+**Follow-up decision:** Phase 5AN, 2026-11-18  
+**Status:** Think Transportation is accepted by the project owner as an authentic reference for People's Bus Service R-series and EV-series route identity, route descriptions and the supplied KML. This supersedes the earlier wording that treated Think Transportation's website as merely supplementary.
 
-## Adopted source hierarchy
+## Accepted Think Transportation material
 
-1. **Think Transportation KML supplied for this project:** primary route-line geometry reference for routes present in the file. Preserve original coordinate order, direction and vertices. Do not snap, simplify, reverse, geocode, interpolate or replace the source line.
-2. **Sindh Mass Transit Authority (SMTA):** authority for the route status, route names and numbered stop/area sequences it publishes. Individual route-detail pages are the sequence source; differences with the route-map index remain visible as conflicts.
-3. **User-supplied Google Maps routes and coordinates:** supplementary route/waypoint evidence. Preserve exact user coordinates and sequence; do not silently insert waypoints or alter a route.
-4. **Think Transportation website and other route directories:** supplementary corroboration only; they do not override SMTA for official status or sequence.
-5. **Bus Kahan Hai:** live vehicle-position evidence only when its feed actually provides usable current observations. An empty/stale feed is not proof that a service is inactive.
-6. **TransKarachi:** evidence for its BRT corridors and project scope, not a substitute for People's Bus route details.
-7. **OpenStreetMap:** supporting geographic and road context only. It is not the primary route geometry source.
+- Route details: https://thinktransportation.net/red-bus-karachi/ (page updated 3 February 2025).
+- KHI-MAP-08 PDF: https://thinktransportation.net/Karachi_transport_map_peoples_bus_service_green_line_orange_line_think_transportation.pdf (dated 1 January 2025).
+- Supplied KML: `Think Transportation - Red Bus (Peoples Bus Service) Routes Karachi (1).kml` (description reports 1 February 2025).
+
+Use the Think Transportation route page and KML as authentic project references for R-series and EV-series route identity, published route descriptions and route-line geometry. Retain source dates and attribution. The route page's operational labels are statements published in February 2025, not live dispatch confirmation on the current date.
+
+## Route and geometry handling
+
+1. For routes present in the supplied KML, preserve the original LineString coordinate order, direction and vertices exactly. Do not snap, simplify, reverse, geocode, interpolate or replace the geometry.
+2. Use Think Transportation's detailed route page for its published route labels, terminal descriptions and ordered named-entry lists.
+3. SMTA route pages and route-map index remain useful government-published comparison evidence. Where they differ from Think Transportation, retain the discrepancy as an alternate source statement; do not silently replace the accepted Think Transportation route reference.
+4. User-supplied Google Maps routes and coordinates remain supplementary evidence. Preserve exact user coordinates and waypoint order; do not silently insert waypoints or alter routes.
+5. Bus Kahan Hai is live vehicle-position evidence only when its feed supplies usable current observations.
+6. TransKarachi is evidence for its BRT corridors and project scope, not a substitute for People's Bus R/EV route detail.
+7. OpenStreetMap is supporting geographic and road context only. It is not a replacement for Think Transportation route geometry.
 
 ## Supplied KML inventory
-
-The supplied file is named `Think Transportation - Red Bus (Peoples Bus Service) Routes Karachi (1).kml`. Its document description reports an update date of 2025-02-01.
 
 - 15 route LineStrings: R1, R2, R3, R4, R8, R9, R10, R11, R12, R13 and EV-01 through EV-05.
 - 10,803 coordinate vertices across those lines.
 - Approximately 463.52 km combined geodesic line length.
 - The KML contains route lines, not separately identified passenger-stop placemarks. Vertices must never be interpreted as bus stops.
-- Original KML coordinate order and direction are retained. This audit does not authorize any geometry edit.
+- Original KML coordinate order and direction are retained.
 
-### SMTA-listed routes absent from this KML
+### Routes absent from supplied KML
 
-- R5, R6 and R7 — SMTA currently labels these inactive.
-- R14 — SMTA labels this route active.
-- DD01 — SMTA labels the Double Decker route active.
+- R5, R6 and R7.
+- R14.
+- DD01.
 
-Absence from the KML is not evidence of route inactivity. No replacement geometry is inferred for these routes.
+Absence from the KML is not evidence of inactivity. R14 and DD01 require separately sourced geometry; do not fabricate replacement lines.
 
-## SMTA numbered sequence register
+## R-series conflict reconciliation
 
-The Phase 5AF register now contains 268 numbered entries from 20 SMTA route-detail pages: R1–R14, EV-01–EV-05 and DD01. The first numbered item on each page is retained as a direction descriptor, not treated as a separately inferred passenger stop. R5–R7 retain their published inactive status.
+Phase 5AN records the owner-approved Think Transportation decisions for R1, R2, R3, R4, R8, R11, R12 and R13:
 
-See:
-- `data/research/PHASE_5AF_OFFICIAL_ROUTE_STOP_SEQUENCES.csv`
-- `docs/PHASE_5AF_OFFICIAL_ROUTE_STOP_SEQUENCES.md`
+- R1: Think's Khokrapar–Dockyard reference is accepted; retain the KML's "Khokrapar No. 1" label and SMTA spellings without forced equivalence.
+- R2: accept Power House–Indus Hospital; retain SMTA's North Karachi–Korangi Crossing description as an alternate statement.
+- R3: accept Power House–Nasir Jump; retain the Think page's "Temporary Change" qualifier.
+- R4: accept Power House–Keamari; retain Kemari as an alternate spelling, with terminal ordering still to be checked.
+- R8: accept Yousuf Goth→Tower as the reference direction; do not infer reverse geometry.
+- R11: accept Miran Nakka–Shireen Jinnah Colony; Think lists Ziauddin Hospital as an intermediate entry, while SMTA describes Mera Naka–Ziauddin Hospital.
+- R12: accept Naddi Kinara–Lucky Star; retain SMTA's Memon Goth–Sadar Lucky Star statement separately.
+- R13: accept the current Think sequence, where Gulbai appears once after Mauripur.
 
-## Known source conflicts retained
+See `docs/research/PHASE_5AN_THINK_TRANSPORTATION_R_SERIES_RECONCILIATION.md` and its CSV companion for route-by-route details.
 
-- R1: SMTA's Khokharapar 04 / Kokharpar 04 differs from the KML's Khokrapar No. 1 label.
-- R2–R4: SMTA individual-page origin descriptions differ from the KML Powerhouse labels.
-- R11 and R12: SMTA individual detail-page endpoint descriptions differ from the route-map index labels.
-- EV-01: SMTA names CMH Malir Cantt; the KML label is Malir Cantt.
-- EV-03: SMTA names Quaid-e-Azam Square Malir Cantt via X-20; KML uses Malir Cantt–Numaish.
-- Route lengths published by SMTA are not used to stretch, shorten or otherwise modify KML geometry.
+## Sequence and physical-stop limitations
 
-Conflicts are recorded, not silently adjudicated. A route name or sequence does not prove the identity or physical location of a boarding pole.
+Think Transportation's ordered named-entry lists are accepted route-description references. They do not provide GPS coordinates for every physical boarding pole or prove the exact boarding side/platform. Keep physical stop identity, coordinate, boarding side and field verification as separate checks. Do not infer a return direction by reversing an outbound sequence or LineString.
 
-## Licensing and redistribution
+## Licensing and attribution
 
-The supplied map/KML carries Think Transportation attribution and a notice restricting use without permission. The source file and derived route geometry are not added to this repository by this phase. Confirm permission or applicable terms before public redistribution, publication, or production use of the KML or derived geometry. Retain attribution and any required notices.
+The supplied map/KML carries Think Transportation attribution and a notice restricting use without permission. Retain attribution and confirm applicable permission/terms before public redistribution, publication or production use of the KML or derived geometry. This project phase does not claim that permission has been obtained.
 
 OpenStreetMap-derived supporting context must retain © OpenStreetMap contributors attribution and ODbL 1.0 licensing.
 
@@ -62,8 +69,8 @@ OpenStreetMap-derived supporting context must retain © OpenStreetMap contributo
 - No historical coordinate replacement or stop-to-route assignment.
 - No geocoding, snapping, route interpolation or road-following geometry generation.
 - No geometry changes to the supplied KML.
-- No claim that every SMTA named area is a verified physical passenger boarding location.
+- No claim that every named area is a verified physical passenger boarding location.
 
 ## Next gate
 
-Continue route-by-route review against the published SMTA sequence and preserved KML line. Reconcile route identity and direction conflicts; obtain permission for use of the KML; verify physical boarding points independently before assigning coordinates or publishing routes.
+Apply the accepted Think Transportation reference consistently to EV-01–EV-05, then continue physical stop matching and coordinate/boarding-side verification. Review R14 and DD01 separately because they are absent from the supplied KML. Prepare direction-specific road-following geometry only from reviewed evidence.

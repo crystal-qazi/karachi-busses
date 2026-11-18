@@ -1,0 +1,66 @@
+route_code,think_sequence,think_stop_name,candidate_node_id,latitude,longitude,match_result,review_status,distance_m,nearest_kml_chainage_km,route_line_proximity
+EV-01,1,CMH Malir Cantt,cmh_malir_cantt,24.95043743,67.21548491,exact_normalized_name_candidate,under_review_not_verified,212.8,0.002,within_250m
+EV-01,2,Tank Chowk,tank_chowk,24.9125582,67.1859867,exact_normalized_name_candidate,under_review_not_verified,25.8,6.007,within_250m
+EV-01,3,Model Colony Mor,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-01,4,Jinnah Ave,jinnah_ave,24.8981084,67.1799093,exact_normalized_name_candidate,under_review_not_verified,6.6,7.746,within_250m
+EV-01,5,Airport,airport,24.8865027,67.1440768,exact_normalized_name_candidate,under_review_not_verified,38.1,12.869,within_250m
+EV-01,6,Colony Gate,colony_gate,24.88711,67.1501422,exact_normalized_name_candidate,under_review_not_verified,25.3,12.256,within_250m
+EV-01,7,Nata Khan Bridge,nata_khan_bridge,24.8835251,67.1365798,exact_normalized_name_candidate,under_review_not_verified,389.8,13.606,250m_to_1km
+EV-01,8,Drigh Road Station,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-01,9,PAF Base Faisal,paf_base_faisal,24.96898395,67.22331802,exact_normalized_name_candidate,under_review_not_verified,2411.4,0.000,over_1km
+EV-01,10,Laal Kothi,laal_kothi,24.86125882,67.0695211,exact_normalized_name_candidate,under_review_not_verified,74.7,21.121,within_250m
+EV-01,11,Karsaz,karsaz,24.8724882,67.0916203,exact_normalized_name_candidate,under_review_not_verified,34.6,18.560,within_250m
+EV-01,12,Nursery,nursery,24.9163873,67.1224255,exact_normalized_name_candidate,under_review_not_verified,3281.9,14.870,over_1km
+EV-01,13,FTC,ftc,24.8583003,67.05220275,exact_normalized_name_candidate,under_review_not_verified,84.0,22.930,within_250m
+EV-01,14,Korangi Road,korangi_road,24.8344317,67.0726736,exact_normalized_name_candidate,under_review_not_verified,1.5,26.743,within_250m
+EV-01,15,DHA Phase 1,dha_phase_1,24.84122,67.0674901,exact_normalized_name_candidate,under_review_not_verified,391.0,25.922,250m_to_1km
+EV-01,16,Masjid e Ayesha,masjid_e_ayesha,24.80238342,67.07764754,exact_normalized_name_candidate,under_review_not_verified,12.8,30.372,within_250m
+EV-01,17,Clock Tower DHA,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-01,18,Dolmen Mall Clifton,dolmen_mall_clifton,24.8021938,67.0292762,exact_normalized_name_candidate,under_review_not_verified,101.0,37.659,within_250m
+EV-02,1,Bahria Town,bahria_town,24.9940186,67.3168881,exact_normalized_name_candidate,under_review_not_verified,34.8,13.284,within_250m
+EV-02,2,Dumba Goth,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-02,3,Toll Plaza,toll_plaza,24.9793624,66.9091871,exact_normalized_name_candidate,under_review_not_verified,27471.3,32.963,over_1km
+EV-02,4,Baqai University,baqai_university,24.9160963,67.0308507,exact_normalized_name_candidate,under_review_not_verified,14894.4,32.972,over_1km
+EV-02,5,Malir Cantt Gate 5,malir_cantt_gate_5,24.9268502,67.1615432,exact_normalized_name_candidate,under_review_not_verified,1747.4,33.350,over_1km
+EV-02,6,Malir Cantt Gate 6,malir_cantt_gate_6,24.91310604,67.19857737,exact_normalized_name_candidate,under_review_not_verified,1007.4,35.654,over_1km
+EV-02,7,Tank Chowk,tank_chowk,24.9125582,67.1859867,exact_normalized_name_candidate,under_review_not_verified,13.4,36.012,within_250m
+EV-02,8,Model Mor,model_mor,24.9035044,67.18190311,exact_normalized_name_candidate,under_review_not_verified,4.2,37.135,within_250m
+EV-02,9,Jinnah Ave,jinnah_ave,24.8981084,67.1799093,exact_normalized_name_candidate,under_review_not_verified,6.6,37.767,within_250m
+EV-02,10,Malir Halt,malir_halt,24.88473238,67.17530796,exact_normalized_name_candidate,under_review_not_verified,26.1,39.299,within_250m
+EV-03,1,Malir Cantt Check Post 5,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-03,2,Rim Jhim Tower,rim_jhim_tower,24.9404477,67.1598766,exact_normalized_name_candidate,under_review_not_verified,29.9,6.942,within_250m
+EV-03,3,Safoora Chowrangi,safoora_chowrangi,24.88227667,67.14885261,exact_normalized_name_candidate,under_review_not_verified,3849.2,14.351,over_1km
+EV-03,4,Mausamiyat Chowrangi,mausamiyat_chowrangi,24.93748255,67.14450823,exact_normalized_name_candidate,under_review_not_verified,51.8,8.542,within_250m
+EV-03,5,Kamran Chowrangi,kamran_chowrangi,24.9237215,67.137763,exact_normalized_name_candidate,under_review_not_verified,7.1,10.562,within_250m
+EV-03,6,Darul Sehat Hospital,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-03,7,Johar Chowrangi,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-03,8,Johar Mor,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-03,9,Millennium Mall,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-03,10,Dalmia Road,dalmia_road,24.9017427,67.0985722,exact_normalized_name_candidate,under_review_not_verified,555.8,16.106,250m_to_1km
+EV-03,11,Bahria University,bahria_university,24.89401793,67.0879853,exact_normalized_name_candidate,under_review_not_verified,8.8,17.386,within_250m
+EV-03,12,National Stadium,national_stadium,24.8946458,67.08160851,exact_normalized_name_candidate,under_review_not_verified,284.6,17.955,250m_to_1km
+EV-03,13,Aga Khan Hospital,aga_khan_hospital,24.8927762,67.07408539,exact_normalized_name_candidate,under_review_not_verified,242.7,18.832,within_250m
+EV-03,14,Liaquat National Hospital,liaquat_national_hospital,24.9139086,67.0308414,exact_normalized_name_candidate,under_review_not_verified,4063.5,20.349,over_1km
+EV-03,15,PIB Colony,p.i.b_colony,24.89497742,67.05440128,exact_normalized_name_candidate,under_review_not_verified,911.3,20.349,250m_to_1km
+EV-03,16,Jail Chowrangi,jail_chowrangi,24.8848564,67.0565777,exact_normalized_name_candidate,under_review_not_verified,4.8,20.833,within_250m
+EV-03,17,Dawood Engineering University,dawood_engineering_university,24.8787907,67.04753855,exact_normalized_name_candidate,under_review_not_verified,51.5,21.963,within_250m
+EV-03,18,Islamia College,islamia_college,24.8797964,67.04616588,exact_normalized_name_candidate,under_review_not_verified,115.6,22.029,within_250m
+EV-03,19,People Secretariat Chowrangi,people_secretariat_chowrangi,24.87759281,67.04411999,exact_normalized_name_candidate,under_review_not_verified,30.2,22.323,within_250m
+EV-03,20,Numaish,numaish,24.8733627,67.0359938,exact_normalized_name_candidate,under_review_not_verified,40.4,23.456,within_250m
+EV-04,1,Bahria Town,bahria_town,24.9940186,67.3168881,exact_normalized_name_candidate,under_review_not_verified,34.8,13.364,within_250m
+EV-04,2,Dumba Goth,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-04,3,M9 Toll Plaza,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-04,4,Jamali Pull,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-04,5,New Sabzi Mandi,new_sabzi_mandi,24.99389573,67.15636147,exact_normalized_name_candidate,under_review_not_verified,84.5,30.947,within_250m
+EV-04,6,Al Asif,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-04,7,Sohrab Goth,sohrab_goth,24.9436845,67.0843456,exact_normalized_name_candidate,under_review_not_verified,29.9,40.601,within_250m
+EV-04,8,Water Pump,water_pump,24.874899,67.1673,exact_normalized_name_candidate,under_review_not_verified,11217.2,39.382,over_1km
+EV-04,9,Ayesha Manzil,ayesha_manzil,24.85579905,67.01541425,exact_normalized_name_candidate,under_review_not_verified,9324.9,43.336,over_1km
+EV-05,1,DHA City,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-05,2,Bahria Town,bahria_town,24.9940186,67.3168881,exact_normalized_name_candidate,under_review_not_verified,199.0,14.738,within_250m
+EV-05,3,Dumba Goth,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-05,4,M9 Toll Plaza,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-05,5,Jamali Pull,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-05,6,New Sabzi Mandi,new_sabzi_mandi,24.99389573,67.15636147,exact_normalized_name_candidate,under_review_not_verified,84.5,31.561,within_250m
+EV-05,7,Al Asif,,,,no_exact_name_match,under_review_not_verified,,,no_coordinate_candidate
+EV-05,8,Sohrab Goth,sohrab_goth,24.9436845,67.0843456,exact_normalized_name_candidate,under_review_not_verified,37.5,41.193,within_250m
