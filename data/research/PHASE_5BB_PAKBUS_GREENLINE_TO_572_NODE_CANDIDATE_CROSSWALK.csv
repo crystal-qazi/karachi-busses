@@ -1,0 +1,23 @@
+sequence,pakbus_stop_id,pakbus_stop_name,pakbus_latitude,pakbus_longitude,nearest_historical_node,nearest_historical_latitude,nearest_historical_longitude,nearest_distance_m,decision
+1,fgejp,Abdullah Chowk,25.023739,67.063653,kda_stop,25.01886377,67.06385519,542.5,candidate_only_no_alias_or_coordinate_change
+2,zc94d,KDA Flats,25.017157,67.064133,kda_stop,25.01886377,67.06385519,191.8,candidate_only_no_alias_or_coordinate_change
+3,cr37m,Karimi Chowrangi,25.010961,67.064415,kda_stop,25.01886377,67.06385519,880.6,candidate_only_no_alias_or_coordinate_change
+4,rz8j9,Surjani (4K) Chowrangi,25.004923,67.064807,two_minutes_chowrangi,25.00057259,67.06491635,483.9,candidate_only_no_alias_or_coordinate_change
+5,x47fq,2 Minute,24.998592,67.065205,two_minutes_chowrangi,25.00057259,67.06491635,222.1,candidate_only_no_alias_or_coordinate_change
+6,trfwx,Road 2400 (Aisha Complex),24.9920211,67.0655972,bukhramandi,24.9946,67.0712,713.7,candidate_only_no_alias_or_coordinate_change
+7,ts9j5,Power House,24.98437,67.066115,bukhramandi,24.9946,67.0712,202.4,candidate_only_no_alias_or_coordinate_change
+8,k9hb3,Road 4200 (Saleem Center),24.9781,67.066523,up_mor,24.9733076,67.066787,593.9,candidate_only_no_alias_or_coordinate_change
+9,bs6ma,Up Mor,24.9733076,67.066787,up_mor,24.9733076,67.066787,61.2,candidate_only_no_alias_or_coordinate_change
+10,r9ege,Nagan Chowrangi,24.966492,67.067014,nagan_chowrangi,24.9650421,67.0668664,161.9,candidate_only_no_alias_or_coordinate_change
+11,ec3sy,Erum Shopping (Shadman No:2),24.9584953,67.0615637,hassan_chowrangi,24.9602,67.0645,674.8,candidate_only_no_alias_or_coordinate_change
+12,tzqdp,Juma Bazar (Bayani Center),24.9503982,67.0544549,hassan_chowrangi,24.9602,67.0645,477.2,candidate_only_no_alias_or_coordinate_change
+13,n67a9,Five Star,24.9456608,67.050287,5_star_chowrangi,24.9456608,67.050287,424.0,candidate_only_no_alias_or_coordinate_change
+14,wrnqg,Hyderi,24.937317,67.042801,hyderi,24.93622,67.0439858,170.7,candidate_only_no_alias_or_coordinate_change
+15,j59mx,Board Office,24.926657,67.03335,kda_chowrangi,24.9314051,67.0375124,674.5,candidate_only_no_alias_or_coordinate_change
+16,gfm2v,Annu Bhai Park,24.9170006,67.0313466,baqai_university,24.9160963,67.0308507,112.3,candidate_only_no_alias_or_coordinate_change
+17,yjpwm,Enquiry Office,24.9059836,67.0309849,nazimabad,24.905865,67.0307183,29.9,candidate_only_no_alias_or_coordinate_change
+18,w9wyf,Nazimabad No 1,24.8997924,67.0304124,nazimabad_chowrangi,24.9009011,67.0299146,133.1,candidate_only_no_alias_or_coordinate_change
+19,cmspa,Sanitary Market (Gulbahar),24.894887,67.030737,nazimabad_chowrangi,24.9009011,67.0299146,673.9,candidate_only_no_alias_or_coordinate_change
+20,ezn5d,Lasbela Chowk,24.8857079,67.0345538,lasbela_chowk,24.8873906,67.0330192,242.8,candidate_only_no_alias_or_coordinate_change
+21,x4kmp,Patel Para (Gurumandir),24.881287,67.038129,gurumandir,24.88140425,67.03925328,114.2,candidate_only_no_alias_or_coordinate_change
+22,crmxq,Numaish,24.8732349,67.0362792,numaish,24.8733627,67.0359938,32.1,candidate_only_no_alias_or_coordinate_change
