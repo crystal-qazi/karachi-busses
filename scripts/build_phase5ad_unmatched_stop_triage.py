@@ -49,7 +49,9 @@ def build(input_path: Path = INPUT, output_path: Path = OUTPUT, report_path: Pat
         "top_candidate_band", "top_candidate_gap", "candidate_ambiguity",
         "triage_priority", "triage_reason",
     ]
-    counts = Counter()
+    top_bands = Counter()
+    ambiguities = Counter()
+    priorities = Counter()
     routes = defaultdict(Counter)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8", newline="") as f:
@@ -96,9 +98,9 @@ def build(input_path: Path = INPUT, output_path: Path = OUTPUT, report_path: Pat
                 "triage_reason": reason,
             })
             writer.writerow(out)
-            counts[top_band] += 1
-            counts[ambiguity] += 1
-            counts[priority] += 1
+            top_bands[top_band] += 1
+            ambiguities[ambiguity] += 1
+            priorities[priority] += 1
             routes[row["route_code"]][priority] += 1
             routes[row["route_code"]]["rows"] += 1
 
@@ -107,7 +109,7 @@ def build(input_path: Path = INPUT, output_path: Path = OUTPUT, report_path: Pat
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "input": str(input_path),
         "output": {"csv": str(output_path), "rows": len(rows)},
-        "counts": {"rows": len(rows), **dict(sorted(counts.items()))},
+        "counts": {\n            "rows": len(rows),\n            "top_candidate_bands": dict(sorted(top_bands.items())),\n            "ambiguity": dict(sorted(ambiguities.items())),\n            "triage_priority": dict(sorted(priorities.items())),\n        },
         "by_route": {route: dict(sorted(c.items())) for route, c in sorted(routes.items())},
         "method": {
             "strong": "top score >= 0.85",
