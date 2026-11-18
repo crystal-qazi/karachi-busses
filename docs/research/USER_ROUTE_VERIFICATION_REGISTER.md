@@ -161,6 +161,55 @@
 8. Jinnah Bridge
 9. Tower
 
+## R9 — Gulshan-e-Hadeed to Tower
+
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed
+- **Corrections supplied:** None; all 35 displayed entries accepted.
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-18
+- **Reference used for the displayed sequence:** Think Transportation, New Red Bus Karachi route page (published route description; accessed 2026-11-18): https://thinktransportation.net/red-bus-karachi/
+- **Important distinction:** The owner confirmed the detailed Think Transportation sequence. This does not independently verify physical boarding poles, GPS coordinates, current dispatch, return-direction sequence, or permission to redistribute Think Transportation's KML geometry.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Owner-confirmed forward stop sequence
+
+1. Gulshan-e-Hadeed
+2. Salah Uddin Ayubi Road
+3. Allah Wali Chowrangi
+4. National Highway 5
+5. Steel Mill More
+6. Port Bin Qasim More
+7. Razzakabad
+8. Abdullah Goth
+9. Chowkundi More
+10. FAST University
+11. Bhains Colony More
+12. Manzil Pump
+13. Quaidabad
+14. Murghi Khana
+15. Prince Aly Boys School
+16. NADRA Center Malir
+17. Malir Session Court
+18. Malir 15
+19. Kalaboard
+20. Malir Halt
+21. Colony Gate
+22. Nata Khan Bridge
+23. Drigh Road Station
+24. PAF Base Faisal
+25. Laal Kothi
+26. Karsaz
+27. Nursery
+28. FTC
+29. Regent Plaza
+30. Metropole
+31. Fawwara Chowk
+32. Arts Council
+33. Shaheen Complex
+34. I.I. Chundrigar Road
+35. Tower
+
 ## Next route awaiting owner review
 
-R9 — Malir Cantt to Tower. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
+R10 — Numaish Chowrangi to Ibrahim Hyderi. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
