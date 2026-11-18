@@ -64,7 +64,7 @@ class Phase5AKTests(unittest.TestCase):
             {"type":"Feature","properties":{"osm_type":"node","osm_id":11,"name":"Sohrab Goth",
               "candidate_kind":"highway_bus_stop","tags":{"highway":"bus_stop"}},"geometry":{"type":"Point","coordinates":[67.2,24.9]}},
             {"type":"Feature","properties":{"osm_type":"node","osm_id":12,"name":"FTC",
-              "candidate_kind":"highway_bus_stop","tags":{"highway":"bus_stop"}},"geometry":{"type":"Point","coordinates":[67.3,24.9}},
+              "candidate_kind":"highway_bus_stop","tags":{"highway":"bus_stop"}},"geometry":{"type":"Point","coordinates":[67.3,24.9]}},
         ]}), encoding="utf-8")
 
     def test_route_scoped_alias_and_all_duplicate_candidates_are_preserved(self):
