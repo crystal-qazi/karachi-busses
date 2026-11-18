@@ -25,4 +25,4 @@ Each row records the current published finding, what can be adjudicated from doc
 
 This phase does not contact SMTA, TransKarachi, SIDCL or operators. It does not infer live service, approve routes, identify physical stop poles, assign coordinates, or create geometry. No conflict is marked fully resolved without authoritative operator evidence.
 
-OSM remains the primary geographic base. Road geometry must remain blocked until route identity, direction, physical boarding point, and bus-accessible path are verified.
+Supplied Think Transportation KML is the primary route-line geometry reference for routes present in that file; preserve its original coordinate order and direction without snapping, simplification, or replacement. SMTA is authoritative for published route status, route names and stop sequences. OSM is supporting geographic/road context only. Missing KML routes (including R14 and DD01) remain without adopted geometry until a permitted, source-backed geometry is obtained. Physical boarding-point verification remains a separate gate.
