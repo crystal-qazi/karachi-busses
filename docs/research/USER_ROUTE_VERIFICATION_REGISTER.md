@@ -285,3 +285,43 @@
 ## Next route awaiting owner review
 
 R12 — Naddi Kinara to Lucky Star. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
+
+
+## R12 — Naddi Kinara to Lucky Star Saddar (awaiting owner review)
+
+- **Owner review:** Pending — do not treat as confirmed.
+- **Stop order:** Pending owner confirmation.
+- **Reference used for the review draft:** Think Transportation, New Red Bus Karachi route page, updated 3 February 2025: https://thinktransportation.net/red-bus-karachi/
+- **Published source terminal label:** Naddi Kinara to Lucky Star.
+- **Important source conflict:** SMTA's detailed route page describes Memon Goth to Sadar Lucky Star. The historical coordinate dataset's Route-12 chain begins at Naddi Kinara and ends at Lucky Star Saddar. These are distinct source statements; this review draft does not resolve the origin conflict.
+- **Review request:** Confirm whether the following displayed Think Transportation names and their exact order are correct. If a name or order is wrong, provide the correction and its position.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Published Think Transportation forward sequence — awaiting owner confirmation
+
+1. Naddi Kinara
+2. Khokhrapar
+3. Saudabad Chowrangi
+4. RCD Ground
+5. Kalaboard
+6. Malir 15
+7. Malir Mandir
+8. Malir Session Court
+9. Murghi Khana
+10. Quaidabad
+11. Dawood Chowrangi
+12. Babar Market
+13. Landhi Road
+14. Nasir Jump
+15. Indus Hospital
+16. Korangi Crossing
+17. Qayyumabad
+18. Defence Mor
+19. National Medical Center
+20. Gora Qabristan
+21. FTC
+22. Jutt Land
+23. Lines Area
+24. Army Public School
+25. Lucky Star Saddar
+
