@@ -210,6 +210,38 @@
 34. I.I. Chundrigar Road
 35. Tower
 
+## R10 — Numaish Chowrangi to Ibrahim Hyderi
+
+- **Owner review:** Confirmed with correction
+- **Stop order:** Confirmed with the supplied correction
+- **Correction supplied:** Split the source's combined "Do Talwar / Abdullah Shah Ghazi" entry into three stops in this exact order: **Do Talwar**, **Pak Tower**, **Abdullah Shah Ghazi**.
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-18
+- **Reference used for the base sequence:** Think Transportation, New Red Bus Karachi route page (published route description; accessed 2026-11-18): https://thinktransportation.net/red-bus-karachi/
+- **Important distinction:** The owner confirmed the displayed Think Transportation sequence with the explicit split/insertion above. This does not independently verify physical boarding poles, GPS coordinates, current dispatch, return-direction sequence, or permission to redistribute Think Transportation's KML geometry.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Owner-confirmed forward stop sequence (with owner correction)
+
+1. Numaish Chowrangi
+2. Mobile Market
+3. Metropole
+4. Frere Hall
+5. Teen Talwar
+6. Do Talwar
+7. Pak Tower
+8. Abdullah Shah Ghazi
+9. Dolmen Mall
+10. Clock Tower DHA
+11. 26 Street
+12. Masjid-e-Ayesha
+13. Rahat Park
+14. KPT Interchange
+15. Korangi Crossing
+16. CBM University
+17. Parco
+18. Ibrahim Hyderi
+
 ## Next route awaiting owner review
 
-R10 — Numaish Chowrangi to Ibrahim Hyderi. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
+R11 — Miran Nakka to Shireen Jinnah Colony. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
