@@ -34,7 +34,7 @@ Keep these as separate evidence records:
 2. **Dedicated contractual BRT corridor (2021 agreement):** TMA Office Orangi Town to Board Office, approximately 4 km, with approximately four bus stations.
 3. **Contractual station IDs:** OL-1 5 No. Chowrangi; OL-2 Orangi Town Police Station; OL-3 Abdullah College; OL-4 Dilpasand Sweets.
 4. **Mixed-traffic continuation:** Agreement describes buses continuing beyond Board Office in mixed traffic toward Hydri/Green Line and Nagan before turning; this must not be mistaken for four additional Orange Line BRT stations.
-5. **Government project scope:** SMTA project page describes TMA Office to Jinnah University and states four BRT stations plus one depot. Its displayed “88 Kilometers” alignment length is inconsistent with the 4 km Assembly statement and should be treated as a likely page/data-entry error until corrected by the authority, not used as a route length.
+5. **Government project scope:** SMTA project page describes TMA Office to Jinnah University and states four BRT stations plus one depot. Its displayed “88 Kilometers” alignment length is inconsistent with the 4 km Assembly statement. The discrepancy is unexplained in the reviewed sources; do not use the 88 km figure as a route length pending written clarification.
 6. **Unresolved count:** Sindh Transport Department material has reported five bus stations. No source reviewed here identifies a fifth named passenger station or maps it to a contract ID.
 
 **Decision:** Keep OL-1 to OL-4 as contract identifiers only. Store TMA Office and Jinnah University as government-reported corridor endpoints, not as a complete ordered stop register. No fifth station inferred.
