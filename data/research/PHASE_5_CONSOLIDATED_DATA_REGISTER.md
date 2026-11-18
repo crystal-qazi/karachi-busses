@@ -1,8 +1,8 @@
 # Karachi transport consolidated research register — Phase 5
 
-**Prepared:** 17 November 2026  
+**Prepared:** 18 November 2026  
 **Repository:** `crystal-qazi/karachi-busses`  
-**Branch:** `research/karachi-route-register-2026`  
+**Branch:** `main`  
 **Status:** Research register / candidate data only. Not approved for database import or public publication.
 
 ## Executive findings
@@ -11,7 +11,7 @@
 - The Think Transportation KHI-MAP-08 map index (01 Jan 2025) conflicts with several detailed SMTA route pages. SMTA explicitly says its map index is third-party data and disclaims authentication. Prefer the individual SMTA route pages for textual stop sequences, while preserving map-index differences as unresolved source observations.
 - R11 remains a major terminal/corridor conflict; R12 remains a terminal/extension conflict. R2–R4 also have map-index vs detail-page start/terminal differences.
 - EV-01–EV-05 now have SMTA-published stop/area sequences and distances. The 76-route Habib coordinate dataset only has plausible corridor candidates for EV-01–EV-03; EV-04/05 are absent as distinct labels.
-- The Green Line coordinate-dataset chain is not accepted as current station truth. Its 22-node chain terminates at Karachi City Station and includes Aga Khan Hospital/Aurangzeb Market, unlike the commonly published 22-station Surjani–Numaish operational sequence.
+- The Green Line count is confirmed as **25 stations** by the 19 March 2021 SIDCL employer response. The 2016 PIDCL presentation names 29 corridor points, but does not identify which 25 are passenger stations. The commonly circulated 22-stop secondary list is not an authoritative 25-station sequence, and the 22-node historical coordinate chain is not current station truth.
 - Orange Line official material provides four station names (OL-1–OL-4), but the project page and agreement contain different descriptions of corridor extension/connection. The local coordinate file has only three edges and four nodes; it does not yet establish a complete, verified current route.
 - The exact-name crosswalk was generated for 191 source-described bus-route stop rows against 572 coordinate nodes: **89 exact normalized name candidates** and **102 unmatched rows**. Exact matches are only candidate name matches, not verified physical stops. No fuzzy matches were silently accepted. The companion `PHASE_5_NODE_AUDIT.csv` inventories all 572 node IDs, coordinates, historical route-label membership and coordinate-collision flags.
 - Road-following GeoJSON was **not fabricated**. The source CSV edges are named-node links, not authoritative road-centreline geometry. Stops need coordinate/boarding-side review before routing/snapping and route-shape production.
@@ -103,11 +103,13 @@
 ### EV-02 — Bahria Town to Malir Halt (44 km)
 
 **SMTA page:** [EV-02](https://smta.gos.pk/routes/16), Active.  
-**Published sequence:** Bahria Town → Usmania → Domba Goth → Karachi Toll Plaza → Checkpost 05 → Checkpost 06 → Tank Chowk → Model Colony → Malir Halt.
+**Published named entries:** Domba Goth → Karachi Toll Plaza → Checkpost 05 → Checkpost 06 → Tank Chowk → Model Colony → Malir Halt. `Usmania` appears in the direction descriptor (“via Usmania”), not as a separately numbered named entry.
 
 **Dataset comparison:** `EV-2` has 9 links and same broad endpoints, but includes Baqai University and Malir Cantt gates, and omits some SMTA-listed areas. Candidate only.
 
 ### EV-03 — Quaid-e-Azam Square Malir Cantt to Numaish (23 km)
+
+**Adjudication note:** `Quaid-e-Azam Square Malir Cantt` and `X-20` occur in the direction descriptor, not as separately numbered named entries. Do not create passenger-stop coordinates from those descriptor strings.
 
 **SMTA page:** [EV-03](https://smta.gos.pk/routes/17), Active.  
 **Published sequence:** Quaid-e-Azam Square Malir Cantt → X-20 → Phase 2 → Askari 5 → Allahwala Chowk → Checkpost 05 → Safoora → Mosamiyat → Kamran Chowrangi → Johar → Millennium Mall → Bahria University → Aga Khan Hospital → Liaquat National Hospital → New Town → Islamia College → Numaish.
@@ -116,12 +118,16 @@
 
 ### EV-04 — Bahria Town to Ayesha Manzil (58 km)
 
+**Adjudication note:** `M9` is a via-corridor reference in the direction descriptor, not a separately numbered passenger stop.
+
 **SMTA page:** [EV-04](https://smta.gos.pk/routes/18), Active.  
 **Published sequence:** Bahria Town → M9 → Usmania → Domba Goth → Karachi Toll Plaza → Malir Link Road → Old Sabzi Mandi → Maymar Mor → Al-Asif Square → Sorab Goth → Ayesha Manzil.
 
 **Dataset comparison:** No dedicated EV-04 route label was found in the 76 route labels. Some individual place nodes exist, but no route chain is proven.
 
 ### EV-05 — DHA City to Sorab Goth (48 km)
+
+**Adjudication note:** `DHA City` and `M9` occur in the direction descriptor and are not separately numbered named entries on the route page. Do not infer passenger-stop coordinates from these labels.
 
 **SMTA page:** [EV-05](https://smta.gos.pk/routes/19), Active.  
 **Published sequence:** DHA City → M9 → Kathore → Usmania → Domba Goth → Karachi Toll Plaza → Malir Link Road → Old Sabzi Mandi → Maymar Mor → Al-Asif Square → Sorab Goth.
@@ -130,9 +136,11 @@
 
 ## BRT station sequence register
 
-### Green Line — provisional operational sequence (22 stations)
+### Green Line — 25 stations (count confirmed; identities and order unresolved)
 
-The commonly published current passenger-facing list runs Surjani/Abdullah Chowk to Numaish. The list below is a **secondary-source corroborated candidate**, not yet confirmed against a current operator station dataset or as-built station GIS. The 2012 JICA design register contains a different 23-station proposal, including KESC Power House, KDA Chowrangi Surjani, Road 2400/Road 4200 and Municipal Park. Do not merge the historic design and current passenger-facing list.
+The 19 March 2021 SIDCL pre-bid response explicitly confirms **25 bus stations** and corrects a procurement reference to twenty-five. It does not list station names or order. Separately, the 2016 PIDCL presentation names **29 corridor points**, all classified in the Phase 5R evidence register as historical planning references rather than current station confirmations. Therefore, the exact 25 passenger-station identities and direction-specific order remain unresolved. Do not select 25 from the 29 points by guesswork.
+
+The 22-item list below is retained only as a secondary-source candidate from BusUpdate. It is not the official 25-station register and must not be used to claim the station sequence is complete. The 2012 JICA design register is another historic proposal and must remain separate.
 
 1. Abdullah Chowk (Surjani Town terminal)
 2. KDA Flats
@@ -157,7 +165,7 @@ The commonly published current passenger-facing list runs Surjani/Abdullah Chowk
 21. Patel Para (Guru Mandir)
 22. Numaish
 
-**Direction:** Reverse the passenger-facing sequence only as a provisional display order. Confirm actual station platforms, branch/extension status, and official stop IDs with SIDCL/TransKarachi before publication.
+**Status:** All 22 names below remain secondary-source candidates. They do not fill the five-station gap against the officially confirmed count, and no exact subset of the 29 historical corridor points has been established as the 25 stations. Do not reverse this list into a public route direction. Obtain the current TransKarachi/SIDCL station schedule, official map, station IDs, and platform coordinates before sequencing or geometry.
 
 **Dataset comparison:** `GreenLine_Bus` has 21 edges / 22 named nodes, but its chain is Surjani Town → 4-K Chowrangi → North Karachi → UP Mor → Nagan → Sakhi Hasan → Shahrah-e-Jehangir → Hyderi → Shahrah-e-Humayun → Orange Line → North Nazimabad → Eid Gah Bagh → Urdu Bazaar → Gul Bahar → Lasbela → Gurumandir → Numaish → Aga Khan Hospital → Aurangzeb Market → Merewether Tower → Karachi City Station. This is not the same sequence as the current 22-station candidate and includes a southern extension/extra corridor not substantiated by the current station list. Keep it separate as historical/unverified candidate geometry.
 
@@ -176,11 +184,13 @@ The agreement describes a TMA Orangi–Board Office operating service with Orang
 
 ## 572-node coordinate crosswalk
 
-The generated companion CSV `PHASE_5_STOP_NODE_CROSSWALK.csv` has one row per SMTA-published stop/area for R1–R4, R8, R11–R14 and EV-01–EV-05. The companion `PHASE_5_NODE_AUDIT.csv` has all 572 source nodes with coordinates, historical route-label membership and collision flags.
+The original exact-normalized-name comparison covered 191 source-described route rows and produced 89 candidate name matches plus 102 unmatched rows. Phase 5AF then transcribed the individual SMTA route pages into a numbered sequence register for 14 routes (R1–R4, R8, R11–R14 and EV-01–EV-05); the first numbered item on each page is treated as a direction descriptor, not a passenger stop. Phase 5AG compared 82 residual historical rows against those published sequences: 71 same-route named-entry matches and 11 descriptor-only references. The 13 spelling equivalences approved by the user in Phase 5Y are name equivalences only, not physical-stop verification. The companion `PHASE_5_NODE_AUDIT.csv` has all 572 source nodes with coordinates, historical route-label membership and collision flags.
 
 Matching policy:
 - Only exact normalized name equality was used (case and punctuation normalization only).
 - An exact match is labelled `candidate_name_match`, not verified.
+- Phase 5AF published named-entry matches and Phase 5AG name reconciliation are text-level evidence only; they do not establish physical stop identity or boarding coordinates.
+- Descriptor-only references (including EV-02 Usmania; EV-03 X-20/Quaid-e-Azam Square; EV-04 M9; and EV-05 DHA City/M9) must not be promoted to numbered passenger stops without operator stop IDs.
 - Unmatched source names remain blank; no guessed geocoding or fuzzy alias assignment.
 - A name match does not prove that the point is the correct stop, route direction, platform, road side, or current boarding location.
 - A single source stop may have several physical candidate locations; a node can be reused across routes only after a shared boarding point is confirmed.
@@ -189,7 +199,7 @@ The existing cleaned coordinate files contain 572 nodes and 1,415 directed edges
 
 ## Directions and road-following GeoJSON
 
-No reverse direction or road-following LineString has been fabricated in this register.
+No reverse direction or road-following LineString has been fabricated in this register. Phase 5AI/5AJ adds an OSM bus-stop/platform candidate inventory and a 250 m proximity/name audit of the 572 historical coordinates; these are research candidates only and do not satisfy the physical-stop or route-assignment gate.
 
 Required next steps for each route:
 1. Obtain operator-approved forward and reverse ordered stop IDs.
