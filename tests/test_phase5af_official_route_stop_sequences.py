@@ -7,10 +7,13 @@ SEQUENCES = ROOT / "data/research/PHASE_5AF_OFFICIAL_ROUTE_STOP_SEQUENCES.csv"
 COVERAGE = ROOT / "data/research/PHASE_5AE_OPERATOR_EVIDENCE_COVERAGE.csv"
 
 EXPECTED = {
-    "R1": 18, "R2": 15, "R3": 13, "R4": 14, "R8": 13,
-    "R11": 11, "R12": 15, "R13": 10, "R14": 16,
+    "R1": 18, "R2": 15, "R3": 13, "R4": 14, "R5": 8, "R6": 16,
+    "R7": 10, "R8": 13, "R9": 18, "R10": 15, "R11": 11,
+    "R12": 15, "R13": 10, "R14": 16,
     "EV-01": 18, "EV-02": 8, "EV-03": 16, "EV-04": 10, "EV-05": 10,
+    "DD01": 14,
 }
+INACTIVE = {"R5", "R6", "R7"}
 
 class Phase5AFTests(unittest.TestCase):
     def read(self, path):
@@ -33,8 +36,11 @@ class Phase5AFTests(unittest.TestCase):
             self.assertEqual(route_rows[0]["entry_type"], "direction_descriptor")
             self.assertTrue(all(r["entry_type"] == "operator_published_named_entry" for r in route_rows[1:]))
             self.assertEqual(coverage[route]["source_sequence_stop_count"], str(count))
-            self.assertTrue(all(r["official_status"] == "Active" for r in route_rows))
+            expected_status = "Inactive" if route in INACTIVE else "Active"
+            self.assertTrue(all(r["official_status"] == expected_status for r in route_rows))
+            self.assertEqual(coverage[route]["official_status"], expected_status)
             self.assertEqual(len({r["official_source_url"] for r in route_rows}), 1)
+            self.assertEqual(coverage[route]["official_source_url"], route_rows[0]["official_source_url"])
 
     def test_route_codes_are_unique_per_sequence_and_sources_are_current(self):
         rows = self.read(SEQUENCES)
