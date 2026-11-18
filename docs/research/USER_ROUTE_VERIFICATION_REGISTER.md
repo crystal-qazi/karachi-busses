@@ -40,6 +40,35 @@
 21. Fisheries
 22. Dockyard
 
+## R2 — Power House to Indus Hospital
+
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed
+- **Corrections supplied:** None
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-18
+- **Reference used for the displayed sequence:** Think Transportation, New Red Bus Karachi route page (published route description; accessed 2026-11-18): https://thinktransportation.net/red-bus-karachi/
+- **Important distinction:** The owner confirmed the displayed stop list and order. This does not independently verify physical boarding poles, GPS coordinates, current dispatch, return-direction sequence, or permission to redistribute Think Transportation's KML geometry.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Owner-confirmed forward stop sequence
+
+1. Power House
+2. UP Mor
+3. Nagan Chowrangi
+4. Shafiq Mor
+5. Sohrab Goth
+6. Gulshan Chowrangi
+7. NIPA
+8. Johar Mor
+9. COD
+10. Drigh Road Station
+11. Colony Gate
+12. Shah Faisal Colony
+13. Singer Chowrangi
+14. Khaddi Stop
+15. Indus Hospital
+
 ## Next route awaiting owner review
 
-R2 — Power House to Indus Hospital. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
+R3 — Power House to Nasir Jump. The published Think Transportation page labels this route as a temporary change. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
