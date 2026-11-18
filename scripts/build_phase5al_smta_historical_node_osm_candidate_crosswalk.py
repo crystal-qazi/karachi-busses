@@ -109,6 +109,8 @@ def reconcile(
     route_counts: dict[str, Counter] = {}
     output_rows = 0
     named_entries = 0
+    entry_osm_status_counts = Counter()
+    entries_with_multiple_250m_candidates = 0
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields)
@@ -141,7 +143,19 @@ def reconcile(
                 total_nearby = int(audit.get("nearby_candidate_count_within_250m") or 0) if audit else 0
                 if nearby:
                     candidate_rows = nearby
-                elif audit and audit.get("nearest_osm_id"):
+                elif not node:
+                    candidate_rows = [{
+                        "osm_type": "", "osm_id": "", "osm_name": "",
+                        "osm_candidate_kind": "", "distance_m": "",
+                        "osm_candidate_relation": "no_historical_node_match",
+                    }]
+                elif not audit:
+                    candidate_rows = [{
+                        "osm_type": "", "osm_id": "", "osm_name": "",
+                        "osm_candidate_kind": "", "distance_m": "",
+                        "osm_candidate_relation": "no_osm_audit_record",
+                    }]
+                elif audit.get("nearest_osm_id"):
                     candidate_rows = [{
                         "osm_type": audit.get("nearest_osm_type", ""),
                         "osm_id": audit.get("nearest_osm_id", ""),
@@ -156,6 +170,21 @@ def reconcile(
                         "osm_candidate_kind": "", "distance_m": "",
                         "osm_candidate_relation": "no_osm_candidate_recorded",
                     }]
+
+                within_count_for_entry = sum(
+                    candidate["osm_candidate_relation"] == "within_250m_proximity_only"
+                    for candidate in candidate_rows
+                )
+                if within_count_for_entry > 1:
+                    entries_with_multiple_250m_candidates += 1
+                if within_count_for_entry:
+                    entry_osm_status_counts["has_250m_proximity_candidates"] += 1
+                elif any(candidate["osm_candidate_relation"] == "nearest_outside_250m_context_only" for candidate in candidate_rows):
+                    entry_osm_status_counts["nearest_only_outside_250m"] += 1
+                elif match_type == "unmatched":
+                    entry_osm_status_counts["no_historical_node_match"] += 1
+                else:
+                    entry_osm_status_counts["no_osm_candidate_recorded"] += 1
 
                 for candidate in candidate_rows:
                     writer.writerow({
@@ -207,7 +236,11 @@ def reconcile(
             "within_250m_proximity_only": counts["within_250m_proximity_only"],
             "nearest_outside_250m_context_only": counts["nearest_outside_250m_context_only"],
             "no_osm_candidate_recorded": counts["no_osm_candidate_recorded"],
+            "no_historical_node_match": counts["no_historical_node_match"],
+            "no_osm_audit_record": counts["no_osm_audit_record"],
         },
+        "unique_official_entry_osm_status_counts": dict(sorted(entry_osm_status_counts.items())),
+        "official_entries_with_multiple_250m_candidates": entries_with_multiple_250m_candidates,
         "route_summary": {
             route: dict(sorted(values.items())) for route, values in sorted(route_counts.items())
         },
