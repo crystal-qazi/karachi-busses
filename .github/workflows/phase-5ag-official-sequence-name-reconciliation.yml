@@ -1,0 +1,49 @@
+name: Phase 5AG Official Sequence Name Reconciliation
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [research/phase-5ag-official-sequence-name-reconciliation]
+    paths:
+      - '.github/workflows/phase-5ag-official-sequence-name-reconciliation.yml'
+      - 'scripts/build_unmatched_stop_name_candidates.py'
+      - 'scripts/build_phase5aa_remaining_unmatched_review.py'
+      - 'scripts/build_phase5ag_official_sequence_name_reconciliation.py'
+      - 'data/research/PHASE_5_STOP_NODE_CROSSWALK.csv'
+      - 'data/research/PHASE_5_NODE_AUDIT.csv'
+      - 'data/research/PHASE_5X_SPELLING_ALIAS_CANDIDATE_SHORTLIST.csv'
+      - 'data/research/PHASE_5Y_USER_CONFIRMED_NAME_ALIASES.csv'
+      - 'data/research/PHASE_5AF_OFFICIAL_ROUTE_STOP_SEQUENCES.csv'
+      - 'tests/test_phase5ag_official_sequence_name_reconciliation.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Rebuild historical name candidates
+        run: python scripts/build_unmatched_stop_name_candidates.py --build
+      - name: Rebuild residual unmatched queue
+        run: python scripts/build_phase5aa_remaining_unmatched_review.py --build
+      - name: Reconcile residual names against official sequences
+        run: python scripts/build_phase5ag_official_sequence_name_reconciliation.py --build
+      - name: Run focused tests
+        run: python -m unittest discover -s tests -p 'test_phase5ag_official_sequence_name_reconciliation.py' -v
+      - name: Upload reconciliation register
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-5ag-official-sequence-name-reconciliation
+          path: |
+            data/research/PHASE_5AG_OFFICIAL_SEQUENCE_NAME_RECONCILIATION.csv
+            data/research/PHASE_5AG_OFFICIAL_SEQUENCE_NAME_RECONCILIATION_REPORT.json
+          if-no-files-found: error
+          retention-days: 30
