@@ -291,3 +291,32 @@ No PakBus stop coordinate was imported or promoted to verified status. All 572 h
 
 The Think Transportation KHI-MAP-08 map/KML is accepted as the primary R/EV route-line reference for research, but its published notice says use without permission is prohibited. SMTA's permission to publish its own route map does not grant this independent application a redistribution licence. Written permission is still required for private storage, public map display, KML-to-GeoJSON conversion, derived geometry, public API/download redistribution, repository hosting, attribution and commercial use. A ready-to-send permission request is documented in [Phase 5BC](../../docs/research/PHASE_5BC_THINK_TRANSPORTATION_KML_PERMISSION_REQUEST.md). The request has not been sent; no permission is implied. Keep route_shapes empty and do not publish Think geometry until the response explicitly permits the intended use.
 
+
+
+## Owner sequence review and adopted source policy — Phase 5BD (18 November 2026)
+
+This section supersedes any earlier statement in this register that assigns SMTA individual route pages as the primary R/EV sequence source or treats Think Transportation as merely secondary. The project owner has adopted Think Transportation's published R/EV route descriptions as the primary reference for route identity and displayed forward stop sequence, and the supplied KML as the primary route-line reference for research inventory only. SMTA route pages remain important government-published comparison evidence and must be retained where they conflict; neither source proves physical boarding-pole locations, current dispatch, return-direction order or GPS coordinates.
+
+### Owner-reviewed forward sequences
+
+The owner route review is recorded separately in [USER_ROUTE_VERIFICATION_REGISTER.md](../../docs/research/USER_ROUTE_VERIFICATION_REGISTER.md). As of 18 November 2026:
+- R1, R2, R4, R8, R9 and R11: displayed forward sequence and order owner-confirmed.
+- R3: owner-confirmed with Shan Chowrangi inserted immediately after Brookes Chowrangi.
+- R10: owner-confirmed with the combined source entry split into Do Talwar, Pak Tower and Abdullah Shah Ghazi in that order.
+- R12: next route awaiting owner review; do not mark it owner-confirmed.
+- These are owner-review decisions, not independent operator or field verification. No MySQL verification status, route activation, route shape, or public API eligibility changes follow from this review.
+
+### Geometry, geography and rights
+
+- OSM remains the primary geographic and road-network reference for the application.
+- Think Transportation KML remains the primary R/EV route-line research reference where a route is present, but its use restriction remains a hard publication gate. The permission request documented in Phase 5BC has not been sent/approved; do not redistribute the KML, convert it to public GeoJSON, host it for public download, or populate publishable route_shapes from it until written permission covers the exact intended uses.
+- SMTA's publication of its map does not grant this application rights to redistribute Think Transportation's independently supplied KML.
+- Historical 572-node coordinates, PakBus candidates and SMTA textual stop lists remain evidence/candidates only. Do not infer a physical stop from name similarity, proximity, or a straight-line graph edge.
+- Keep route_shapes empty and all candidate stops/sources under review until the project's existing verification and rights gates are satisfied.
+
+### Next work
+
+1. Prepare the R12 owner-review sequence from the adopted Think Transportation source and request confirmation of the displayed names/order; keep the SMTA Naddi Kinara–Lucky Star conflict visible.
+2. Continue R13, R14 and EV-01–EV-05 owner-review coverage without changing KML waypoint order or inventing return directions.
+3. Continue matching candidate stops to the 572 historical nodes using exact, traceable evidence; unresolved rows stay unmatched.
+4. Use OSM for road-network analysis only after boarding points and applicable data/licence constraints are checked. Do not publish a route shape derived from restricted KML before written permission.
