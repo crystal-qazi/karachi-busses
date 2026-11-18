@@ -31,6 +31,7 @@ The workflow consumes the Phase 5AI artifact containing the Phase 5AJ audit. It 
 - An OSM feature within 250m is a spatial candidate only. Proximity does not prove physical stop identity, route membership, current service, boarding side, or direction.
 - Historical route labels are retained as source metadata, not treated as current SMTA route assignments.
 - The audit lists up to three nearest candidates per historical node. The total count is preserved and rows are flagged if more than three exist.
+- The report distinguishes unique official entries with at least one within-250m candidate, entries whose nearest feature is outside 250m, and entries with no historical-node name match. It also counts entries with multiple within-radius candidates.
 - No fuzzy matching, geocoding, snapping, coordinate approval, route assignment, database writes, or route geometry generation is performed.
 - Every row remains `physical_stop_verification=unverified`, `coordinate_assignment=not_assigned`, and `route_assignment=not_assigned`.
 

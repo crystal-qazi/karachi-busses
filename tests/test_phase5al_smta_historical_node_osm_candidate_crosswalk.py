@@ -106,6 +106,9 @@ class Phase5ALTests(unittest.TestCase):
         self.assertEqual({r["osm_id"] for r in rows}, {"101", "102"})
         self.assertTrue(all(r["osm_candidate_relation"] == "within_250m_proximity_only" for r in rows))
         self.assertEqual(report["direction_descriptors_excluded"], 1)
+        self.assertEqual(report["unique_official_entry_osm_status_counts"]["has_250m_proximity_candidates"], 1)
+        self.assertEqual(report["unique_official_entry_osm_status_counts"]["nearest_only_outside_250m"], 1)
+        self.assertEqual(report["unique_official_entry_osm_status_counts"]["no_historical_node_match"], 2)
 
     def test_alias_is_route_scoped_and_outside_radius_is_context_only(self):
         self.build_inputs()
@@ -119,6 +122,7 @@ class Phase5ALTests(unittest.TestCase):
         self.assertEqual(r2["osm_distance_m"], "300.0")
         self.assertEqual(r9["historical_match_type"], "unmatched")
         self.assertEqual(r9["historical_node_id"], "")
+        self.assertEqual(r9["osm_candidate_relation"], "no_historical_node_match")
 
     def test_all_rows_remain_unverified_and_unassigned(self):
         self.build_inputs()
