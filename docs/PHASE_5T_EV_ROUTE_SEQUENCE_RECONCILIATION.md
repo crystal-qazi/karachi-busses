@@ -1,6 +1,6 @@
 # Phase 5T — EV-01 to EV-05 published stop-sequence reconciliation
 
-**Status:** Current SMTA route-detail pages transcribed and compared with the historical 572-node crosswalk. This is a published-source reconciliation, not operator certification or stop verification.
+**Status:** Historical SMTA sequence comparison retained for traceability. Phase 5AO (2026-11-18) supersedes this document as the accepted primary EV-01–EV-05 route-description reference: Think Transportation route page and supplied KML. This file remains a record of what SMTA separately publishes, not the adopted primary EV sequence.
 
 ## Source and method
 
@@ -12,7 +12,7 @@ Accessed 18 November 2026. Individual SMTA route-detail pages identify all five 
 - EV-04: [SMTA route 18](https://smta.gos.pk/routes/18)
 - EV-05: [SMTA route 19](https://smta.gos.pk/routes/19)
 
-The SMTA route-map directory credits its map data to Think Transportation and disclaims authentication of third-party service data. Accordingly, "Active" and the ordered lists below are recorded as SMTA-published page content, not independent confirmation from the bus operator or live dispatch.
+The SMTA route-map directory credits its map data to Think Transportation and disclaims authentication of third-party service data. The SMTA "Active" labels and numbered lists below are retained as separate SMTA-published statements only. They do not override the Think Transportation EV route descriptions accepted by the project owner in Phase 5AO, and they are not live dispatch confirmation.
 
 ## Reconciliation rule
 
@@ -33,9 +33,9 @@ The CSV retains every original crosswalk row and its candidate node/coordinates,
 
 ## Geometry gate
 
-All 62 passenger-stop rows remain coordinate-unverified. A historical name match does not confirm the physical boarding point, platform side, direction, or current operator use. The five route sequences can now be used as the latest published reference for further cross-checking, but road-following geometry remains blocked pending operator confirmation and physical boarding-point verification.
+All 62 passenger-stop rows remain coordinate-unverified. A historical name match does not confirm the physical boarding point, platform side, direction, or current operator use. The five SMTA route sequences remain available for comparison only. For the adopted EV route descriptions, use Phase 5AO and its CSV. Road-following geometry remains blocked pending physical boarding-point verification and direction-specific road-path review.
 
-Think Transportation KML is the primary route-line geometry reference where a route is present; preserve its original coordinates, order and direction. SMTA remains authoritative for published route status, names and stop sequences. OSM and the Phase 5N road network are supporting geographic/road context only; they do not replace KML geometry or establish that a bus is permitted to use a road. OSM one-way, access, bus/PSV and conditional restrictions require separate review.
+Think Transportation route page is the accepted EV route-description reference and its supplied KML is the primary route-line geometry reference where a route is present; preserve original coordinates, order and direction. SMTA remains an independent government-published comparison source for its own status and sequence statements. OSM and the Phase 5N road network are supporting geographic/road context only; they do not replace KML geometry or establish that a bus is permitted to use a road. OSM one-way, access, bus/PSV and conditional restrictions require separate review.
 
 ## Safety / scope
 
