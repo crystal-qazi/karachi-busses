@@ -287,3 +287,7 @@ The PakBus Green Line page lists 22 stops, matching one secondary passenger-faci
 
 No PakBus stop coordinate was imported or promoted to verified status. All 572 historical stops remain under_review; data sources remain pending; route_shapes remain empty.
 
+## Think Transportation KML permission gate — Phase 5BC (18 November 2026)
+
+The Think Transportation KHI-MAP-08 map/KML is accepted as the primary R/EV route-line reference for research, but its published notice says use without permission is prohibited. SMTA's permission to publish its own route map does not grant this independent application a redistribution licence. Written permission is still required for private storage, public map display, KML-to-GeoJSON conversion, derived geometry, public API/download redistribution, repository hosting, attribution and commercial use. A ready-to-send permission request is documented in [Phase 5BC](../../docs/research/PHASE_5BC_THINK_TRANSPORTATION_KML_PERMISSION_REQUEST.md). The request has not been sent; no permission is implied. Keep route_shapes empty and do not publish Think geometry until the response explicitly permits the intended use.
+
