@@ -1,0 +1,68 @@
+name: Phase 5AK SMTA Route to OSM Name Candidate Crosswalk
+
+on:
+  workflow_run:
+    workflows: ["Phase 5AI OSM Bus Stop Candidate Inventory"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      artifact_run_id:
+        description: "Successful Phase 5AI workflow run ID containing the OSM candidate artifact"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build-crosswalk:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download Phase 5AI OSM candidate artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: phase-5ai-osm-bus-stop-candidate-inventory
+          run-id: ${{ github.event_name == 'workflow_dispatch' && inputs.artifact_run_id || github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: data
+      - name: Place candidate inventory at expected path
+        shell: bash
+        run: |
+          mkdir -p data/osm_stops
+          candidate="$(find data -type f -name 'karachi-osm-bus-stop-candidates.geojson' -print -quit)"
+          test -n "$candidate"
+          if [ "$candidate" != "data/osm_stops/karachi-osm-bus-stop-candidates.geojson" ]; then
+            cp "$candidate" data/osm_stops/karachi-osm-bus-stop-candidates.geojson
+          fi
+      - name: Build Phase 5AK exact-name crosswalk
+        run: python scripts/build_phase5ak_smta_route_osm_name_candidate_crosswalk.py --build
+      - name: Upload Phase 5AK review outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-5ak-smta-route-osm-name-candidate-crosswalk
+          path: |
+            data/osm_stops/PHASE_5AK_SMTA_ROUTE_OSM_NAME_CANDIDATE_CROSSWALK.csv
+            data/osm_stops/PHASE_5AK_SMTA_ROUTE_OSM_NAME_CANDIDATE_CROSSWALK_REPORT.json
+          if-no-files-found: error
+          retention-days: 14
+
+  focused-tests:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run Phase 5AK unit tests
+        run: python -m unittest discover -s tests -p 'test_phase5ak_smta_route_osm_name_candidate_crosswalk.py' -v
