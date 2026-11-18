@@ -138,6 +138,29 @@
 19. Bolton Market
 20. Tower and Keamari (combined entry in the published source)
 
+## R8 — Yousuf Goth to Tower
+
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed
+- **Corrections supplied:** None
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-18
+- **Reference used for the displayed sequence:** Think Transportation, New Red Bus Karachi route page (published route description; accessed 2026-11-18): https://thinktransportation.net/red-bus-karachi/
+- **Important distinction:** The owner confirmed the displayed stop list and order. SMTA publishes a different/more detailed route description; this confirmation applies to the displayed Think Transportation sequence only. It does not independently verify physical boarding poles, GPS coordinates, current dispatch, return-direction sequence, or permission to redistribute Think Transportation's KML geometry.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Owner-confirmed forward stop sequence
+
+1. Yousuf Goth
+2. Naval Colony
+3. Baldia
+4. Sher Shah
+5. Gulbai
+6. Agra Taj Colony
+7. Daryabad
+8. Jinnah Bridge
+9. Tower
+
 ## Next route awaiting owner review
 
-R8 — Yousuf Goth to Tower. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
+R9 — Malir Cantt to Tower. Do not treat it as owner-confirmed until the project owner reviews its displayed stop list and order.
