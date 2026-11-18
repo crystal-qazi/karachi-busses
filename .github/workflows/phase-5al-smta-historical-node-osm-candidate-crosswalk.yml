@@ -41,7 +41,7 @@ jobs:
           script: |
             let runId;
             if (context.eventName === "workflow_dispatch") {
-              runId = Number(core.getInput("artifact_run_id"));
+              runId = Number(context.payload.inputs.artifact_run_id);
             } else if (context.eventName === "workflow_run") {
               runId = context.payload.workflow_run.id;
             } else {
