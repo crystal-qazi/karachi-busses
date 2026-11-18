@@ -7,6 +7,9 @@
 
 ## Executive findings
 
+> **Source-decision update — 18 November 2026 (Phases 5AN and 5AO):** The project owner has accepted Think Transportation's route page and supplied KML as the authentic reference for People's Bus Service R-series and EV-series route identity, published route descriptions and route geometry where present. This supersedes the earlier hierarchy below wherever it says SMTA individual route pages are the preferred/primary R/EV sequence source or Think Transportation is merely secondary. SMTA's route index and detail pages remain preserved as separate government-published comparison evidence; they do not override the adopted Think Transportation R/EV descriptions. See [Phase 5AN R-series reconciliation](../../docs/research/PHASE_5AN_THINK_TRANSPORTATION_R_SERIES_RECONCILIATION.md), [Phase 5AO EV-series reconciliation](../../docs/research/PHASE_5AO_THINK_TRANSPORTATION_EV_ROUTE_RECONCILIATION.md), and the supplied KML audit. This update does not certify live dispatch, physical boarding locations, stop coordinates or return-direction paths, and it does not change MySQL verification statuses.
+
+
 - The SMTA route directory currently publishes individual Karachi route pages for R1–R4, R8, R11–R14 and EV-01–EV-05, with active status and stop/area sequences. These are authoritative **published source statements**, not proof of current bus operation at each stop.
 - The Think Transportation KHI-MAP-08 map index (01 Jan 2025) conflicts with several detailed SMTA route pages. SMTA explicitly says its map index is third-party data and disclaims authentication. Prefer the individual SMTA route pages for textual stop sequences, while preserving map-index differences as unresolved source observations.
 - R11 remains a major terminal/corridor conflict; R12 remains a terminal/extension conflict. R2–R4 also have map-index vs detail-page start/terminal differences.
