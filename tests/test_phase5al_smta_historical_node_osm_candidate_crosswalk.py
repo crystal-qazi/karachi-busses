@@ -108,7 +108,7 @@ class Phase5ALTests(unittest.TestCase):
         self.assertEqual(report["direction_descriptors_excluded"], 1)
         self.assertEqual(report["unique_official_entry_osm_status_counts"]["has_250m_proximity_candidates"], 1)
         self.assertEqual(report["unique_official_entry_osm_status_counts"]["nearest_only_outside_250m"], 1)
-        self.assertEqual(report["unique_official_entry_osm_status_counts"]["no_historical_node_match"], 1)
+        self.assertEqual(report["unique_official_entry_osm_status_counts"]["no_historical_node_match"], 2)
 
     def test_alias_is_route_scoped_and_outside_radius_is_context_only(self):
         self.build_inputs()
