@@ -7,8 +7,9 @@ Required files:
 Dataset provenance: Zenodo DOI 10.5281/zenodo.13951512 (Data Research Lab Pakistan,
 published 2024-10-18). The authors describe route compilation from Travel Culture and
 HamariWeb and coordinate extraction from Google Maps. No per-stop source pins or
-current operator validation are supplied. Verify the exact licence metadata before
-redistribution; the importer records the source as pending.
+current operator validation are supplied. The publisher companion project page declares CC BY 4.0;
+the Zenodo page's visible Rights field shows no value, so record this distinction accurately.
+The importer records the source as pending because it is not current operator evidence.
 
 Dry-run by default. Apply only after backup:
   python scripts/import_historical_network.py --apply --confirm-database karachi_buses
@@ -42,9 +43,9 @@ SOURCE_NOTES = (
     "The Zenodo description says 76 Karachi public bus routes (BRT and minibuses) were compiled from "
     "Travel Culture and HamariWeb, with stop coordinates extracted using Google Maps. "
     "The node/edge files are historical secondary research, not current operator GPS or proof of current service. "
-    "No per-stop source pins or capture dates are supplied. Repository documentation records CC BY 4.0, "
-    "but the exact machine-readable Rights value must be verified before redistribution. "
-    "Keep verification_status pending and imported stops/routes under_review."
+    "No per-stop source pins or capture dates are supplied. The publisher companion project page declares CC BY 4.0; "
+    "the Zenodo page's visible Rights field shows no value, so preserve this metadata distinction. "
+    "Keep verification_status pending and imported stops/routes under_review because this is historical data."
 )
 CATEGORY_NAME = "Historical / Unverified Network"
 DIRECTION_NAME = "Source-listed network (unverified)"
