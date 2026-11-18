@@ -4,6 +4,16 @@
 **Repository:** crystal-qazi/karachi-busses  
 **Purpose:** Record route sequence reviews explicitly supplied by the project owner. A user confirmation is recorded as owner-reviewed; it is not represented as independent operator/field verification.
 
+## Think Transportation — source-level verification
+
+- **Source status:** Verified as an identifiable, published reference source for the Karachi Peoples Bus Service route descriptions and the supplied route KML inventory.
+- **Verification scope:** Source identity and the presence of published route descriptions / route-line geometry were checked. The source is accepted as the project's primary reference for the R-series and EV-series route identity, published sequence descriptions, and geometry inventory where present.
+- **Routes represented in the supplied KML:** R1, R2, R3, R4, R8, R9, R10, R11, R12, R13, EV-01, EV-02, EV-03, EV-04, EV-05.
+- **Not covered by this status:** Independent correctness of every stop name/order; physical stop or boarding-pole existence; stop coordinates; current service operation; return-direction details; operator/field confirmation; missing routes not present in the KML.
+- **Data distinction:** This source-level status does not automatically change any `bus_stops.verification_status`, `bus_routes`, `route_stops`, `route_shapes`, `data_sources` database status, or public API eligibility. Owner-reviewed route sequences remain separately labelled below.
+- **Rights restriction:** The supplied Think Transportation KML includes a restriction against use without permission. Do not publicly redistribute the KML or derived geometry until reuse permission or a suitable licence is established.
+- **Primary public reference:** https://thinktransportation.net/red-bus-karachi/
+
 ## R1 — Khokrapar to Dockyard
 
 - **Owner review:** Confirmed
