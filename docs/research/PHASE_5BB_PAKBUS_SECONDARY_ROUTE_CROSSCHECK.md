@@ -164,7 +164,30 @@ Absence from PakBus is not proof that a service is discontinued. Use the SMTA st
 - The non-commercial data-use permission is not a blanket commercial redistribution licence. Obtain written permission if the application is commercial or revenue-generating.
 - OSM/MapLibre/Geoapify base map attribution requirements remain separate from PakBus data permission.
 
-## 9. Project decisions
+## 9. PakBus Green Line coordinates versus the 572 historical nodes
+
+The 22 PakBus Green Line stop records in the 13-Nov-2026 catalogue expose latitude/longitude and locationUsable=true. These coordinates were screened against the 572 rows in data/imports/karachi_bus_network_cleaned_nodes.csv using great-circle Haversine distance to each historical node. The nearest-node result is only a proximity comparison; it does not establish that the two records refer to the same physical boarding point.
+
+| Nearest historical-node distance | Candidate count |
+|---|---:|
+| Under 50 m | 2 |
+| 50–under 100 m | 1 |
+| 100–under 250 m | 9 |
+| 250–under 500 m | 3 |
+| 500 m or more | 7 |
+| **Total** | **22** |
+
+The two candidates under 50 m are Enquiry Office (29.9 m from historical node nazimabad) and Numaish (32.1 m from historical node numaish). Up Mor is 61.2 m from the historical up_mor node. Several other names have their nearest historical point hundreds of metres away; for example, Abdullah Chowk is 542.5 m from kda_stop, Karimi Chowrangi is 880.6 m from kda_stop, and Board Office is 674.5 m from kda_chowrangi. These offsets are not proof of incorrectness or correctness; the historical node file is not a verified stop register.
+
+Reproducible artifacts:
+- Source candidate coordinates: data/research/PHASE_5BB_PAKBUS_GREENLINE_STOP_CANDIDATES.csv
+- Nearest-node crosswalk: data/research/PHASE_5BB_PAKBUS_GREENLINE_TO_572_NODE_CANDIDATE_CROSSWALK.csv
+- Standard-library audit script: scripts/audit_phase5bb_pakbus_greenline_to_572_nodes.py
+- Tests: tests/test_phase5bb_pakbus_greenline_crosswalk.py
+
+The script requires the repository's existing 572-row historical node CSV and does not access the network. It writes only the crosswalk CSV. It does not create aliases, edit source coordinates, update MySQL or change verification status.
+
+## 10. Project decisions
 
 1. Add PakBus as a named secondary research source, not an authoritative operator source.
 2. Use its Green Line sequence and coordinates only as candidates for comparison against SIDCL/SMTA drawings and the existing 572-stop historical dataset.
