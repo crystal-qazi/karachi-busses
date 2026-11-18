@@ -52,6 +52,10 @@ Notable differences include:
 - `data/research/PHASE_5AO_THINK_TRANSPORTATION_EV_ROUTE_RECONCILIATION.csv`
 - This report.
 
+## Historical 572-node candidate crosswalk
+
+Phase 5AQ compares all 65 Think EV named entries against the existing 572-node historical candidate set using exact normalized node-ID matching only. It found 47 candidate name matches and 18 unmatched names. These are not verified physical stops; all candidate nodes remain under review. See `docs/research/PHASE_5AQ_THINK_EV_TO_572_NODE_CANDIDATE_CROSSWALK.md` and its CSV.
+
 ## Next gate
 
 Continue physical stop-name matching and coordinate/boarding-side verification for EV-01–EV-05. Reconcile the EV-01/EV-02 user waypoint evidence without altering the user's order. Then review R14 and DD01 separately because they are absent from the supplied KML.
