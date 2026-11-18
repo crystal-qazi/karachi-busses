@@ -34,7 +34,7 @@ from config import Config  # noqa: E402
 
 NODES_FILE = ROOT / "data" / "imports" / "karachi_bus_network_cleaned_nodes.csv"
 EDGES_FILE = ROOT / "data" / "imports" / "karachi_bus_network_cleaned_edges.csv"
-SOURCE_NAME = "Karachi Bus Network Research Dataset (Zenodo 10.5281/zenodo.13951512)"
+SOURCE_NAME = "Karachi Bus Network Research Dataset (user-provided cleaned files)"
 SOURCE_URL = "https://zenodo.org/records/13951512"
 SOURCE_NOTES = (
     "Historical 2024 research dataset, Version v1, published 2024-10-18 by Data Research Lab Pakistan; "
