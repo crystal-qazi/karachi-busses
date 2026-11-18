@@ -1,4 +1,6 @@
 import csv
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -7,6 +9,17 @@ OUTPUT = ROOT / "data/research/PHASE_5AG_OFFICIAL_SEQUENCE_NAME_RECONCILIATION.c
 REPORT = ROOT / "data/research/PHASE_5AG_OFFICIAL_SEQUENCE_NAME_RECONCILIATION_REPORT.json"
 
 class Phase5AGTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Rebuild transient Phase 5W/5AA inputs so the normal pytest workflow is self-contained.
+        commands = [
+            [sys.executable, str(ROOT / "scripts/build_unmatched_stop_name_candidates.py"), "--build"],
+            [sys.executable, str(ROOT / "scripts/build_phase5aa_remaining_unmatched_review.py"), "--build"],
+            [sys.executable, str(ROOT / "scripts/build_phase5ag_official_sequence_name_reconciliation.py"), "--build"],
+        ]
+        for command in commands:
+            subprocess.run(command, cwd=ROOT, check=True, capture_output=True, text=True)
+
     def test_all_82_residual_rows_are_represented_without_approval(self):
         with OUTPUT.open(encoding="utf-8-sig", newline="") as f:
             rows = list(csv.DictReader(f))
