@@ -43,7 +43,7 @@ class Phase5AQTests(unittest.TestCase):
              "match_status":"coordinate_review_required","candidate_source_node_id":"shafiq_mor",
              "candidate_latitude":"24.85","candidate_longitude":"67.0","candidate_coordinate_collision":"no"},
             {"route_code":"R14","sequence":"3","owner_reviewed_stop_name":"Sorab Goth",
-             "match_status":"user_confirmed_name_alias","candidate_source_node_id":"sohrab_goth",
+             "match_status":"user_confirmed_name_alias_coordinate_unassigned","candidate_source_node_id":"sohrab_goth",
              "candidate_latitude":"","candidate_longitude":"","candidate_coordinate_collision":"no"},
             {"route_code":"R4","sequence":"4","owner_reviewed_stop_name":"Ayesha Manzil",
              "match_status":"ambiguous_name_variant","candidate_source_node_id":"ayesha_manzil|aisha_manzil",
@@ -102,7 +102,7 @@ class Phase5AQTests(unittest.TestCase):
         self.inputs()
         MODULE.build(self.source, self.audit, self.output, self.report)
         rows = self.rows()
-        alias = next(r for r in rows if r["match_status"] == "user_confirmed_name_alias")
+        alias = next(r for r in rows if r["match_status"] == "user_confirmed_name_alias_coordinate_unassigned")
         ambiguous = next(r for r in rows if r["match_status"] == "ambiguous_name_variant")
         unmatched = next(r for r in rows if r["match_status"] == "unmatched")
         self.assertEqual(alias["osm_review_relation"], "not_joined_coordinate_not_authorized")
