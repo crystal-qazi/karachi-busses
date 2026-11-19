@@ -358,3 +358,62 @@ The owner-supplied 16 November 2026 database snapshot contains 572 historical re
 - The supplied Think Transportation KML still has a restrictive permission notice. The permission request documented in Phase 5BC has **not** been sent or approved. Do not redistribute the KML, convert it to public GeoJSON, host it for public download, or populate publishable `route_shapes` until written permission covers the exact intended uses.
 - No database records, verification states, route-stop links, coordinates, route shapes, activation, or public API data were changed by the owner sequence reviews or research updates.
 - **CI verification:** GitHub Actions `Tests` completed successfully on the PR head commits for PRs #87–#96. The `Phase 5AD Unmatched Stop Triage` and `Phase 5AG Official Sequence Name Reconciliation` workflows also completed successfully on those PR heads. The GitHub connector returned no combined status entries for the squash merge commits, but the PR-triggered Actions runs are successful. This verifies the automated tests/workflows, not live-browser visual rendering of the admin map.
+
+
+## OSM candidate coverage and unmatched-stop triage — Phase 5AP (19 November 2026)
+
+This update records the completed Phase 5AI/5AJ OSM inventory, Phase 5AL SMTA-to-historical/OSM crosswalk artifact, and latest Phase 5AD unmatched-stop triage artifact. These are research coverage results only; they do not verify physical boarding locations or authorize coordinate assignments.
+
+### Karachi OSM transit-feature inventory and historical-node proximity
+
+The Phase 5AI workflow extracted **1,133 OSM transit features** from the Geofabrik Pakistan regional extract, clipped/reviewed against OpenStreetMap Karachi Division relation 6080948. The inventory contains 1,018 `highway=bus_stop` features, 113 bus stations and 2 bus platforms. OSM nodes remain points and mapped ways retain their geometry; no centroid or inferred boarding point was created.
+
+The Phase 5AJ read-only proximity audit compared all 572 historical node coordinates with that inventory using a 250-metre search radius in EPSG:32642:
+
+| Historical-node review result | Count |
+|---|---:|
+| Exact normalized name and OSM candidate within 250 m | 21 |
+| Proximity candidates only (no exact-name candidate) | 196 |
+| No OSM candidate within 250 m | 355 |
+| **Total historical nodes** | **572** |
+| Historical nodes with multiple nearby candidates | 72 |
+
+The 21 exact-name-and-proximity results are candidates for manual inspection, not verified stops. A nearby OSM feature may be a different stop, the opposite side of a road, an obsolete feature, or a general station/platform object. The 355 no-candidate result does not prove that a physical stop is absent; it means no qualifying mapped feature was found within the chosen radius in this OSM snapshot. The source artifact was generated 18 November 2026; OSM coverage is community-maintained and can change.
+
+### SMTA published-entry to historical/OSM crosswalk — Phase 5AL
+
+The Phase 5AL artifact contains 281 rows representing 248 official named entries after excluding 20 direction descriptors and preserving multiple OSM candidates as separate rows. Its report records:
+
+- 121 exact historical-node name matches, 18 route-scoped user-approved aliases, and 109 official entries without a historical-node name match.
+- 60 unique official entries have at least one OSM candidate within 250 m.
+- 79 unique official entries have only a nearest OSM feature outside 250 m.
+- 109 unique official entries have no historical-node name match.
+- 24 unique official entries have multiple within-250-metre OSM candidates.
+
+The Phase 5AL crosswalk is based on SMTA's published named entries and is kept separate from the adopted Think Transportation owner-reviewed R/EV sequence register. Its historical coordinates and OSM features remain unverified; no OSM object or coordinate is assigned to an official route stop.
+
+### Residual unmatched owner-sequence names — Phase 5AD
+
+The latest successful Phase 5AD workflow (run 115, 19 November 2026) generated a fresh 82-row triage artifact from the current Phase 5AA residual queue. The triage distribution is:
+
+| Triage category | Rows |
+|---|---:|
+| Possible text candidate (0.65–under 0.85) | 30 |
+| Weak text candidate (0.45–under 0.65) | 29 |
+| Low text candidate (under 0.45) | 23 |
+| **Total** | **82** |
+
+The 82 rows comprise 28 leading-text-candidate-only cases, 19 multiple-close-candidate cases, 23 cases with no candidate at or above 0.45, and 12 weak-text-only cases. Priority grouping is 40 operator-evidence-first, 19 manual-disambiguation and 23 low-priority. Similarity scores are linguistic triage hints only. No candidate node or coordinate is selected, and the physical-stop, coordinate-assignment and route-approval fields remain unverified/not-assigned/not-approved.
+
+### Files, artifacts and next actions
+
+- Phase 5AI/5AJ: GitHub Actions artifact `phase-5ai-osm-bus-stop-candidate-inventory`; reproducibility and limitations are documented in [Phase 5AI](../../docs/PHASE_5AI_OSM_BUS_STOP_CANDIDATE_INVENTORY.md).
+- Phase 5AL: GitHub Actions artifact `phase-5al-smta-historical-node-osm-candidate-crosswalk`; method and safeguards are documented in [Phase 5AL](../../docs/research/PHASE_5AL_SMTA_HISTORICAL_NODE_OSM_CANDIDATE_CROSSWALK.md).
+- Phase 5AD: GitHub Actions artifact `phase-5ad-unmatched-stop-triage`; method and safeguards are documented in [Phase 5AD](../../docs/PHASE_5AD_UNMATCHED_STOP_TRIAGE.md).
+
+The next useful research step is a human-readable review of the 21 exact-name/proximity candidates and the 72 multi-candidate historical nodes, prioritizing coordinate collisions and known anomalies. Do not promote them automatically. The 82 unmatched owner-sequence entries still need route-specific operator/field evidence; OSM name similarity alone cannot close them. The 75-edge raw-to-cleaned discrepancy, current operator station registers, KML written permission, and live admin-map rendering remain separate open blockers.
+
+No database records, verification states, route-stop links, coordinates, route shapes, activation, or public API data were changed by these audits.
+
+
+**Artifact freshness note:** Phase 5AI run 11 is the latest successful OSM inventory artifact available for this review (generated 18 November 2026). The subsequent run 12 failed at the Geofabrik download step with a runner-side `Network is unreachable` error; its focused tests passed, but it produced no refreshed OSM inventory. The Phase 5AI/5AJ figures above therefore describe the successful 18-November snapshot, not a newly refreshed 19-November extract.
