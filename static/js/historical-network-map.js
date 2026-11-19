@@ -1,7 +1,15 @@
 (() => {
   "use strict";
   const mapElement = document.getElementById("historical-map");
-  if (!mapElement || !window.L) return;
+  if (!mapElement) return;
+  const message = document.getElementById("map-message");
+  if (!window.L) {
+    if (message) {
+      message.textContent = "The map library (Leaflet) did not load. Check the browser network tab, CDN access and Content Security Policy.";
+      message.classList.add("text-danger");
+    }
+    return;
+  }
 
   const map = L.map(mapElement).setView([24.8607, 67.0011], 11);
   const tileUrl = mapElement.dataset.tileUrl
@@ -25,7 +33,6 @@
   const showSegments = document.getElementById("show-segments");
   const showCollisions = document.getElementById("show-collisions");
   const showAnomalies = document.getElementById("show-anomalies");
-  const message = document.getElementById("map-message");
   let dataset = null;
 
   const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
@@ -130,6 +137,16 @@
     const markerMode = hasMarkerCluster
       ? "Markers are clustered at wider zoom levels."
       : "Marker-cluster library unavailable; displaying individual markers instead.";
+    if (stopCount === 0) {
+      const reported = dataset.counts && Number.isFinite(Number(dataset.counts.stops))
+        ? Number(dataset.counts.stops) : null;
+      message.textContent = reported && reported > 0
+        ? "The data endpoint reports " + reported + " stops, but returned an empty stop list. Check the historical source_id query and database rows."
+        : "No historical stop records were returned. Check that the historical dataset has been imported into this database and that its source name matches the configured research source.";
+      message.classList.add("text-danger");
+      return;
+    }
+    message.classList.remove("text-danger");
     message.textContent = (selected ? "Route " + selected + ": " : "All routes: ") +
       visibleSegments.length + " source-listed segments shown when enabled. " +
       stopCount + " unverified historical source stop markers loaded. " + markerMode;
