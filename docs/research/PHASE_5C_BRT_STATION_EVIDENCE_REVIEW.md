@@ -111,3 +111,26 @@ The existing government-source findings remain controlling where they provide st
 ## Next safe action
 
 Obtain written or published operator evidence for Green and Orange station names/order. In parallel, continue the 572-node historical coordinate audit and candidate crosswalk as separate research-only workstreams. Do not promote any candidate coordinate or route geometry based on name matching alone.
+
+
+## Cross-corridor guard — TransKarachi's 22-station count is Red Line evidence (19 November 2026)
+
+A fresh check of the official TransKarachi website found a separate **Red Line** station count that must not be attributed to the Green Line:
+
+- TransKarachi's home page labels the project as **Karachi BRT Red Line** and says 22 K-BRT stations are planned on a dedicated corridor from Malir Halt to Numaish.
+- Its official [Routes page](https://transkarachi.pk/routes/) explicitly identifies the Red Line, describes the 26.6 km Malir Halt–Tower corridor (24.2 km main corridor to Numaish plus 2.4 km common corridor to Tower), and lists Red Line locations including Model Colony, Safoora Goth, Met Office, Safari Park, Federal Urdu University, Civic Centre, Dawood University, Numaish, King Cottages, NED University, NIPA, Masjid Baitul Mukarram, Askari Park, Society Office and Tower.
+- The Government of Sindh's [Karachi BRT page](https://transport.sindh.gov.pk/karachi-bus-rapid-transit-brt) likewise identifies TransKarachi as the implementation agency for the Red Line.
+
+Therefore, TransKarachi's **22-station Red Line count is not evidence for the Green Line's station count or ordered sequence**. Keep the Green Line's 25-station government project-count evidence, 29 historical planning corridor points and two separate 22-stop secondary passenger-facing lists in their existing evidence classes. Do not merge the Red Line count or station names into the Green Line register.
+
+This also reinforces the need to keep the corridor identities separate:
+- Green Line: existing north–central corridor Surjani/Abdullah Chowk–Numaish, with the Numaish–Municipal Park extension separately under development.
+- Red Line: separate TransKarachi/ADB corridor Malir Halt–Numaish, with a shared/common corridor continuing toward Tower.
+- Orange Line: separate Orangi Town corridor, with its own four-versus-five station evidence conflict.
+
+Sources:
+- TransKarachi official routes page: https://transkarachi.pk/routes/
+- TransKarachi official home page: https://transkarachi.pk/
+- Government of Sindh BRT page: https://transport.sindh.gov.pk/karachi-bus-rapid-transit-brt
+
+No Green Line or Red Line station sequence is changed or approved by this clarification.
