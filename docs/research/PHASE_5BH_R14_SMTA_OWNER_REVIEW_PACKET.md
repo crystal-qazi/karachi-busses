@@ -1,7 +1,7 @@
 # Phase 5BH — R14 source-comparison and owner-review packet
 
 **Date:** 19 November 2026  
-**Scope:** Prepare an attributed R14 sequence for owner review. This packet does not claim that the sequence has been confirmed.
+**Scope:** Record the project owner's confirmation of the SMTA-published R14 sequence on 19 November 2026.
 
 ## Source finding
 
@@ -15,7 +15,7 @@ Source: [Sindh Mass Transit Authority — Karachi Bus Route Map](https://smta.go
 
 This is an SMTA-attributed sequence, not a Think Transportation sequence. The SMTA directory's via-description is the source basis for the review list below. Third-party route lists and videos may show a different or newer pattern; they are not silently substituted for the official SMTA text.
 
-## SMTA-published forward sequence — awaiting owner review
+## Owner-confirmed SMTA-published forward sequence
 
 1. Maymar (route origin)
 2. Nawaz Sharif Park
@@ -37,11 +37,12 @@ This is an SMTA-attributed sequence, not a Think Transportation sequence. The SM
 
 ## Owner review requested
 
-Please confirm whether this SMTA-published sequence and exact order should be recorded as the project's owner-reviewed R14 sequence, or provide corrections and their positions. Because the adopted Think Transportation source inventory has no R14 sequence, approval here would explicitly mean owner acceptance of the SMTA sequence—not adoption of an unavailable Think Transportation list.
+The project owner confirmed all 17 entries in the exact SMTA-published order, with no corrections. This is explicitly owner acceptance of the SMTA sequence, not adoption of an unavailable Think Transportation R14 list.
 
 ## Limits and safety
 
 - Owner review is not independent physical-stop, boarding-pole, coordinate, operator, dispatch, or return-direction verification.
+- The adopted Think Transportation inventory/KML does not include R14; the accepted sequence remains attributed to SMTA.
 - No database connection or writes.
 - No coordinates, route shapes, route activation, verification status, or public API data changed.
 - No Think Transportation KML-derived geometry is redistributed or published.
