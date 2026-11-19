@@ -489,3 +489,33 @@ Bahria Town to Malir Halt via Usmania, Domba Goth, Karachi Toll Plaza, Checkpost
 ### SMTA via-description — comparison only, not merged into the review sequence
 
 Quaid-e-Azam Square Malir Cantt to Numaish via X-20, Phase 2, Askari 5, Allahwala Chowk, Checkpost 05, Safoora, Mosamiyat, Kamran Chowrangi, Johar, Millennium Mall, Bahria University, Aga Khan Hospital, Liaquat National Hospital, New Town, Islamia College, Numaish.
+
+## EV-04 — Bahria Town to Ayesha Manzil
+
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed exactly as displayed below; all nine entries accepted in the published order.
+- **Corrections supplied:** None.
+- **Primary review sequence:** Think Transportation's published route description, updated 18 November 2026: https://thinktransportation.net/red-bus-karachi/
+- **Government comparison:** SMTA's official route directory publishes a different, more detailed via-description for EV-04: Bahria Town to Ayesha Manzil via M9, Usmania, Domba Goth, Karachi Toll Plaza, Malir Link Road, Old Sabzi Mandi, Maymar Mor, Al-Asif Square, Sorab Goth, Ayesha Manzil. Source: https://smta.gos.pk/route-map (accessed 2026-11-19). Keep the two source descriptions distinct; do not merge their names or silently reorder them.
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-19
+- **Owner decision:** The project owner replied “correct” to the complete nine-entry Think Transportation sequence. Confirmation applies to that list only; it does not resolve the separate SMTA via-description.
+- **Important distinction:** Owner review is not independent physical-stop, boarding-pole, coordinate, operator, dispatch, or return-direction verification.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Owner-confirmed Think Transportation forward sequence
+
+1. Bahria Town
+2. Dumba Goth
+3. M9 Toll Plaza
+4. Jamali Pull
+5. New Sabzi Mandi
+6. Al Asif
+7. Sohrab Goth
+8. Water Pump
+9. Ayesha Manzil
+
+### SMTA via-description — comparison only, not merged into the review sequence
+
+Bahria Town to Ayesha Manzil via M9, Usmania, Domba Goth, Karachi Toll Plaza, Malir Link Road, Old Sabzi Mandi, Maymar Mor, Al-Asif Square, Sorab Goth, Ayesha Manzil.
+
