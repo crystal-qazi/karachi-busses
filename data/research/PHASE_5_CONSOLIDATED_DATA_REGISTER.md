@@ -316,7 +316,45 @@ The owner route review is recorded separately in [USER_ROUTE_VERIFICATION_REGIST
 
 ### Next work
 
-1. Prepare the R12 owner-review sequence from the adopted Think Transportation source and request confirmation of the displayed names/order; keep the SMTA Naddi Kinara–Lucky Star conflict visible.
-2. Continue R13, R14 and EV-01–EV-05 owner-review coverage without changing KML waypoint order or inventing return directions.
-3. Continue matching candidate stops to the 572 historical nodes using exact, traceable evidence; unresolved rows stay unmatched.
-4. Use OSM for road-network analysis only after boarding points and applicable data/licence constraints are checked. Do not publish a route shape derived from restricted KML before written permission.
+1. Obtain current operator evidence for unresolved R-series identity/terminal variants and both Green/Orange BRT station sequences. Owner review of a published list does not close operator or physical-stop verification.
+2. Reconcile the 75-edge difference between the canonical 1,490-edge Zenodo file and the project's 1,415-edge cleaned file before treating the cleaned graph as complete.
+3. Continue the exact-name candidate crosswalk review. Keep the 58 unmatched labels, three Ayesha Manzil name-variant rows, two Shafiq Mor coordinate-review rows and four collision-flagged exact-name rows unresolved until evidence supports a decision.
+4. Obtain written permission for the supplied Think Transportation KML before any redistribution, conversion to public GeoJSON or use in publishable `route_shapes`.
+5. Use OSM as the primary road-network reference only after physical boarding points and their coordinates are reviewed. Do not derive public route geometry from unverified stop candidates.
+6. Present the refreshed consolidated register and unresolved items for explicit owner approval before database writes, activation or public publication.
+
+## Current consolidated status — 19 November 2026
+
+### Owner-reviewed published stop sequences
+
+The project owner has now confirmed the displayed forward stop names/order for:
+
+- **Think Transportation R-series:** R1, R2, R3 (including the owner-supplied Shan Chowrangi insertion), R4, R8, R9, R10 (including the owner-supplied Do Talwar / Pak Tower / Abdullah Shah Ghazi split), R11, R12 and R13.
+- **SMTA R-series:** R14 (the owner confirmation applies to the SMTA-published 17-entry sequence because R14 is absent from the adopted Think Transportation KML inventory).
+- **Think Transportation EV-series:** EV-01, EV-02 (including the Gate 5/Checkpost 05 and Gate 6/Checkpost 06 aliases), EV-03, EV-04 and EV-05.
+
+Detailed decisions and complete ordered lists are in [the owner route verification register](../../docs/research/USER_ROUTE_VERIFICATION_REGISTER.md), with individual packets for EV-03, EV-04 and EV-05. Owner review confirms the displayed list only; it does not independently verify current dispatch, physical boarding platforms, coordinates, reverse-direction service, or geometry rights. The separate SMTA via-descriptions remain comparison evidence and have not been merged into the adopted Think sequences.
+
+### BRT station evidence remains provisional
+
+- **Green Line:** government project evidence records 25 stations; a historical planning presentation lists 29 corridor points; two 2026 passenger-facing secondary lists each claim 22 stops and materially disagree. No current operator-issued ordered station-ID register has been received.
+- **Orange Line:** the 2021 contract lists OL-1 to OL-4 (5 No. Chowrangi, Orangi Town Police Station, Abdullah College, Dilpasand Sweets). A 19 May 2026 Assembly answer confirms the operating corridor endpoints TMA Office Orangi Town to Jinnah University for Women near Matriculation Board Office. Official sources still differ on four versus five passenger stations.
+- Reconciled source evidence and required operator clarifications are recorded in [the Phase 5C BRT station evidence review](../../docs/research/PHASE_5C_BRT_STATION_EVIDENCE_REVIEW.md), alongside the prior Phase 5AR/5BA/5AV evidence. No complete current BRT station sequence is approved.
+
+### Historical coordinate dataset and candidate crosswalk
+
+- Canonical source: [Zenodo DOI 10.5281/zenodo.13951512](https://doi.org/10.5281/zenodo.13951512), Data Research Lab Pakistan / Habib University, published 18 October 2024. The publisher project page states CC BY 4.0; the Zenodo Rights/License field is blank. DOI 13932672 is unrelated `xIndices` software.
+- Current cleaned files: 572 nodes, 1,415 directed edges and 76 route identifiers. The canonical published edge file has 1,490 rows; the 75-row raw-to-cleaned delta remains unexplained.
+- Structural QA: no duplicate node IDs, invalid WGS84 coordinates, dangling edge endpoints or duplicate directed edge rows; 10 exact-coordinate collision groups involve 24 nodes; one self-loop remains; seven route identifiers require topology review.
+- The new all-route owner-sequence crosswalk covers 270 stop entries across 16 owner-reviewed forward sequences: 185 exact normalized-name matches, 80 unmatched entries (58 distinct labels), three Ayesha Manzil name-variant rows withheld as ambiguous, two Shafiq Mor rows marked for coordinate review, and four exact-name match rows flagged for coordinate collisions. See [candidate crosswalk CSV](../../data/research/owner_route_node_candidate_crosswalk.csv) and [method/review notes](../../docs/research/PHASE_5C_OWNER_ROUTE_NODE_CANDIDATE_CROSSWALK.md).
+- All candidate coordinates remain research-only. No fuzzy matches, automatic alias merges, coordinate averaging or database promotion were performed.
+
+### Database and map publication state
+
+The owner-supplied 16 November 2026 database snapshot contains 572 historical research stops, all `under_review`, with the historical source `pending`; `route_shapes` has zero rows. Public discovery intentionally returns only active stops on published/verified routes, so this snapshot provides no public stop markers. The admin-only `/admin/historical-network` QA map is the correct layer for inspecting the unverified candidate markers. PR #94 adds a fallback to individual Leaflet markers if the optional MarkerCluster asset is unavailable and clarifies the public empty state. If the admin QA map still shows no markers, inspect its authenticated `/admin/historical-network/data` response and browser console; live visual behavior has not been independently verified.
+
+### Rights, safety and publication gates
+
+- The supplied Think Transportation KML still has a restrictive permission notice. The permission request documented in Phase 5BC has **not** been sent or approved. Do not redistribute the KML, convert it to public GeoJSON, host it for public download, or populate publishable `route_shapes` until written permission covers the exact intended uses.
+- No database records, verification states, route-stop links, coordinates, route shapes, activation, or public API data were changed by the owner sequence reviews or research updates.
+- Recent research and documentation PRs #87–#93 and map-visibility PR #94 were merged. GitHub reported no workflow runs or status checks for those merge commits; CI is not verified.
