@@ -27,16 +27,16 @@ See [USER_ROUTE_VERIFICATION_REGISTER.md](USER_ROUTE_VERIFICATION_REGISTER.md) f
 | R11 | Confirmed |
 | R12 | Confirmed 2026-11-19 |
 | R13 | Confirmed 2026-11-19 |
+| R14 | Confirmed 2026-11-19 — SMTA-published sequence; TT R14 sequence unavailable |
 
 Owner review is not independent physical-stop, operator, dispatch, coordinate, or return-direction verification. No database verification state or publication eligibility changes were made.
 
 ## Next actions
 
-1. Obtain owner review of [the R14 SMTA source-comparison packet](PHASE_5BH_R14_SMTA_OWNER_REVIEW_PACKET.md); preserve the fact that the adopted Think Transportation route list does not provide an R14 sequence.
-2. Continue owner review for EV-01–EV-05 using clearly attributed published sequences and retain source discrepancies.
-3. Continue exact-name candidate matching against the 572 historical coordinate nodes; never promote a candidate based only on name similarity or proximity.
-4. Keep unverified stops/sources under review and route_shapes empty.
-5. Use OSM for geographic/road-network analysis only after candidate boarding points and licence constraints are checked. Do not derive public route geometry from the restricted KML before written permission.
+1. Prepare the EV-01–EV-05 owner-review packets using clearly attributed published sequences and retain source discrepancies.
+2. Continue exact-name candidate matching against the 572 historical coordinate nodes; never promote a candidate based only on name similarity or proximity.
+3. Keep unverified stops/sources under review and route_shapes empty.
+4. Use OSM for geographic/road-network analysis only after candidate boarding points and licence constraints are checked. Do not derive public route geometry from the restricted KML before written permission.
 
 ## Validation and safety
 

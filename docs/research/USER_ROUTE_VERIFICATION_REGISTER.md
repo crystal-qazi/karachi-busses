@@ -347,17 +347,19 @@
 7. Tower
 
 
-## R14 — Maymar to Tower (awaiting owner review)
+## R14 — Maymar to Tower
 
-- **Owner review:** Pending — do not treat as confirmed.
-- **Stop order:** Pending owner confirmation.
-- **Source limitation:** The adopted Think Transportation route inventory/KML does not include R14. Do not invent a Think Transportation sequence.
-- **Reference used for the review draft:** Sindh Mass Transit Authority, Karachi Bus Route Map, R14 via-description: https://smta.gos.pk/route-map (accessed 2026-11-19).
-- **Review basis:** The list below is transcribed from SMTA's official via-description and is explicitly attributed to SMTA. Owner approval would confirm this SMTA sequence, not a Think Transportation sequence.
-- **Review request:** Confirm whether the 17 displayed entries and their exact order are acceptable, or provide corrections and positions.
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed exactly as published below
+- **Corrections supplied:** None; all 17 displayed entries accepted in the published order.
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-19
+- **Reference used for the displayed sequence:** Sindh Mass Transit Authority, Karachi Bus Route Map, R14 via-description: https://smta.gos.pk/route-map (accessed 2026-11-19).
+- **Source limitation:** The adopted Think Transportation route inventory/KML does not include R14. This owner confirmation explicitly applies to the SMTA-published sequence, not a Think Transportation sequence.
+- **Important distinction:** Owner review confirms the SMTA-attributed names and order only. It does not independently verify physical boarding poles, GPS coordinates, current dispatch, return-direction sequence, or operator service status.
 - **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
 
-### SMTA-published forward sequence — awaiting owner confirmation
+### Owner-confirmed SMTA forward sequence
 
 1. Maymar (route origin)
 2. Nawaz Sharif Park
