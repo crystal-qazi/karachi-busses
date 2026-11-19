@@ -7,7 +7,19 @@ This import consumes the two cleaned research files supplied for the project:
 - `karachi_bus_network_cleaned_nodes.csv`: 572 named nodes and WGS84 coordinates.
 - `karachi_bus_network_cleaned_edges.csv`: 1,415 directed stop-to-stop edges across 76 route identifiers.
 
-The dataset's original author, publication date, source URL and redistribution licence have not yet been independently confirmed. The source record is therefore created with `verification_status='pending'`, and the importer deliberately does not identify a transport operator or claim that these routes currently operate.
+The source provenance has now been identified: Data Research Lab Pakistan's *Karachi Bus Network* dataset, published 18 October 2024, DOI `10.5281/zenodo.13951512`, with creators Muhammad Qasim Pasta, Moid Raza Khan and Fatima Aslam (Habib University affiliation). The Lab's project page states a Creative Commons Attribution 4.0 International licence. The Zenodo record's own Rights/License fields are blank, so the project page is retained as the explicit licence evidence. The dataset description says route text was compiled from Travel Culture and HamariWeb and coordinates were extracted using Google Maps. This establishes dataset attribution/licence, not current operator accuracy or boarding-point accuracy. The source record should retain pending verification until the project reviewer completes source review; the importer still does not identify a transport operator or claim that these routes currently operate.
+
+## Canonical source and file reconciliation
+
+- Canonical dataset: [Zenodo 13951512 — Karachi Bus Network](https://doi.org/10.5281/zenodo.13951512), published 18 October 2024 by Data Research Lab Pakistan.
+- Creators: Muhammad Qasim Pasta (data curator), Moid Raza Khan and Fatima Aslam (data collectors); Habib University affiliation.
+- The Lab's project page states **CC BY 4.0**: https://darlab-pakistan.github.io/karachi-bus-network/
+- Methodology disclosed by the Lab: route descriptions were sourced from Travel Culture and HamariWeb; stop coordinates were extracted using Google Maps.
+- The previously cited Zenodo ID `13932672` is unrelated: it identifies the `xIndices` climate-variability software package, not the Karachi dataset. Do not cite it for this import.
+- The canonical Zenodo download contains 572 node rows and 1,490 directed edge rows. The project's cleaned files contain 572 node rows and 1,415 directed edge rows. The 75-edge difference has not yet been reconciled to a documented cleaning log. Keep the cleaned import file unchanged until a row-level difference report explains every removed or altered edge.
+- The source node file uses the same `node,latit,long` schema as the project's cleaned node file. Do not assume this proves every coordinate has been independently verified.
+
+The source attribution and licence discovery do not change the dataset's historical/secondary-source status. It remains unsuitable as current operator truth or passenger-facing verified route data.
 
 ## Important modelling choice
 
