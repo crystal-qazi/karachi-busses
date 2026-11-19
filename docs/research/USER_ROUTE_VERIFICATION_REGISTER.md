@@ -425,7 +425,7 @@ CMH Malir Cantt to Dolmen Mall via CMH, Cantt Bazar, Checkpost 02, Tank Chowk, M
 - **Stop order:** Pending owner confirmation.
 - **Primary review sequence:** Think Transportation's published route description, updated 18 November 2026: https://thinktransportation.net/red-bus-karachi/
 - **Government comparison:** SMTA's official route directory publishes a different, more detailed via-description for EV-02: https://smta.gos.pk/route-map (accessed 2026-11-19). Keep the two source descriptions distinct; do not merge their names or silently reorder them.
-- **Review request:** Confirm whether the 10 Think Transportation entries and their exact order below are correct for the project's adopted route sequence. If not, provide corrections and positions. Confirmation applies to the Think Transportation list only; it does not resolve the separate SMTA via-description.
+- **Owner clarification received:** Malir Cantt Gate 5 is also named **Checkpost 05**; Malir Cantt Gate 6 is also named **Checkpost 06**. These are alternate names for the corresponding entries, not additional stops. The remaining sequence and complete order are still awaiting confirmation. This clarification does not resolve the separate SMTA via-description.
 - **Important distinction:** Owner review is not independent physical-stop, boarding-pole, coordinate, operator, dispatch, or return-direction verification.
 - **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
 
@@ -435,8 +435,8 @@ CMH Malir Cantt to Dolmen Mall via CMH, Cantt Bazar, Checkpost 02, Tank Chowk, M
 2. Dumba Goth
 3. Toll Plaza
 4. Baqai University
-5. Malir Cantt Gate 5
-6. Malir Cantt Gate 6
+5. Malir Cantt Gate 5 (also named Checkpost 05)
+6. Malir Cantt Gate 6 (also named Checkpost 06)
 7. Tank Chowk
 8. Model Mor
 9. Jinnah Ave
