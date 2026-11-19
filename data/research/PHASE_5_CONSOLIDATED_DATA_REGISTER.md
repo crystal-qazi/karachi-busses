@@ -416,4 +416,47 @@ The next useful research step is a human-readable review of the 21 exact-name/pr
 No database records, verification states, route-stop links, coordinates, route shapes, activation, or public API data were changed by these audits.
 
 
-**Artifact freshness note:** Phase 5AI run 11 is the latest successful OSM inventory artifact available for this review (generated 18 November 2026). The subsequent run 12 failed at the Geofabrik download step with a runner-side `Network is unreachable` error; its focused tests passed, but it produced no refreshed OSM inventory. The Phase 5AI/5AJ figures above therefore describe the successful 18-November snapshot, not a newly refreshed 19-November extract.
+**Artifact freshness correction (19 November 2026):** Phase 5AI run 12's first attempt failed at the Geofabrik download step with a runner-side `Network is unreachable` error. Rerunning the failed job (attempt 2) succeeded: the PBF download, Karachi boundary build, OSM feature extraction, 572-node proximity audit and artifact upload all completed. The refreshed artifact was generated 19 November 2026 and contains 1,133 transit features (1,018 bus stops, 113 bus stations and 2 bus platforms). The Phase 5AJ counts remain 21 exact-name/proximity candidates, 196 proximity-only, 355 with no candidate within 250 m and 72 with multiple nearby candidates. Phase 5AQ run 2 and Phase 5BG run 1 consumed this refreshed artifact.
+
+
+## Owner-route OSM candidate reviews — Phase 5AQ and Phase 5BG (19 November 2026)
+
+The refreshed Phase 5AI run 12 artifact (rerun attempt 2) was consumed successfully by Phase 5AQ run 2 and Phase 5BG run 1. These are research-only candidate inventories. They do not approve coordinates, physical stops, route assignments or publication.
+
+### Phase 5AQ — proximity context for owner-reviewed sequence entries
+
+The Phase 5AQ artifact covers all 270 entries in the 16 owner-reviewed forward sequences. It emits 306 rows because some historical-node entries have multiple nearby OSM candidates.
+
+| Unique owner route-stop entries | Count |
+|---|---:|
+| At least one OSM feature within 250 m | 86 |
+| Nearest OSM feature is outside 250 m (context only) | 101 |
+| No historical node match; not joined to proximity audit | 77 |
+| Name-only alias or ambiguous variant deliberately not joined | 6 |
+| **Total** | **270** |
+
+Twenty-five entries have multiple OSM candidates within 250 m. Twelve route-stop entries have at least one exact-name OSM candidate within 250 m. The 2 Shafiq Mor rows remain `coordinate_review_required`; the nearest OSM feature in this snapshot is 308.42 m away and is not an exact-name match. No candidate is promoted.
+
+The join policy is deliberately conservative: only `exact_normalized_name` and `coordinate_review_required` historical-node rows are joined. The three user-confirmed name-only aliases and three ambiguous Ayesha Manzil rows remain unjoined because their coordinate assignment is not authorized. The 77 unmatched entries remain without historical-node coordinates.
+
+### Phase 5BG — exact OSM names for the 77 unmatched owner entries
+
+The Phase 5BG artifact compares only the 77 entries already marked `unmatched` against OSM `name` and `name:en` tags using exact normalized equality. It found:
+
+- **12 route-stop entries** with exact OSM name candidates.
+- **7 distinct labels:** Johar Mor, Brookes Chowrangi, Nasir Jump, Daryabad, Malir 15, Shireen Jinnah Colony and PIB Colony.
+- **65 route-stop entries** with no exact OSM name candidate.
+- No label had multiple exact OSM objects in this snapshot.
+
+The exact-name matches are still candidate references, not proof of route use or physical boarding location. The output deliberately omits OSM coordinates and geometry; it retains only OSM IDs and tags for manual inspection. No aliases, transliterations, fuzzy matches or coordinates were inferred.
+
+### Reproducibility and artifacts
+
+- Phase 5AQ workflow run 2: `phase-5aq-owner-route-osm-candidate-crosswalk`.
+- Phase 5BG workflow run 1: `phase-5bg-owner-unmatched-osm-name-candidates`.
+- Phase 5AI workflow run 12, rerun attempt 2: `phase-5ai-osm-bus-stop-candidate-inventory`.
+- PR #99 added Phase 5AQ and merged after Tests, Phase 5AD, Phase 5AG and container build passed.
+- PR #101 added Phase 5BG and merged after 142 tests passed on Python 3.11 and 3.12, Phase 5AD/5AG passed and the container build passed.
+- PR #100 clarified that TransKarachi's 22-station count is Red Line evidence, not Green Line evidence.
+
+All these candidate outputs remain outside the production database. No stop status, coordinate, route-stop link, route shape, activation or public API eligibility was changed.

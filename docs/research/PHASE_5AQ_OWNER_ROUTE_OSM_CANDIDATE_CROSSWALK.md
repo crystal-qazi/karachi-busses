@@ -17,7 +17,7 @@ Only two existing match statuses are joined to the OSM proximity audit:
 
 The following statuses are deliberately not joined, even if a node identifier appears in a name-only alias row:
 
-- `user_confirmed_name_alias`: the owner-confirmed alias is name-only and its coordinate assignment remains explicitly unassigned.
+- `user_confirmed_name_alias_coordinate_unassigned`: the owner-confirmed alias is name-only and its coordinate assignment remains explicitly unassigned.
 - `ambiguous_name_variant`: no candidate is selected.
 - `unmatched`: no historical node is selected.
 
