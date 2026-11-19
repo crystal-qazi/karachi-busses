@@ -116,3 +116,17 @@ def test_historical_network_data_returns_all_572_unverified_stops(client, monkey
     assert {stop["status"] for stop in payload["stops"]} == {"under_review"}
     assert all(24.0 <= stop["lat"] <= 25.5 for stop in payload["stops"])
     assert all(66.0 <= stop["lng"] <= 68.0 for stop in payload["stops"])
+
+
+def test_historical_network_map_allows_click_to_preview_osm_road_candidate(client):
+    with client.session_transaction() as session:
+        session["admin_user_id"] = 1
+    response = client.get("/admin/historical-network")
+    assert response.status_code == 200
+    assert "https://router.project-osrm.org" in response.headers["Content-Security-Policy"]
+    script = client.get("/static/js/historical-network-map.js")
+    assert script.status_code == 200
+    assert b"router.project-osrm.org/route/v1/driving/" in script.data
+    assert b'line.on("click"' in script.data
+    assert b"not a verified bus path" in script.data
+    assert b"Please wait at least one second" in script.data
