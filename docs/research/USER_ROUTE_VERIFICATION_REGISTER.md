@@ -324,16 +324,19 @@
 25. Lucky Star Saddar
 
 
-## R13 — Hawksbay to Tower (awaiting owner review)
+## R13 — Hawksbay to Tower
 
-- **Owner review:** Pending — do not treat as confirmed.
-- **Stop order:** Pending owner confirmation.
-- **Reference used for the review draft:** Think Transportation, New Red Bus Karachi route page: https://thinktransportation.net/red-bus-karachi/
-- **Published source sequence:** Think Transportation lists seven entries. SMTA's route-map page provides a more detailed via-description; retain it as separate comparison evidence rather than silently inserting extra stops into the Think sequence.
-- **Review request:** Confirm whether the seven displayed Think Transportation names and their exact order are correct. If a name or order is wrong, provide the correction and its position.
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed exactly as published below
+- **Corrections supplied:** None; all seven displayed entries accepted in the published order.
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-19
+- **Reference used for the displayed sequence:** Think Transportation, New Red Bus Karachi route page: https://thinktransportation.net/red-bus-karachi/
+- **Published source sequence:** Think Transportation lists seven entries. SMTA's route-map page provides a more detailed via-description; retain it as separate comparison evidence rather than silently inserting extra stops into the Think sequence. This owner confirmation does not reconcile the different level of detail between sources.
+- **Important distinction:** Owner review confirms the displayed source names and order only. It does not independently verify physical boarding poles, GPS coordinates, current dispatch, return-direction sequence, or permission to redistribute Think Transportation's KML geometry.
 - **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
 
-### Published Think Transportation forward sequence — awaiting owner confirmation
+### Owner-confirmed forward stop sequence
 
 1. Hawksbay
 2. Mauripur
