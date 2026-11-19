@@ -4,6 +4,14 @@
 **Inputs:** `data/imports/karachi_bus_network_cleaned_nodes.csv` and `data/imports/karachi_bus_network_cleaned_edges.csv` on `main`.  
 **Purpose:** Recheck structural and coordinate integrity of the historical research dataset before any candidate matching. This is not operational route verification or publication approval.
 
+## Source provenance resolution
+
+The canonical source is [Zenodo record 13951512](https://doi.org/10.5281/zenodo.13951512), *Karachi Bus Network*, published 18 October 2024 by Data Research Lab Pakistan. Creators are Muhammad Qasim Pasta, Moid Raza Khan and Fatima Aslam, affiliated with Habib University. The Lab's project page explicitly states CC BY 4.0 and describes the source methodology: route text from Travel Culture and HamariWeb, coordinates extracted using Google Maps.
+
+The former alternate ID `13932672` is not a second version of this dataset; it is an unrelated `xIndices` climate-variability software record. The correct record's Zenodo Rights/License metadata is blank, so the Lab project page is the explicit licence evidence to cite.
+
+The canonical Zenodo downloads contain 572 node rows and 1,490 edge rows. The current project files contain 572 node rows and 1,415 edge rows. The 75-edge delta is unexplained because no complete cleaning/removal log has been located. This audit therefore validates only the current cleaned file's internal structure; it does not certify that the 75-row reduction was correct. Reconcile the raw-to-cleaned edge difference before treating the cleaned network as a complete derivative.
+
 ## Input and basic integrity results
 
 | Check | Result |
