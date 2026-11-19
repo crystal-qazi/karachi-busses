@@ -322,13 +322,6 @@
 23. Lines Area
 24. Army Public School
 25. Lucky Star Saddar
-- **Reference used for the review draft:** Think Transportation, New Red Bus Karachi route page, updated 3 February 2025: https://thinktransportation.net/red-bus-karachi/
-- **Published source terminal label:** Naddi Kinara to Lucky Star.
-- **Important source conflict:** SMTA's detailed route page describes Memon Goth to Sadar Lucky Star. The historical coordinate dataset's Route-12 chain begins at Naddi Kinara and ends at Lucky Star Saddar. These are distinct source statements; this review draft does not resolve the origin conflict.
-- **Review request:** Confirm whether the following displayed Think Transportation names and their exact order are correct. If a name or order is wrong, provide the correction and its position.
-- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
-
-### Published Think Transportation forward sequence — awaiting owner confirmation
 
 1. Naddi Kinara
 2. Khokhrapar
