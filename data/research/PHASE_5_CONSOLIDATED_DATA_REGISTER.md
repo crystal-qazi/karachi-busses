@@ -337,7 +337,7 @@ Detailed decisions and complete ordered lists are in [the owner route verificati
 
 ### BRT station evidence remains provisional
 
-- **Green Line:** government project evidence records 25 stations; a historical planning presentation lists 29 corridor points; two 2026 passenger-facing secondary lists each claim 22 stops and materially disagree. No current operator-issued ordered station-ID register has been received. TransKarachi's separate 22-station count belongs to the Red Line (Malir Halt–Numaish main corridor, continuing on a shared corridor to Tower), not the Green Line; it is excluded from Green Line station evidence.
+- **Green Line:** the 2012 JICA feasibility report lists 29 historical design IDs but its narrative says 18+4=22; the 2016 PIDCL progress presentation lists 29 corridor points and states 25 stations; a 2021 SIDCL response confirms the 25-station project count. Two 2026 passenger-facing secondary lists each claim 22 operating stops and materially disagree. The FY2025–26 Sindh Budget White Paper says Green Line operations transferred to SMTA and reports 60,000 daily riders in May 2025, but no current ordered station-ID register has been received. TransKarachi's separate 22-station count belongs to the Red Line, not the Green Line.
 - **Orange Line:** the 2021 contract lists OL-1 to OL-4 (5 No. Chowrangi, Orangi Town Police Station, Abdullah College, Dilpasand Sweets). A 19 May 2026 Assembly answer confirms the operating corridor endpoints TMA Office Orangi Town to Jinnah University for Women near Matriculation Board Office. Official sources still differ on four versus five passenger stations.
 - Reconciled source evidence and required operator clarifications are recorded in [the Phase 5C BRT station evidence review](../../docs/research/PHASE_5C_BRT_STATION_EVIDENCE_REVIEW.md), alongside the prior Phase 5AR/5BA/5AV evidence. No complete current BRT station sequence is approved.
 
@@ -493,3 +493,12 @@ Source CSV SHA-256: `a9c6c79f78de6df4df80edc365a193fc72770f359adca04060beaf42d9a
 Project cleaned CSV SHA-256: `19e269a3b6b88458295417d1b749368e9128d7ae7b074a51122b00620d98f96f`.
 
 The 75-edge discrepancy is closed. The comparison workflow and its 14-day row-level delta artifact remain available for reproducibility. No source CSV, project CSV, database record, route-stop link, coordinate, route shape, activation or public API data was modified.
+
+
+### Green Line evidence clarification — JICA 2012 design and current SMTA operation
+
+The JICA 2012 feasibility report contains 29 ordered historical design IDs (M1–M5 and G01–G23), but its narrative states 18+4=22 and its later Table 6-3-1 uses generic "Street Name" labels for G17/G19 where Table 3-2-2 says Rd 2400/Rd 4200. The 2016 PIDCL progress presentation separately lists 29 corridor points and states 25 stations; the 2021 SIDCL response confirms a 25-station project count. These are historical design/project sources, not current passenger station registers.
+
+The Sindh Government FY2025–26 Budget White Paper states Green Line operations have transferred to SMTA and reports average ridership of 60,000/day in May 2025. Therefore SMTA is the current authority from which to request a dated ordered passenger station register; SIDCL/PIDCL remain relevant for historic project design and construction records. The 22-station TransKarachi count remains Red Line evidence and is excluded.
+
+See the expanded [Phase 5C BRT station evidence review](../../docs/research/PHASE_5C_BRT_STATION_EVIDENCE_REVIEW.md), including the 29 JICA design IDs and internal count/label conflicts.
