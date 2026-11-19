@@ -33,10 +33,12 @@ Owner review is not independent physical-stop, operator, dispatch, coordinate, o
 
 ## Next actions
 
-1. Prepare the EV-01–EV-05 owner-review packets using clearly attributed published sequences and retain source discrepancies.
-2. Continue exact-name candidate matching against the 572 historical coordinate nodes; never promote a candidate based only on name similarity or proximity.
-3. Keep unverified stops/sources under review and route_shapes empty.
-4. Use OSM for geographic/road-network analysis only after candidate boarding points and licence constraints are checked. Do not derive public route geometry from the restricted KML before written permission.
+1. Obtain owner review of [the EV-01 Think Transportation sequence](PHASE_5BJ_EV01_OWNER_REVIEW_PACKET.md); retain SMTA's via-description separately.
+
+2. Continue EV-02–EV-05 owner review using clearly attributed published sequences and retain source discrepancies.
+3. Continue exact-name candidate matching against the 572 historical coordinate nodes; never promote a candidate based only on name similarity or proximity.
+4. Keep unverified stops/sources under review and route_shapes empty.
+5. Use OSM for geographic/road-network analysis only after candidate boarding points and licence constraints are checked. Do not derive public route geometry from the restricted KML before written permission.
 
 ## Validation and safety
 
