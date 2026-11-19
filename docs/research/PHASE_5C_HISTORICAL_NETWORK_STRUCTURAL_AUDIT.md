@@ -81,7 +81,7 @@ No exact duplicate directed edge rows were found. That does not remove the need 
 ## Interpretation and constraints
 
 1. This file pair is a historical/crowd-sourced research network, not a verified operator GTFS or current service catalogue.
-2. The original author, canonical publication record, exact source files and redistribution licence still require independent confirmation. Do not redistribute the underlying dataset or derived database/geometry beyond the applicable permission.
+2. The canonical Zenodo record and dataset creators have been identified, and the publisher companion project page states CC BY 4.0; the Zenodo record's own Rights/License field is blank. Preserve that distinction in attribution and downstream licence review. Do not redistribute the underlying dataset or derived database/geometry without meeting the applicable licence and attribution obligations.
 3. The 10 coordinate collisions must remain separate node records until resolved. Do not average coordinates, select one label arbitrarily, or merge opposite-side boarding points.
 4. A simple directed path in this source is only a graph-shape property. It does not prove that the route is current, correctly named, operated by the claimed provider, or safe to publish.
 5. This audit does not match historical nodes to owner-reviewed R/EV sequences, approve any stop coordinate, or infer reverse-direction services.
@@ -89,8 +89,20 @@ No exact duplicate directed edge rows were found. That does not remove the need 
 
 ## Next audit steps
 
-- Resolve the canonical Zenodo record and licence/attribution discrepancy before any redistribution.
+- Reconcile the 75-edge raw-to-cleaned difference with a row-level comparison and a documented cleaning transform; do not infer why records differ.
 - Inspect each collision group against OSM features and independent authoritative/field evidence, recording evidence per candidate without merging nodes automatically.
 - Reconcile the historical node names against the owner-reviewed sequence register as a separate candidate crosswalk; preserve unmatched and ambiguous cases explicitly.
 - Review the seven non-simple route graphs edge-by-edge and retain their original topology.
 - Keep OSM as the primary road-network reference for any future, separately authorized geometry work. Do not use restricted Think Transportation KML-derived geometry without written permission.
+
+
+## Published source graph-generation script and the 75-edge difference
+
+The Zenodo record also publishes `generate_bus_network.R`:
+
+- Lines 8–10 read `karachi_bus_network_edge_list.csv` and construct an igraph object from the edge list.
+- Lines 22–25 call `igraph::simplify(bus_network, edge.attr.comb = "concat")` and write `karachi_bus_network.graphml`.
+
+Source: https://zenodo.org/records/13951512/files/generate_bus_network.R?download=1
+
+This script simplifies the in-memory graph for its GraphML output; it does **not** write a reduced or cleaned edge CSV. It therefore does not explain why the published CSV contains 1,490 edge rows while the project's cleaned CSV contains 1,415. The 75-row difference remains unresolved. Do not describe those 75 rows as duplicate removals or as the result of `igraph::simplify` without a row-level comparison proving that explanation.
