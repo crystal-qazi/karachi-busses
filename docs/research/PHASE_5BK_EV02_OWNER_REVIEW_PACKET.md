@@ -1,7 +1,7 @@
 # Phase 5BK — EV-02 owner-review packet
 
 **Date:** 19 November 2026  
-**Scope:** Request owner review of the Think Transportation EV-02 forward sequence while preserving the separate SMTA comparison description.
+**Scope:** Record owner-supplied stop-name aliases and continue review of the Think Transportation EV-02 forward sequence while preserving the separate SMTA comparison description.
 
 ## Primary sequence for review
 
@@ -17,9 +17,13 @@ Sources:
 
 Do not merge the lists or assume their entries are interchangeable. Owner confirmation is requested for the Think Transportation list because it is the adopted route-sequence reference. The SMTA description remains separately attributed comparison evidence.
 
-## Owner review requested
+## Owner clarification recorded
 
-Please confirm whether all 10 Think Transportation names and their exact order are correct, or provide corrections and positions.
+The project owner clarified that **Malir Cantt Gate 5 is also named Checkpost 05** and **Malir Cantt Gate 6 is also named Checkpost 06**. These are alternate names for the corresponding stops, not extra stops. The two entries in the review list are therefore displayed with both names.
+
+## Owner review still requested
+
+Please confirm whether the remaining eight entries and the complete 10-stop order are correct, or provide any further corrections. The alias clarification alone does not constitute confirmation of the entire sequence.
 
 ## Limits and safety
 
