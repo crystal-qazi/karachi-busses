@@ -1,0 +1,38 @@
+name: Phase 5BI Historical Edge Source Delta Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/phase-5bi-historical-edge-source-delta.yml'
+      - 'scripts/audit_historical_edge_source_delta.py'
+      - 'data/imports/karachi_bus_network_cleaned_edges.csv'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-source-edges:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run focused edge-delta tests
+        run: python -m unittest discover -s tests -p 'test_historical_edge_source_delta.py' -v
+      - name: Download canonical Zenodo CSV and compare rows
+        run: python scripts/audit_historical_edge_source_delta.py --download
+      - name: Upload row-level delta report (not the source CSV)
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-5bi-historical-edge-source-delta
+          path: |
+            data/research/PHASE_5BI_HISTORICAL_EDGE_SOURCE_DELTA.csv
+            data/research/PHASE_5BI_HISTORICAL_EDGE_SOURCE_DELTA_REPORT.json
+          if-no-files-found: error
+          retention-days: 14
