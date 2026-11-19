@@ -5,7 +5,7 @@
 
 ## Owner decision
 
-<badge>Confirmed</badge>
+**Status: Confirmed**
 
 The project owner confirmed the complete 10-entry Think Transportation sequence by replying “correct” after clarifying these aliases:
 
