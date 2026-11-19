@@ -322,30 +322,3 @@
 23. Lines Area
 24. Army Public School
 25. Lucky Star Saddar
-
-1. Naddi Kinara
-2. Khokhrapar
-3. Saudabad Chowrangi
-4. RCD Ground
-5. Kalaboard
-6. Malir 15
-7. Malir Mandir
-8. Malir Session Court
-9. Murghi Khana
-10. Quaidabad
-11. Dawood Chowrangi
-12. Babar Market
-13. Landhi Road
-14. Nasir Jump
-15. Indus Hospital
-16. Korangi Crossing
-17. Qayyumabad
-18. Defence Mor
-19. National Medical Center
-20. Gora Qabristan
-21. FTC
-22. Jutt Land
-23. Lines Area
-24. Army Public School
-25. Lucky Star Saddar
-
