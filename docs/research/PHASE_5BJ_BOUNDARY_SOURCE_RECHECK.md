@@ -85,3 +85,22 @@ This discrepancy remains unexplained. The new P&D Board disclosure suggests an O
 - World Food Programme, [FeatureServer item metadata](https://atlas.geospatial.wfp.org/server/rest/services/Hosted/pak_bnd_adm3district_aha_usda/FeatureServer/info/iteminfo), accessed 19 November 2026.
 - OpenStreetMap, [Karachi Division relation 6080948](https://www.openstreetmap.org/relation/6080948), candidate rejected for clipping pending reconciliation.
 - OSM-derived GeoView record, [Karachi Division relation area summary](https://pk.geoview.info/krachy_dwyzhn%2C6080948r), reports 7,134.669 km²; secondary diagnostic only.
+
+
+## 7. Independent district-area benchmark conflict
+
+A second source comparison shows that published district areas are not consistent across administrative vintages and source methodologies:
+
+- The current Commissioner Office Karachi page reports a division total of **3,527 km²** and district areas: Central 69, East 139, South 122, West 370, Keamari 559, Korangi 108 and Malir 2,160 km².
+- A July 2026 Karachi Mobility Project / World Bank YBRT package repeats the same five values for Central (69), East (139), Korangi (108), South (122) and Keamari (559) km². It is a corridor document, however, and does not provide a complete seven-district division total.
+- An Urban Unit city profile dated 2024 reports a materially different set: Central 64, East 159, South 81, West 88, Keamari 761, Korangi 95 and Malir 2,487 km², with a stated division area of 3,640 km².
+
+The largest differences concern West, Keamari and Malir. They may reflect different administrative vintages, boundary definitions or source geometries. The available documents do not explain the differences sufficiently to reconcile them.
+
+**Decision:** use the Commissioner page as the current published administrative benchmark, while recording source date and vintage for every comparison. Do not use a simple area match as sole proof that WFP polygons or an OSM relation are correct. Geometry coverage, topology, overlaps/gaps and administrative lineage must be inspected independently.
+
+Additional source:
+- Karachi Mobility Project, [Final Approved CLRP – YBRT Package 3](https://kmp.gos.pk/wp-content/uploads/2026/07/Final-Approved-CLRP-YLBRT-Package-3-Approved-by-WB-on-17-July-2026.pdf), July 2026.
+- Urban Unit, [City Profile / Deliverable D](https://urbanunit.gov.pk/Download/Project%20files/8/Deliverable%20D_CCRA_FD_17042024.pdf), 2024.
+
+No new boundary geometry was downloaded or accepted as part of this comparison.
