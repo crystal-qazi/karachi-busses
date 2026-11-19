@@ -25,7 +25,7 @@ See [USER_ROUTE_VERIFICATION_REGISTER.md](USER_ROUTE_VERIFICATION_REGISTER.md) f
 | R9 | Confirmed |
 | R10 | Confirmed with Do Talwar, Pak Tower and Abdullah Shah Ghazi separated in that order |
 | R11 | Confirmed |
-| R12 | Next awaiting owner review |
+| R12 | Confirmed 2026-11-19 |
 
 Owner review is not independent physical-stop, operator, dispatch, coordinate, or return-direction verification. No database verification state or publication eligibility changes were made.
 
