@@ -1,0 +1,87 @@
+# Phase 5BJ — Administrative boundary source recheck
+
+**Review date:** 19 November 2026  
+**Status:** Research-only source review. No boundary geometry downloaded, clipped, imported, or approved.
+
+## 1. Purpose
+
+Reassess the rejected Karachi Division OSM relation and identify a defensible administrative boundary reference for a future OSM road-network extraction. OSM remains the primary road and map source. Administrative boundary material is used only to establish the study extent, not to replace OSM road data.
+
+## 2. New source findings
+
+### 2.1 Commissioner Karachi — published division extent
+
+The Commissioner Office Karachi's [Area & Maps page](https://www.commissionerkarachi.gos.pk/area-maps) states that Karachi Division covers **3,527 km²**, comprising seven districts and 31 subdivisions. It publishes a district/subdivision area table. The listed district totals are consistent with the 3,527 km² division figure.
+
+Use: authoritative published area benchmark and administrative structure cross-check.
+
+Limit: the page's text does not provide a downloadable GIS boundary or a machine-readable polygon. Its displayed map is not a substitute for source geometry.
+
+### 2.2 Sindh Planning & Development Board — boundary-source disclosure
+
+The P&D Board's [Sindh Development Mapping page](https://pnd.gos.pk/gis-map) states:
+
+> Boundaries: OCHA. Keamari is split from OpenStreetMap.
+
+The same page explicitly warns that the GIS map is under development and contains incomplete data.
+
+Use: direct Government of Sindh evidence that its development map uses OCHA boundary data with an OpenStreetMap-derived Keamari split.
+
+Limit: the page does not identify the exact OCHA release, OSM relation/version, derivation steps, or reuse terms. Because the map is explicitly incomplete, it must not be treated as a finalized production boundary.
+
+### 2.3 WFP ArcGIS district-boundary service
+
+The [WFP ArcGIS FeatureServer](https://atlas.geospatial.wfp.org/server/rest/services/Hosted/pak_bnd_adm3district_aha_usda/FeatureServer) exposes layer 0 as a WGS84 polygon feature layer. Its published attributes include province, district name, district code/label/number and OCHA district code, plus creation/edit timestamps.
+
+The service description records:
+- Base data acquired from Al-Hassan Associates in 2012 and last updated in 2016.
+- Keamari district creation from West Karachi on 16 June 2025.
+- Karachi district boundary adjustments during January–March 2026 following formation of new tehsils.
+
+The [ArcGIS item metadata](https://atlas.geospatial.wfp.org/server/rest/services/Hosted/pak_bnd_adm3district_aha_usda/FeatureServer/info/iteminfo) credits Al-Hassan Associates and World Food Programme and says the dataset can be shared outside WFP.
+
+Use: a potentially current district-level feature service with a documented update history and useful administrative identifiers.
+
+Limit: “can be shared outside WFP” is not an explicit open licence or permission for unrestricted derivative redistribution. The service metadata does not, by itself, establish a validated Karachi Division union polygon or prove that the geometry matches the Commissioner's published district areas. No feature query or geometry was downloaded in this review.
+
+### 2.4 Rejected OSM division relation
+
+The previously investigated [OSM relation 6080948](https://www.openstreetmap.org/relation/6080948) is still not approved for clipping. The OSM-derived GeoView record reports an area of **7,134.669 km²**, materially different from the Commissioner's **3,527 km²** figure.
+
+This discrepancy remains unexplained. The new P&D Board disclosure suggests an OCHA-plus-OSM-Keamari approach may be relevant, but it does not prove that relation 6080948 is the relation used by the Government map or that it is geometrically correct.
+
+## 3. Evidence decision
+
+| Candidate | What is established | Decision |
+|---|---|---|
+| Commissioner Karachi area page | Seven districts; 31 subdivisions; 3,527 km² published division area | Accept as an area/administrative benchmark, not as polygon geometry |
+| P&D Board GIS map | Government disclosure of OCHA boundaries plus OSM Keamari split | Record as a useful methodology lead; not production-ready because the map is incomplete |
+| WFP ArcGIS district layer | WGS84 district polygon service with Karachi updates through Jan–Mar 2026 | Candidate for read-only district-feature inspection; licence and geometry validation remain open |
+| OSM relation 6080948 | OSM-derived area reported as 7,134.669 km² | Keep rejected for clipping pending geometry and area reconciliation |
+
+## 4. Next validation steps
+
+1. Make a read-only query of the WFP layer for the seven Karachi district records. Capture attributes, feature IDs, edit timestamps and geometry without editing the service.
+2. Calculate each returned district polygon area using a suitable equal-area/geodesic method and compare it with the Commissioner's district-area table. Record method and tolerance; do not expect rounded published areas to match exactly.
+3. Check district coverage, gaps, overlaps, topology and the seven-district union extent. Determine whether the service includes the current Keamari boundary and the January–March 2026 adjustments.
+4. Compare the WFP district geometries with the P&D Board's disclosed OCHA base plus OSM Keamari method, if the P&D source data or a reproducible OSM relation/version can be obtained.
+5. Revisit OSM relation 6080948 only after inspecting its current member lineage and geometry. Do not clip roads to it merely because its name and administrative tags look correct.
+6. Confirm reuse terms for the WFP/OCHA geometry and any OSM-derived Keamari split before committing or redistributing boundary files.
+
+## 5. Safety and data impact
+
+- No database changes.
+- No stop coordinates or route shapes changed.
+- No public map or API publication settings changed.
+- No boundary polygon or road extraction generated.
+- OSM remains the primary map/road-network reference.
+- All candidate boundary sources remain research-only until geometry, area, topology and reuse checks pass.
+
+## 6. Source register
+
+- Commissioner Office Karachi, [Area & Maps](https://www.commissionerkarachi.gos.pk/area-maps), accessed 19 November 2026.
+- Sindh Planning & Development Board, [Sindh Development Mapping](https://pnd.gos.pk/gis-map), accessed 19 November 2026.
+- World Food Programme, [Pakistan district boundary FeatureServer](https://atlas.geospatial.wfp.org/server/rest/services/Hosted/pak_bnd_adm3district_aha_usda/FeatureServer), accessed 19 November 2026.
+- World Food Programme, [FeatureServer item metadata](https://atlas.geospatial.wfp.org/server/rest/services/Hosted/pak_bnd_adm3district_aha_usda/FeatureServer/info/iteminfo), accessed 19 November 2026.
+- OpenStreetMap, [Karachi Division relation 6080948](https://www.openstreetmap.org/relation/6080948), candidate rejected for clipping pending reconciliation.
+- OSM-derived GeoView record, [Karachi Division relation area summary](https://pk.geoview.info/krachy_dwyzhn%2C6080948r), reports 7,134.669 km²; secondary diagnostic only.
