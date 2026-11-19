@@ -448,3 +448,44 @@ CMH Malir Cantt to Dolmen Mall via CMH, Cantt Bazar, Checkpost 02, Tank Chowk, M
 ### SMTA via-description — comparison only, not merged into the review sequence
 
 Bahria Town to Malir Halt via Usmania, Domba Goth, Karachi Toll Plaza, Checkpost 05, Checkpost 06, Tank Chowk, Model Colony, Malir Halt.
+
+
+## EV-03 — Malir Cantt Check Post 5 to Numaish
+
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed exactly as displayed below; all 20 entries accepted in the published order.
+- **Corrections supplied:** None.
+- **Primary review sequence:** Think Transportation's published route description, updated 18 November 2026: https://thinktransportation.net/red-bus-karachi/
+- **Government comparison:** SMTA's official route directory publishes a different, more detailed via-description for EV-03: Quaid-e-Azam Square Malir Cantt to Numaish via X-20, Phase 2, Askari 5, Allahwala Chowk, Checkpost 05, Safoora, Mosamiyat, Kamran Chowrangi, Johar, Millennium Mall, Bahria University, Aga Khan Hospital, Liaquat National Hospital, New Town, Islamia College, Numaish. Source: https://smta.gos.pk/route-map (accessed 2026-11-19). Keep the two source descriptions distinct; do not merge their names or silently reorder them.
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-19
+- **Owner decision:** The project owner replied “correct” to the complete 20-entry Think Transportation sequence. Confirmation applies to that list only; it does not resolve the separate SMTA via-description.
+- **Important distinction:** Owner review is not independent physical-stop, boarding-pole, coordinate, operator, dispatch, or return-direction verification.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Owner-confirmed Think Transportation forward sequence
+
+1. Malir Cantt Check Post 5
+2. Rim Jhim Tower
+3. Safoora Chowrangi
+4. Mausamiyat Chowrangi
+5. Kamran Chowrangi
+6. Darul Sehat Hospital
+7. Johar Chowrangi
+8. Johar Mor
+9. Millennium Mall
+10. Dalmia Road
+11. Bahria University
+12. National Stadium
+13. Aga Khan Hospital
+14. Liaquat National Hospital
+15. PIB Colony
+16. Jail Chowrangi
+17. Dawood Engineering University
+18. Islamia College
+19. People Secretariat Chowrangi
+20. Numaish
+
+### SMTA via-description — comparison only, not merged into the review sequence
+
+Quaid-e-Azam Square Malir Cantt to Numaish via X-20, Phase 2, Askari 5, Allahwala Chowk, Checkpost 05, Safoora, Mosamiyat, Kamran Chowrangi, Johar, Millennium Mall, Bahria University, Aga Khan Hospital, Liaquat National Hospital, New Town, Islamia College, Numaish.
