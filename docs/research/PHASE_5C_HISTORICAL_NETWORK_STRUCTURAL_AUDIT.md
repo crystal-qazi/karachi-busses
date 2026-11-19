@@ -10,7 +10,7 @@ The canonical source is [Zenodo record 13951512](https://doi.org/10.5281/zenodo.
 
 The former alternate ID `13932672` is not a second version of this dataset; it is an unrelated `xIndices` climate-variability software record. The correct record's Zenodo Rights/License metadata is blank, so the Lab project page is the explicit licence evidence to cite.
 
-The canonical Zenodo downloads contain 572 node rows and 1,490 edge rows. The current project files contain 572 node rows and 1,415 edge rows. The 75-edge delta is unexplained because no complete cleaning/removal log has been located. This audit therefore validates only the current cleaned file's internal structure; it does not certify that the 75-row reduction was correct. Reconcile the raw-to-cleaned edge difference before treating the cleaned network as a complete derivative.
+The canonical Zenodo downloads contain 572 node rows and 1,490 edge rows. The current project files contain 572 node rows and 1,415 edge rows. Phase 5BI performed a duplicate-aware row-level comparison: the source contains 1,415 distinct edge tuples plus 75 exact duplicate occurrences; every distinct source tuple appears exactly once in the project cleaned file, with no missing or extra edge tuples. The 75-row reduction is therefore fully accounted for as duplicate removal.
 
 ## Input and basic integrity results
 
@@ -76,7 +76,7 @@ The single self-loop is:
 bilawal_chowrangi -> bilawal_chowrangi (route 19-D)
 ```
 
-No exact duplicate directed edge rows were found. That does not remove the need to inspect source route identity, chronology, or route-variant provenance.
+No exact duplicate directed edge rows were found in the project cleaned file. The Phase 5BI source comparison found 75 exact duplicate occurrences in the original Zenodo CSV; all 1,415 distinct source edge tuples are retained once in the cleaned file. Route identity, chronology and route-variant provenance still require review.
 
 ## Interpretation and constraints
 
@@ -89,7 +89,7 @@ No exact duplicate directed edge rows were found. That does not remove the need 
 
 ## Next audit steps
 
-- Reconcile the 75-edge raw-to-cleaned difference with a row-level comparison and a documented cleaning transform; do not infer why records differ.
+- Retain the Phase 5BI row-level reconciliation report as provenance for the duplicate-removal step; do not change the cleaned edge CSV without a new source comparison.
 - Inspect each collision group against OSM features and independent authoritative/field evidence, recording evidence per candidate without merging nodes automatically.
 - Reconcile the historical node names against the owner-reviewed sequence register as a separate candidate crosswalk; preserve unmatched and ambiguous cases explicitly.
 - Review the seven non-simple route graphs edge-by-edge and retain their original topology.
@@ -105,4 +105,4 @@ The Zenodo record also publishes `generate_bus_network.R`:
 
 Source: https://zenodo.org/records/13951512/files/generate_bus_network.R?download=1
 
-This script simplifies the in-memory graph for its GraphML output; it does **not** write a reduced or cleaned edge CSV. It therefore does not explain why the published CSV contains 1,490 edge rows while the project's cleaned CSV contains 1,415. The 75-row difference remains unresolved. Do not describe those 75 rows as duplicate removals or as the result of `igraph::simplify` without a row-level comparison proving that explanation.
+This script simplifies the in-memory graph for its GraphML output; it does **not** write a reduced or cleaned edge CSV. A separate Phase 5BI row-level comparison now proves that the 1,490-row source CSV contains 1,415 distinct edge tuples plus 75 exact duplicate occurrences. The project cleaned CSV contains all 1,415 distinct tuples exactly once, with zero missing and zero extra tuples. Thus the duplicate removal is confirmed by direct CSV comparison, not by the R script's GraphML simplification.
