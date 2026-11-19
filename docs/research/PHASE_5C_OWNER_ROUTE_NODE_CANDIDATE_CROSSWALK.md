@@ -25,7 +25,7 @@ The crosswalk covers 16 owner-reviewed forward sequences (R1–R4, R8–R14 and 
 
 - Lowercase and normalize Unicode, punctuation, spaces and underscores to a common underscore-separated key.
 - Match directly only when the normalized stop label equals exactly one normalized historical node identifier.
-- Separately record the three applicable aliases already listed as `confirmed_by_user` in `PHASE_5Y_USER_CONFIRMED_NAME_ALIASES.csv` (Guru Mandar on R4/R14 and Millennium Mall on EV-03). These rows carry the node ID only; latitude/longitude remain blank because the alias register explicitly says `coordinate_assignment=not_assigned`.
+- Separately record the three applicable aliases already listed as `confirmed_by_user` in `PHASE_5Y_USER_CONFIRMED_NAME_ALIASES.csv` (Sorab Goth and Guru Mandar on R14, and Millennium Mall on EV-03). These rows carry the node ID only; latitude/longitude remain blank because the alias register explicitly says `coordinate_assignment=not_assigned`.
 - For the explicit annotation `(also named ...)`, use the leading stop label for the exact-name check; preserve the full owner-reviewed label in the output.
 - For `(route origin)`, remove the annotation only; do not infer aliases.
 - Do not apply fuzzy string matching, geographic proximity, guessed aliases, manual coordinate snapping, or route-shape inference.
@@ -52,7 +52,7 @@ Four crosswalk rows have exact-name matches to nodes in coordinate-collision gro
 
 **Shafiq Mor coordinate anomaly:** The exact-name node `shafiq_mor` has coordinate 24.85644702,67.0001716, which appears inconsistent with Shafiq Mor in Gulberg/Buffer Zone. Secondary place references return candidate locations around 24.9571–24.9729 N, 67.0643–67.0761 E. Both rows are marked `coordinate_review_required`; do not use its coordinate until checked against OSM and authoritative/field evidence. References: https://www.distancesfrom.com/pk/Shafique-Mor-Bus-Stop-Karachi-latitude-longitude-Shafique-Mor-Bus-Stop-Karachi-latitude-Shafique-Mor/LatLongHistory/9176893.aspx and https://www.distancesfrom.com/pk/Shafiq-Morr-latitude-longitude-Shafiq-Morr-latitude-Shafiq-Morr-longitude/LatLongHistory/1696827.aspx.
 
-The three user-confirmed alias rows (Guru Mandar on R4/R14 and Millennium Mall on EV-03) remain name-only mappings; their coordinates were deliberately not copied. The remaining 77 unmatched entries represent 55 distinct labels. Unmatched labels are not automatically errors. Many may require aliases, transliteration, source spelling reconciliation or a separate authoritative place/boarding-point check. Composite labels such as `Tower and Keamari` intentionally remain unmatched.
+The three user-confirmed alias rows (Sorab Goth and Guru Mandar on R14, and Millennium Mall on EV-03) remain name-only mappings; their coordinates were deliberately not copied. The remaining 77 unmatched entries represent 55 distinct labels. Unmatched labels are not automatically errors. Many may require aliases, transliteration, source spelling reconciliation or a separate authoritative place/boarding-point check. Composite labels such as `Tower and Keamari` intentionally remain unmatched.
 
 ## Data governance
 
