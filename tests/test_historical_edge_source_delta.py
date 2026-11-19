@@ -48,7 +48,7 @@ class HistoricalEdgeDeltaTests(unittest.TestCase):
         self.assertEqual(report["comparison"]["missing_rows_by_route"], {"EV-01":1,"R1":1})
         with self.output.open(encoding="utf-8", newline="") as stream:
             rows = list(csv.DictReader(stream))
-        self.assertEqual(len(rows), 2)
+        self.assertEqual(len(rows), 3)
         self.assertEqual({r["delta_type"] for r in rows}, {
             "present_in_zenodo_missing_from_project",
             "present_in_project_missing_from_zenodo",
