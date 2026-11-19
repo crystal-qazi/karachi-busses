@@ -30,3 +30,15 @@ def test_stop_picker_asset_available(client):
     response = client.get("/static/js/stop-picker.js")
     assert response.status_code == 200
     assert b"map.on(\"click\"" in response.data
+
+
+def test_historical_network_map_requires_login(client):
+    response = client.get("/admin/historical-network")
+    assert response.status_code == 302
+    assert "/admin/login" in response.headers["Location"]
+
+
+def test_historical_network_data_requires_login(client):
+    response = client.get("/admin/historical-network/data")
+    assert response.status_code == 302
+    assert "/admin/login" in response.headers["Location"]
