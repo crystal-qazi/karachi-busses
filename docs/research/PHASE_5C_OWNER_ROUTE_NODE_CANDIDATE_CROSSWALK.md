@@ -13,12 +13,12 @@ The crosswalk covers 16 owner-reviewed forward sequences (R1–R4, R8–R14 and 
 | Measure | Result |
 |---|---:|
 | Owner-reviewed stop entries | 270 |
-| Exact normalized-name matches | 186 |
+| Exact normalized-name matches | 185 |
 | Unmatched entries | 80 |
 | Distinct unmatched stop labels | 58 |
 | Coordinate-collision-flagged exact-name match rows | 4 |
 | Ambiguous Ayesha Manzil name-variant rows | 3 |
-| Coordinate-review-required Shafiq Mor row | 1 |
+| Coordinate-review-required Shafiq Mor rows | 2 |
 
 ## Matching method
 
@@ -41,7 +41,7 @@ An exact normalized-name match means only that the label maps to a node identifi
 - the owner-reviewed route is independently operator-confirmed;
 - the reverse direction follows the same stop list in reverse.
 
-Four crosswalk rows have exact-name matches to nodes in coordinate-collision groups. They are retained as candidate matches but explicitly flagged in the CSV (three distinct node IDs; Korangi Road appears in two routes):
+Four crosswalk rows have exact-name matches to nodes in coordinate-collision groups. They are retained as candidate matches but explicitly flagged in the CSV (three distinct node IDs; Korangi Road appears in both R3 and EV-01):
 - Korangi Road → `korangi_road` (shared coordinate with three other Korangi node identifiers)
 - Lucky Star Saddar → `lucky_star_saddar` (shared coordinate with `lucky_star`)
 - Dawood Engineering University → `dawood_engineering_university` (shared coordinate with `Karachi_university`)
