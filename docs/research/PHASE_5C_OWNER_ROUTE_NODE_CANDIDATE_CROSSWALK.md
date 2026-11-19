@@ -13,10 +13,12 @@ The crosswalk covers 16 owner-reviewed forward sequences (R1–R4, R8–R14 and 
 | Measure | Result |
 |---|---:|
 | Owner-reviewed stop entries | 270 |
-| Exact normalized-name matches | 190 |
+| Exact normalized-name matches | 186 |
 | Unmatched entries | 80 |
 | Distinct unmatched stop labels | 58 |
-| Exact-name matches whose source node is in a coordinate-collision group | 4 |
+| Coordinate-collision-flagged exact-name match rows | 4 |
+| Ambiguous Ayesha Manzil name-variant rows | 3 |
+| Coordinate-review-required Shafiq Mor row | 1 |
 
 ## Matching method
 
@@ -27,7 +29,7 @@ The crosswalk covers 16 owner-reviewed forward sequences (R1–R4, R8–R14 and 
 - Do not apply fuzzy string matching, geographic proximity, guessed aliases, manual coordinate snapping, or route-shape inference.
 - Unmatched rows retain blank candidate node/coordinate fields.
 
-The CSV columns are: route code, sequence, owner-reviewed stop label, match status, candidate source node ID, candidate latitude, candidate longitude, and whether the matched node participates in an exact-coordinate collision.
+The CSV columns are: route code, sequence, owner-reviewed stop label, match status, candidate source node ID(s), candidate latitude, candidate longitude, coordinate-collision flag, and candidate review note.
 
 ## Important interpretation
 
@@ -39,10 +41,14 @@ An exact normalized-name match means only that the label maps to a node identifi
 - the owner-reviewed route is independently operator-confirmed;
 - the reverse direction follows the same stop list in reverse.
 
-Four exact-name matches land in coordinate-collision groups. They are retained as candidate matches but explicitly flagged in the CSV:
+Four crosswalk rows have exact-name matches to nodes in coordinate-collision groups. They are retained as candidate matches but explicitly flagged in the CSV (three distinct node IDs; Korangi Road appears in two routes):
 - Korangi Road → `korangi_road` (shared coordinate with three other Korangi node identifiers)
 - Lucky Star Saddar → `lucky_star_saddar` (shared coordinate with `lucky_star`)
 - Dawood Engineering University → `dawood_engineering_university` (shared coordinate with `Karachi_university`)
+
+**Ayesha Manzil name-variant conflict:** Three owner-reviewed entries are marked `ambiguous_name_variant`, not assigned a coordinate. The source contains `ayesha_manzil` at 24.85579905,67.01541425, which corresponds to an OSM-backed building in Saddar, and `aisha_manzil` at 24.9265667,67.065173, near the Ayesha Manzil neighbourhood. The labels are close variants, but the coordinates refer to different parts of Karachi. The intended boarding location must be checked; neither candidate is automatically selected. References: https://mapcarta.com/W681000733 and https://mapcarta.com/N2671310324.
+
+**Shafiq Mor coordinate anomaly:** The exact-name node `shafiq_mor` has coordinate 24.85644702,67.0001716, which appears inconsistent with Shafiq Mor in Gulberg/Buffer Zone. Secondary place references return candidate locations around 24.9571–24.9729 N, 67.0643–67.0761 E. The row is marked `coordinate_review_required`; do not use its coordinate until checked against OSM and authoritative/field evidence. References: https://www.distancesfrom.com/pk/Shafique-Mor-Bus-Stop-Karachi-latitude-longitude-Shafique-Mor-Bus-Stop-Karachi-latitude-Shafique-Mor/LatLongHistory/9176893.aspx and https://www.distancesfrom.com/pk/Shafiq-Morr-latitude-longitude-Shafiq-Morr-latitude-Shafiq-Morr-longitude/LatLongHistory/1696827.aspx.
 
 The unmatched labels are not automatically errors. Many may require aliases, transliteration, source spelling reconciliation or a separate authoritative place/boarding-point check. Composite labels such as `Tower and Keamari` intentionally remain unmatched.
 
