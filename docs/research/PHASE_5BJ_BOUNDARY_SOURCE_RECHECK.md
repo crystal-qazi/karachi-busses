@@ -104,3 +104,31 @@ Additional source:
 - Urban Unit, [City Profile / Deliverable D](https://urbanunit.gov.pk/Download/Project%20files/8/Deliverable%20D_CCRA_FD_17042024.pdf), 2024.
 
 No new boundary geometry was downloaded or accepted as part of this comparison.
+
+## 8. Independent ArcGIS Online Karachi district layer — candidate only
+
+A separate ArcGIS Online service was discovered during the follow-up source search:
+
+- Service: [Karachi_Map_WFL1 FeatureServer](https://services3.arcgis.com/iuNbZYJOrAYBrPyC/ArcGIS/rest/services/Karachi_Map_WFL1/FeatureServer)
+- Layer 2: [Karachi_districts](https://services3.arcgis.com/iuNbZYJOrAYBrPyC/ArcGIS/rest/services/Karachi_Map_WFL1/FeatureServer/2)
+- Geometry type: polygon; layer spatial reference EPSG:3857 (Web Mercator).
+- District labels exposed in the layer renderer/templates: Central, East, **Kaemari**, Korangi, Malir, South and West.
+- Attributes: `FID`, `id`, `District`, `Town`, `Shape__Area`, `Shape__Length`.
+- Layer metadata reports last data edit, schema edit and layer edit as 2 May 2025.
+- The REST layer metadata has blank Description and Copyright Text fields. The service description and copyright text are also blank.
+
+### Temporal and provenance warning
+
+The layer already contains a `Kaemari` district label, while the WFP service change log records Keamari's creation from West Karachi on **16 June 2025**. The ArcGIS layer's reported last data edit is **2 May 2025**, earlier than that recorded creation date. This chronology needs explanation from the item owner; it must not be assumed to be an authoritative post-creation boundary. The spelling `Kaemari` is retained exactly as a source attribute and is not an approved alias correction.
+
+### Retrieval and decision
+
+The ArcGIS REST query operation is exposed, but the feature query response could not be retrieved through the available research interface. Consequently, no feature IDs, district attribute records, numeric areas, geometries, topology, gaps/overlaps or union extent have been inspected. The `Shape__Area` field must not be treated as square kilometres without verifying its calculation method and units; EPSG:3857 planar areas also require care because of projection distortion.
+
+**Decision:** record this as a potentially useful independent comparison layer, but keep it **unverified and not approved for clipping/import**. Obtain the item owner and source lineage, a clear reuse licence, the exact data vintage, and a read-only export/query of all seven features before any geometric comparison. Do not use this service's household layers; this review concerns only the district polygon layer.
+
+Additional source:
+- ArcGIS Online, [Karachi_Map_WFL1 service and layer directory](https://services3.arcgis.com/iuNbZYJOrAYBrPyC/ArcGIS/rest/services/Karachi_Map_WFL1/FeatureServer/layers), accessed 19 November 2026.
+- ArcGIS Online, [Karachi_districts layer 2](https://services3.arcgis.com/iuNbZYJOrAYBrPyC/ArcGIS/rest/services/Karachi_Map_WFL1/FeatureServer/2), accessed 19 November 2026.
+
+No geometry was downloaded, no boundary was imported, and no database, route, stop-coordinate, public-map or API setting changed.
