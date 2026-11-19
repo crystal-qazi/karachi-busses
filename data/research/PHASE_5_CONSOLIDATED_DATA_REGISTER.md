@@ -337,7 +337,7 @@ Detailed decisions and complete ordered lists are in [the owner route verificati
 
 ### BRT station evidence remains provisional
 
-- **Green Line:** government project evidence records 25 stations; a historical planning presentation lists 29 corridor points; two 2026 passenger-facing secondary lists each claim 22 stops and materially disagree. No current operator-issued ordered station-ID register has been received.
+- **Green Line:** government project evidence records 25 stations; a historical planning presentation lists 29 corridor points; two 2026 passenger-facing secondary lists each claim 22 stops and materially disagree. No current operator-issued ordered station-ID register has been received. TransKarachi's separate 22-station count belongs to the Red Line (Malir Halt–Numaish main corridor, continuing on a shared corridor to Tower), not the Green Line; it is excluded from Green Line station evidence.
 - **Orange Line:** the 2021 contract lists OL-1 to OL-4 (5 No. Chowrangi, Orangi Town Police Station, Abdullah College, Dilpasand Sweets). A 19 May 2026 Assembly answer confirms the operating corridor endpoints TMA Office Orangi Town to Jinnah University for Women near Matriculation Board Office. Official sources still differ on four versus five passenger stations.
 - Reconciled source evidence and required operator clarifications are recorded in [the Phase 5C BRT station evidence review](../../docs/research/PHASE_5C_BRT_STATION_EVIDENCE_REVIEW.md), alongside the prior Phase 5AR/5BA/5AV evidence. No complete current BRT station sequence is approved.
 
