@@ -414,3 +414,6 @@ The 82 rows comprise 28 leading-text-candidate-only cases, 19 multiple-close-can
 The next useful research step is a human-readable review of the 21 exact-name/proximity candidates and the 72 multi-candidate historical nodes, prioritizing coordinate collisions and known anomalies. Do not promote them automatically. The 82 unmatched owner-sequence entries still need route-specific operator/field evidence; OSM name similarity alone cannot close them. The 75-edge raw-to-cleaned discrepancy, current operator station registers, KML written permission, and live admin-map rendering remain separate open blockers.
 
 No database records, verification states, route-stop links, coordinates, route shapes, activation, or public API data were changed by these audits.
+
+
+**Artifact freshness note:** Phase 5AI run 11 is the latest successful OSM inventory artifact available for this review (generated 18 November 2026). The subsequent run 12 failed at the Geofabrik download step with a runner-side `Network is unreachable` error; its focused tests passed, but it produced no refreshed OSM inventory. The Phase 5AI/5AJ figures above therefore describe the successful 18-November snapshot, not a newly refreshed 19-November extract.
