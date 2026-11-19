@@ -13,12 +13,12 @@
 
 ## Initial review result
 
-Using the retained successful Phase 5AI OSM inventory snapshot generated 18 November 2026:
+Using the refreshed successful Phase 5AI run 12 artifact (rerun attempt 2), generated 19 November 2026:
 
 - 77 unmatched route-stop entries across 55 distinct labels were checked.
 - 12 route-stop entries across 7 distinct labels have an exact normalized OSM name candidate.
 - 65 route-stop entries have no exact OSM name candidate in this snapshot.
-- No label in this initial result matched multiple OSM objects, but the workflow preserves multiple objects if later snapshots produce them.
+- No label in this snapshot matched multiple OSM objects, but the workflow preserves multiple objects if later snapshots produce them.
 
 The exact-name candidate labels found were Johar Mor, Brookes Chowrangi, Nasir Jump, Daryabad, Malir 15, Shireen Jinnah Colony and PIB Colony. These names occur on multiple route entries where applicable; the output preserves each route/sequence occurrence.
 
