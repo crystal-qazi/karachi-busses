@@ -60,9 +60,11 @@ def test_historical_network_data_returns_all_572_unverified_stops(client, monkey
     class FakeCursor:
         def __init__(self):
             self.query = ""
+            self.params = None
 
         def execute(self, query, params=None):
             self.query = query
+            self.params = params
 
         def fetchone(self):
             assert "FROM data_sources" in self.query
@@ -74,6 +76,9 @@ def test_historical_network_data_returns_all_572_unverified_stops(client, monkey
 
         def fetchall(self):
             if "FROM bus_stops" in self.query:
+                assert "WHERE source_id=%s" in self.query
+                assert self.params == (4,)
+                assert "status=" not in self.query.lower()
                 return [
                     {
                         "id": index + 1,
