@@ -317,7 +317,7 @@ The owner route review is recorded separately in [USER_ROUTE_VERIFICATION_REGIST
 ### Next work
 
 1. Obtain current operator evidence for unresolved R-series identity/terminal variants and both Green/Orange BRT station sequences. Owner review of a published list does not close operator or physical-stop verification.
-2. Reconcile the 75-edge difference between the canonical 1,490-edge Zenodo file and the project's 1,415-edge cleaned file before treating the cleaned graph as complete.
+2. Preserve the completed Phase 5BI row-level edge reconciliation report; it confirms that all 1,415 distinct source edges are present once in the 1,415-row project file and that the 75 additional source rows are exact duplicate occurrences.
 3. Continue the exact-name candidate crosswalk review. Keep the 55 unmatched labels, three Ayesha Manzil name-variant rows, two Shafiq Mor coordinate-review rows and four collision-flagged exact-name rows unresolved until evidence supports a decision. Three additional user-confirmed name aliases are recorded separately with coordinates deliberately unassigned.
 4. Obtain written permission for the supplied Think Transportation KML before any redistribution, conversion to public GeoJSON or use in publishable `route_shapes`.
 5. Use OSM as the primary road-network reference only after physical boarding points and their coordinates are reviewed. Do not derive public route geometry from unverified stop candidates.
@@ -344,7 +344,7 @@ Detailed decisions and complete ordered lists are in [the owner route verificati
 ### Historical coordinate dataset and candidate crosswalk
 
 - Canonical source: [Zenodo DOI 10.5281/zenodo.13951512](https://doi.org/10.5281/zenodo.13951512), Data Research Lab Pakistan / Habib University, published 18 October 2024. The publisher project page states CC BY 4.0; the Zenodo Rights/License field is blank. DOI 13932672 is unrelated `xIndices` software.
-- Current cleaned files: 572 nodes, 1,415 directed edges and 76 route identifiers. The canonical published edge file has 1,490 rows; the 75-row raw-to-cleaned delta remains unexplained.
+- Current cleaned files: 572 nodes, 1,415 directed edges and 76 route identifiers. The canonical published edge file has 1,490 rows, comprising 1,415 distinct edge tuples plus 75 exact duplicate occurrences; the project cleaned file contains each distinct tuple once, with no missing or extra edges.
 - Structural QA: no duplicate node IDs, invalid WGS84 coordinates, dangling edge endpoints or duplicate directed edge rows; 10 exact-coordinate collision groups involve 24 nodes; one self-loop remains; seven route identifiers require topology review.
 - The new all-route owner-sequence crosswalk covers 270 stop entries across 16 owner-reviewed forward sequences: 185 exact normalized-name matches, three user-confirmed name aliases with no coordinate assignment, 77 unmatched entries (55 distinct labels), three Ayesha Manzil name-variant rows withheld as ambiguous, two Shafiq Mor rows marked for coordinate review, and four exact-name match rows flagged for coordinate collisions. See [candidate crosswalk CSV](../../data/research/owner_route_node_candidate_crosswalk.csv), [method/review notes](../../docs/research/PHASE_5C_OWNER_ROUTE_NODE_CANDIDATE_CROSSWALK.md), and the source [user-confirmed alias register](PHASE_5Y_USER_CONFIRMED_NAME_ALIASES.csv).
 - All candidate coordinates remain research-only. No fuzzy matches, automatic alias merges, coordinate averaging or database promotion were performed.
@@ -411,7 +411,7 @@ The 82 rows comprise 28 leading-text-candidate-only cases, 19 multiple-close-can
 - Phase 5AL: GitHub Actions artifact `phase-5al-smta-historical-node-osm-candidate-crosswalk`; method and safeguards are documented in [Phase 5AL](../../docs/research/PHASE_5AL_SMTA_HISTORICAL_NODE_OSM_CANDIDATE_CROSSWALK.md).
 - Phase 5AD: GitHub Actions artifact `phase-5ad-unmatched-stop-triage`; method and safeguards are documented in [Phase 5AD](../../docs/PHASE_5AD_UNMATCHED_STOP_TRIAGE.md).
 
-The next useful research step is a human-readable review of the 21 exact-name/proximity candidates and the 72 multi-candidate historical nodes, prioritizing coordinate collisions and known anomalies. Do not promote them automatically. The 82 unmatched owner-sequence entries still need route-specific operator/field evidence; OSM name similarity alone cannot close them. The 75-edge raw-to-cleaned discrepancy, current operator station registers, KML written permission, and live admin-map rendering remain separate open blockers.
+The next useful research step is a human-readable review of the 21 exact-name/proximity candidates and the 72 multi-candidate historical nodes, prioritizing coordinate collisions and known anomalies. Do not promote them automatically. The 82 unmatched owner-sequence entries still need route-specific operator/field evidence; OSM name similarity alone cannot close them. Current operator station registers, KML written permission, physical boarding-point verification, and live admin-map rendering remain separate open blockers.
 
 No database records, verification states, route-stop links, coordinates, route shapes, activation, or public API data were changed by these audits.
 
@@ -460,3 +460,36 @@ The exact-name matches are still candidate references, not proof of route use or
 - PR #100 clarified that TransKarachi's 22-station count is Red Line evidence, not Green Line evidence.
 
 All these candidate outputs remain outside the production database. No stop status, coordinate, route-stop link, route shape, activation or public API eligibility was changed.
+
+
+## Phase 5BI — historical edge source delta resolved (19 November 2026)
+
+The Phase 5BI GitHub Actions run 1 downloaded the canonical Zenodo edge CSV directly and compared it to the project cleaned CSV as duplicate-aware multisets. The comparison preserved direction, node spelling, case and route code.
+
+| Comparison | Result |
+|---|---:|
+| Canonical Zenodo source rows | 1,490 |
+| Distinct source edge tuples | 1,415 |
+| Exact duplicate occurrences in source | 75 |
+| Project cleaned edge rows | 1,415 |
+| Distinct project edge tuples | 1,415 |
+| Source edge occurrences matched by project file | 1,415 |
+| Distinct source edge tuples missing from project | 0 |
+| Extra project edge tuples | 0 |
+
+The 75 duplicate occurrences are distributed as follows:
+
+| Route identifier | Duplicate occurrences |
+|---|---:|
+| D-10 | 32 |
+| 17-I | 26 |
+| 45-A | 16 |
+| Sheraz_Coach | 1 |
+| **Total** | **75** |
+
+This confirms the project cleaned CSV is the exact distinct-edge set of the canonical source after duplicate occurrences are removed. No edge segment was lost or added by this cleaning step. The published R graph-generation script's in-memory GraphML simplification is separate and is not the mechanism used to create the cleaned CSV.
+
+Source CSV SHA-256: `a9c6c79f78de6df4df80edc365a193fc72770f359adca04060beaf42d9a73892`.  
+Project cleaned CSV SHA-256: `19e269a3b6b88458295417d1b749368e9128d7ae7b074a51122b00620d98f96f`.
+
+The 75-edge discrepancy is closed. The comparison workflow and its 14-day row-level delta artifact remain available for reproducibility. No source CSV, project CSV, database record, route-stop link, coordinate, route shape, activation or public API data was modified.
