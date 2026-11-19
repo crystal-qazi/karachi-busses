@@ -322,3 +322,23 @@
 23. Lines Area
 24. Army Public School
 25. Lucky Star Saddar
+
+
+## R13 — Hawksbay to Tower (awaiting owner review)
+
+- **Owner review:** Pending — do not treat as confirmed.
+- **Stop order:** Pending owner confirmation.
+- **Reference used for the review draft:** Think Transportation, New Red Bus Karachi route page: https://thinktransportation.net/red-bus-karachi/
+- **Published source sequence:** Think Transportation lists seven entries. SMTA's route-map page provides a more detailed via-description; retain it as separate comparison evidence rather than silently inserting extra stops into the Think sequence.
+- **Review request:** Confirm whether the seven displayed Think Transportation names and their exact order are correct. If a name or order is wrong, provide the correction and its position.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Published Think Transportation forward sequence — awaiting owner confirmation
+
+1. Hawksbay
+2. Mauripur
+3. Gulbai
+4. Agra Taj
+5. Daryabad
+6. Jinnah Bridge
+7. Tower
