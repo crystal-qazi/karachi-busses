@@ -1,133 +1,113 @@
-# Phase 5C — BRT station-sequence evidence review
+# Phase 5C — Green and Orange Line station evidence reconciliation
 
-**Research date:** 19 November 2026  
-**Scope:** Green Line and Orange Line station-order evidence only. This is a source audit, not operator verification, field verification, owner approval, or publication approval.
+**Review date:** 19 November 2026  
+**Scope:** Reconcile the new station-list comparison with the existing Phase 5AR and Phase 5BA government-source reviews. This is a source register, not operator confirmation, field verification, owner approval, or publication approval.
 
 ## Decision summary
 
-- **Green Line:** Do not approve a station sequence yet. The current SMTA route-map page identifies the Green Line but does not publish an ordered station list in its text. Two 2026 secondary references publish different 22-station sequences. Preserve them as competing candidate transcriptions; neither is an operator-confirmed station register.
-- **Orange Line:** The current SMTA project page describes the alignment as TMA Orangi to Jinnah University for Women and says four BRT stations. A Sindh Transport Department page reports five stations. The Provincial Assembly's 30 January 2026 answer confirms the service is operating between TMA Office, Orangi Town and Jinnah University for Women near Matriculation Board Office, but does not name or count stations. A 2026 secondary station directory lists four names. Do not silently resolve the four-versus-five discrepancy or adopt the secondary names as authoritative.
-- **No database changes:** No station records, stop coordinates, route sequences, route shapes, activation states, or public API data were changed.
+- **Green Line:** Government project evidence records a 25-station count, while a 2016 presentation lists 29 corridor points. Two 2026 passenger-facing secondary lists each claim 22 stops and materially disagree. No current operator-issued station-ID schedule resolves 25 project stations, 29 corridor points and the two 22-stop passenger lists. Keep all source versions distinct; no complete current station sequence is approved.
+- **Orange Line:** A 19 May 2026 Provincial Assembly answer reports the service operating between TMA Office Orangi Town and Jinnah University for Women near Matriculation Board Office. The 2021 facility agreement lists four contract station IDs (OL-1 to OL-4); SMTA project text says four BRT stations plus one depot, while a Sindh Transport Department page reports five bus stations. A secondary list of four names also exists but does not map cleanly to the contract IDs. The current passenger station count, names and order still need operator confirmation.
+- **No data changes:** No station records, route sequences, stop coordinates, route shapes, activation states, verification statuses or public API data were changed.
 
-## Green Line — source comparison
+## Green Line — source reconciliation
 
-### Official-source evidence
+### Government / project evidence
 
-1. **SMTA Karachi Bus Route Map** identifies BRT Green Line as a BRT system but its accessible route index does not enumerate the station names or their order. It is useful for confirming the system's inclusion in the official route map, not for reconstructing a complete station sequence.
+1. **SIDCL response to pre-bid queries, 19 March 2021:** confirms a Green Line project count of 25 bus stations. It confirms the count, not the current passenger station-ID schedule.
+   - https://pidcl.com.pk/wp-content/uploads/2021/03/2021-03-19-Response-Document-Final-Version-.pdf
+
+2. **PIDCL Green Line progress presentation, 16 August 2016:** states 25 stations but separately prints 29 named corridor points. The 29 entries must not be treated as 29 passenger stations.
+   - https://pidcl.com.pk/wp-content/uploads/2016/08/Updated-Progress-Presentation-Green-Line-16-8-16.pdf
+
+3. **Government of Sindh / PIDCL operational context:** government material describes the approximately 22–22.5 km Surjani-to-central-Karachi corridor; PIDCL records the infrastructure phase as complete in 2022 and a separate 4 km operationalisation/ITS phase as complete in 2024. The FY2025–26 Budget White Paper reports Green Line ridership of about 60,000 passengers/day in May 2025. These support an operating corridor, not the current ordered station list.
+   - https://www.sindh.gov.pk/mega-project/the-greenline-brt-government-of-sindh
+   - https://pidcl.com.pk/
+   - https://www.finance.gos.pk/Home/Download?path=Budget%2FBudgetBooks%2FFY-25-26%2FBUDGET+WHITE+PAPER+2025-26.pdf
+
+4. **SMTA current route-map index:** includes Green Line but does not provide a complete ordered station-ID list in its accessible route-index text.
    - https://smta.gos.pk/route-map
-   - Accessed 19 November 2026.
 
-2. **JICA Karachi Transportation Improvement Project final report** contains a historical planning-stage Green Line station-location table. It is not a current as-built or operator station list and must not be used as proof of today's station names/order.
-   - https://openjicareport.jica.go.jp/pdf/12086393_01.pdf
-   - Published approximately 2013.
+5. **Green Line extension:** Dawn reported on 18 October 2026 that the Numaish-to-Municipal Park extension was expected to complete during FY2026–27. This is a project forecast, not evidence that Municipal Park is already an operating passenger terminal.
+   - https://www.dawn.com/news/2037938/karachis-green-line-extension-to-be-completed-in-fy27-assures-governor
 
-### Competing secondary transcriptions — retain separately
+### Competing 2026 passenger-facing lists — secondary evidence only
 
-**Candidate A — CMTA.com.pk, Numaish to Surjani (22 entries), published 16 November 2026:**
+Both lists claim 22 stops between Numaish and Abdullah Chowk / Surjani, but their named entries differ materially. They are preserved as separate variants, not reconciled or merged.
 
-1. Numaish Chowrangi
-2. Guru Mandir (Patel Para)
-3. Lasbela Chowk
-4. Gul Bahar (Sanitary Market)
-5. Urdu Bazaar
-6. Eid Gah Bagh
-7. North Nazimabad
-8. Orange Line Interchange
-9. Shahrah-e-Humayun
-10. Hyderi
-11. Shahrah-e-Jehangir
-12. Sakhi Hassan
-13. Nagan Chowrangi
-14. UP Morr
-15. North Karachi
-16. 4K Chowrangi (Surjani Chowrangi)
-17. Power House Chowrangi
-18. Road 2400 (Aisha Complex)
-19. Road 4200 (Saleem Centre)
-20. KDA Flats
-21. Karimi Chowrangi
-22. Abdullah Chowk (Surjani Terminal)
+- **BusUpdate list:** https://busupdate.com/pakistan/karachi/bus-routes/route-green-line/
+- **CMTA list:** https://cmta.com.pk/karachi-green-line-brt-route/
 
-Source: https://cmta.com.pk/karachi-green-line-brt-route/
+The earlier candidate transcriptions are recorded in Phase 5AR. Differences include the Board Office / Orange Line interchange area, the Gulbahar-to-Hyderi section, and the Nagan-to-Surjani section.
 
-**Candidate B — BusUpdate.com station dataset, October 2026, reversed here only to show the same south-to-north direction (22 entries):**
+### Green Line decision
 
-1. Numaish
-2. Patel Para (Guru Mandir)
-3. Lasbela Chowk
-4. Sanitary Market (Gulbahar)
-5. Nazimabad No.1
-6. Enquiry Office
-7. Annu Bhai Park
-8. Board Office
-9. Hyderi
-10. Five Star Chowrangi
-11. Jummah Bazar
-12. Erum Shopping
-13. Nagan Chowrangi
-14. U.P. More
-15. Road 4200 (Saleem Centre)
-16. Power House Chowrangi
-17. Road 2400 (Aisha Complex)
-18. 2 Minute Chowrangi
-19. 4K Chowrangi
-20. Karimi Chowrangi
-21. KDA Flats
-22. Abdullah Chowk
+- Retain **25** as the government project-count evidence.
+- Retain the **29** named 2016 corridor points as historical planning references, not as a current passenger station list.
+- Retain both **22-stop** 2026 secondary lists as separate candidate variants.
+- Do not choose one list, delete four entries by inference, assign station coordinates, or create route geometry.
+- Obtain a current dated operator station register or diagram with station IDs and ordered stops in both directions.
 
-Source: https://busupdate.com/pakistan/karachi/stations/u-p-more-station/ (appendix described as compiled October 2026).
+## Orange Line — source reconciliation
 
-**Comparison finding:** Both sources claim 22 stations and share some names, but the station names and order differ materially. Examples include the Board Office / Orange Line interchange area, the Gulbahar-to-Hyderi section, and the Nagan-to-Surjani section. Do not combine the two lists, choose one by majority, or use either to create verified stop records. Obtain the operator's current station list or a dated official station diagram.
+### Current operation and corridor endpoints
 
-## Orange Line — source comparison
+The Provincial Assembly of Sindh answer for **19 May 2026** reports that Orange Line (4 km) is operating from Town Municipal Administration Office, Orangi Town to Jinnah University for Women near Matriculation Board Office, serving approximately 2,500 passengers daily. An earlier Assembly answer dated 29 January 2026 reports the same endpoints and approximately 5,000 passengers/day. The ridership figures differ; neither answer provides the complete station sequence.
 
-### Official-source evidence
+- 19 May 2026: https://www.pas.gov.pk/business/questios-details/33/2019
+- 29 January 2026: https://pas.gov.pk/business/questios-details/33/1989
 
-1. **SMTA project page — BRT Abdul Sattar Edhi Line (Orange Line):**
-   - Describes the route from Town Municipal Administration Office, Orangi Town to Jinnah University for Women near Matriculation Board Office.
-   - States four BRT stations and one depot.
-   - States formal bus operations commenced on 10 September 2022 and names Daewoo Pakistan Express Bus Service Ltd. as operator.
-   - https://smta.sindh.gov.pk/brt-abdul-sattar-edhi-line-orange-line
-   - Accessed 19 November 2026.
+### Contract station IDs — four named entries
 
-2. **Sindh Transport Department Orange Line page:**
-   - Reports five bus stations, conflicting with the SMTA project page's four.
-   - https://transport.sindh.gov.pk/orange-line
-   - Search result accessed 19 November 2026; page retrieval timed out during this review. Treat the count as an official-source discrepancy requiring direct confirmation.
+The 2021 Orange Line Facility Management Agreement Exhibit 1 lists:
 
-3. **Provincial Assembly of Sindh, answer dated 30 January 2026:**
-   - Confirms Orange Line was in operation from TMA Office, Orangi Town to Jinnah University for Women near Matriculation Board Office.
-   - Does not enumerate the station names or resolve the four-versus-five count.
-   - https://www.pas.gov.pk/business/questios-details/33/1989
+1. **OL-1** — 5 No. Chowrangi
+2. **OL-2** — Orangi Town Police Station
+3. **OL-3** — Abdullah College
+4. **OL-4** — Dilpasand Sweets
 
-### Secondary candidate station list — not approved
+Source: https://pidcl.com.pk/wp-content/uploads/2021/02/Orange-Line-Project-Facility-Management-Agreement_compressed.pdf
 
-BusUpdate's October 2026 station dataset lists four entries in this order:
+These are contract station identities. The 2026 Assembly answer confirms the operating corridor endpoints but does not re-confirm the current names, order, station IDs or boarding platforms.
 
-1. AO Chowk
-2. Abdul Sattar Chowrangi
-3. Poney Panch Chowrangi
-4. TMO Office
+### Four-versus-five count discrepancy
 
-Source: https://busupdate.com/pakistan/karachi/stations/tmo-office-station/
+- **SMTA Orange Line project page:** states four BRT stations plus one depot and describes the TMA Office–Jinnah University for Women alignment.
+  - https://smta.sindh.gov.pk/brt-abdul-sattar-edhi-line-orange-line
+- **Sindh Transport Department page:** reports five bus stations, but the reviewed page does not provide a station-by-station list that reconciles the count with OL-1 to OL-4.
+  - https://transport.sindh.gov.pk/orange-line
+- **BusUpdate secondary candidate list:** AO Chowk, Abdul Sattar Chowrangi, Poney Panch Chowrangi, TMO Office.
+  - https://busupdate.com/pakistan/karachi/stations/tmo-office-station/
 
-The list is consistent with SMTA's stated count of four, but not with the Sindh Transport Department page's count of five. It also needs the operator to confirm whether AO Chowk / Board Office and Jinnah University for Women / Matriculation Board Office are the same official terminal/station label or distinct places in the operational station sequence. Do not use this secondary list as a verified sequence.
+Do not treat the depot as a passenger station, infer a fifth stop, or map the BusUpdate labels to OL-1 through OL-4 without evidence. The contract also describes mixed-traffic continuation beyond the dedicated corridor; those mixed-traffic points must not be mistaken for additional Orange Line BRT stations.
 
-## Required evidence to close the BRT sequence blocker
+### Orange Line decision
 
-Request from SMTA / SIDCL / the Orange Line operator:
+- Accept TMA Office Orangi Town to Jinnah University for Women near Matriculation Board Office as the latest government-reported operating corridor endpoints.
+- Retain OL-1 to OL-4 as contract station identities, not as newly operator-confirmed current passenger stops.
+- Preserve the four-versus-five count conflict and the ridership discrepancy.
+- Do not create a complete current station sequence or passenger-facing geometry until the operator confirms station IDs, names, order, terminal equivalence and boarding platforms.
 
-- Current dated station register or route/station diagram for Green Line, including official names and terminal labels in both directions.
-- Current dated station register for Orange Line, explicitly resolving four versus five stations and naming each station in order.
-- Confirmation of interchange naming and whether interchange labels represent one physical station or separate facilities.
-- Any current service suspension, extension, or station-closure notices affecting the station list.
+## Evidence required to close the BRT blocker
 
-Until that evidence is received, keep both BRT station sequences provisional and do not create verified station coordinates or passenger-facing route geometry from these lists.
+Request from SMTA / SIDCL / the current operator:
 
-## Relationship to the route-owner review register
+- Current dated Green Line station register with unique station IDs, official names, sequence in both directions, operational status and WGS84 coordinates.
+- Clarification of the 25-station project count versus 29 historical corridor points and the two conflicting 22-stop passenger lists.
+- Confirmation of Green Line extension status, including whether Municipal Park is an operating passenger terminal.
+- Current dated Orange Line station register mapping OL-1 to OL-4 to current station names and order.
+- Written resolution of the Orange Line four-versus-five passenger-station count and the relationship between TMA Office, Board Office and Jinnah University for Women terminal labels.
+- Confirmation of which portions are dedicated BRT and which are mixed-traffic continuation.
 
-Owner confirmations for R-series and EV-series routes record agreement with the displayed source stop names/order only. They do not satisfy operator confirmation, physical boarding-platform verification, coordinate verification, reverse-direction verification, or geometry rights. The unresolved route identity variants in Phase 5C remain open for the same reason.
+Until this evidence is received, keep BRT station sequences provisional and do not create verified coordinates or passenger-facing route geometry from the secondary lists.
+
+## Relationship to prior research
+
+This document reconciles and supplements:
+- [Phase 5AR — Current Green and Orange Line source reconciliation](PHASE_5AR_CURRENT_GREEN_ORANGE_LINE_RECONCILIATION.md)
+- [Phase 5BA — Current BRT status and operator evidence request](PHASE_5BA_CURRENT_BRT_STATUS_AND_OPERATOR_EVIDENCE_REQUEST.md)
+
+The existing government-source findings remain controlling where they provide stronger dated evidence. This document does not replace their source records.
 
 ## Next safe action
 
-Obtain written or published operator evidence for Green and Orange station names/order. In parallel, continue the 572-node historical coordinate audit as a separate research-only workstream; do not match coordinate collisions or ambiguous nodes to physical boarding stops without independent evidence.
+Obtain written or published operator evidence for Green and Orange station names/order. In parallel, continue the 572-node historical coordinate audit and candidate crosswalk as separate research-only workstreams. Do not promote any candidate coordinate or route geometry based on name matching alone.
