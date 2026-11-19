@@ -133,9 +133,9 @@
 
 ## BRT station sequence register
 
-### Green Line — provisional operational sequence (22 stations)
+### Green Line — secondary passenger-facing candidate sequence A (22 stops; BusUpdate)
 
-The commonly published current passenger-facing list runs Surjani/Abdullah Chowk to Numaish. The list below is a **secondary-source corroborated candidate**, not yet confirmed against a current operator station dataset or as-built station GIS. The 2012 JICA design register contains a different 23-station proposal, including KESC Power House, KDA Chowrangi Surjani, Road 2400/Road 4200 and Municipal Park. Do not merge the historic design and current passenger-facing list.
+The list below is BusUpdate's 2026 secondary passenger-facing candidate from Abdullah Chowk/Surjani to Numaish. It is not an operator-confirmed current station register. The competing CMTA list is recorded separately below and materially differs. The 2012 JICA feasibility report lists 29 historical design IDs (M1–M5 and G01–G23, including G03a), while its narrative says 18+4=22; the 2016 PIDCL presentation lists 29 corridor points and states 25 stations. Do not merge these historic design/project records with either 22-stop secondary list.
 
 1. Abdullah Chowk (Surjani Town terminal)
 2. KDA Flats
@@ -160,7 +160,39 @@ The commonly published current passenger-facing list runs Surjani/Abdullah Chowk
 21. Patel Para (Guru Mandir)
 22. Numaish
 
-**Direction:** Reverse the passenger-facing sequence only as a provisional display order. Confirm actual station platforms, branch/extension status, and official stop IDs with SIDCL/TransKarachi before publication.
+**Status and direction:** This is candidate sequence A only. Do not reverse it into a current service claim or treat it as the operator's official order. The two 22-stop lists are preserved as separate variants. Request the dated station IDs, sequence in both directions, operational status and platform/road-side information from SMTA as current operating authority; use SIDCL/PIDCL for historical project/design records. TransKarachi is the separate Red Line implementation agency, not the Green Line operator.
+
+
+### Green Line — secondary passenger-facing candidate sequence B (22 stops; CMTA)
+
+This is a separate 2026 CMTA passenger-facing list from Numaish to Abdullah Chowk/Surjani. It is not a reverse copy of candidate sequence A and must remain separate pending operator evidence.
+
+1. Numaish Chowrangi
+2. Guru Mandir (Patel Para)
+3. Lasbela Chowk
+4. Gul Bahar (Sanitary Market)
+5. Urdu Bazaar
+6. Eid Gah Bagh
+7. North Nazimabad
+8. Orange Line Interchange
+9. Shahrah-e-Humayun
+10. Hyderi
+11. Shahrah-e-Jehangir
+12. Sakhi Hassan
+13. Nagan Chowrangi
+14. UP Morr
+15. North Karachi
+16. 4K Chowrangi (Surjani Chowrangi)
+17. Power House Chowrangi
+18. Road 2400 (Aisha Complex)
+19. Road 4200 (Saleem Centre)
+20. KDA Flats
+21. Karimi Chowrangi
+22. Abdullah Chowk (Surjani Terminal)
+
+Source: https://cmta.com.pk/karachi-green-line-brt-route/
+
+**Decision:** Preserve candidate A and candidate B as distinct secondary variants. No station name, sequence, coordinate or platform is approved from either list.
 
 **Dataset comparison:** `GreenLine_Bus` has 21 edges / 22 named nodes, but its chain is Surjani Town → 4-K Chowrangi → North Karachi → UP Mor → Nagan → Sakhi Hasan → Shahrah-e-Jehangir → Hyderi → Shahrah-e-Humayun → Orange Line → North Nazimabad → Eid Gah Bagh → Urdu Bazaar → Gul Bahar → Lasbela → Gurumandir → Numaish → Aga Khan Hospital → Aurangzeb Market → Merewether Tower → Karachi City Station. This is not the same sequence as the current 22-station candidate and includes a southern extension/extra corridor not substantiated by the current station list. Keep it separate as historical/unverified candidate geometry.
 
