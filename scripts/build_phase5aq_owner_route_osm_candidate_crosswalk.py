@@ -100,7 +100,7 @@ def build(input_path: Path = INPUT, audit_path: Path = OSM_AUDIT,
             if status not in JOINABLE_STATUSES:
                 relation = (
                     "not_joined_coordinate_not_authorized"
-                    if status in {"user_confirmed_name_alias", "ambiguous_name_variant"}
+                    if status in {"user_confirmed_name_alias_coordinate_unassigned", "ambiguous_name_variant"}
                     else "no_historical_node_match"
                 )
                 candidates = [placeholder(relation)]
