@@ -42,3 +42,12 @@ def test_historical_network_data_requires_login(client):
     response = client.get("/admin/historical-network/data")
     assert response.status_code == 302
     assert "/admin/login" in response.headers["Location"]
+
+
+def test_historical_network_map_uses_official_leaflet_integrity_hashes(client):
+    with client.session_transaction() as session:
+        session["admin_user_id"] = 1
+    response = client.get("/admin/historical-network")
+    assert response.status_code == 200
+    assert b'integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="' in response.data
+    assert b'integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="' in response.data

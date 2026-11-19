@@ -164,7 +164,7 @@ def test_service_worker_never_caches_osm_tiles():
 def test_leaflet_css_sri_hash_is_current_in_all_templates():
     from pathlib import Path
 
-    expected = "sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H"
+    expected = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     old = "sha384-EFZ0jt3DbvE1VivitkgNKHKPMhJcP7wjuPgyHHMVLhBd2fvDbmzAzT6Ia2y7qRuu"
     paths = (
         "templates/public/index.html",
@@ -174,7 +174,8 @@ def test_leaflet_css_sri_hash_is_current_in_all_templates():
     )
     for path in paths:
         source = Path(path).read_text(encoding="utf-8")
-        assert expected in source, f"Correct Leaflet CSS SRI hash missing from {path}"
+        assert expected in source, f"Official Leaflet CSS SRI hash missing from {path}"
+        assert "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" in source, f"Official Leaflet JS SRI hash missing from {path}"
         assert old not in source, f"Stale Leaflet CSS SRI hash remains in {path}"
 
 
