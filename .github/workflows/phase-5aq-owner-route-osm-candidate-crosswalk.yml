@@ -1,0 +1,120 @@
+name: Phase 5AQ Owner Route OSM Candidate Crosswalk
+
+on:
+  workflow_run:
+    workflows: ["Phase 5AI OSM Bus Stop Candidate Inventory"]
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/phase-5aq-owner-route-osm-candidate-crosswalk.yml'
+      - 'scripts/build_phase5aq_owner_route_osm_candidate_crosswalk.py'
+      - 'data/research/owner_route_node_candidate_crosswalk.csv'
+  workflow_dispatch:
+    inputs:
+      artifact_run_id:
+        description: "Successful Phase 5AI workflow run ID containing the OSM proximity audit"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build-crosswalk:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Resolve successful Phase 5AI artifact run
+        id: resolve-artifact
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let runId;
+            if (context.eventName === "workflow_dispatch") {
+              runId = Number(context.payload.inputs.artifact_run_id);
+            } else if (context.eventName === "workflow_run") {
+              if (context.payload.workflow_run.conclusion !== "success") {
+                core.setFailed("Phase 5AI run did not succeed.");
+                return;
+              }
+              runId = context.payload.workflow_run.id;
+            } else {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: "phase-5ai-osm-stop-candidate-inventory.yml",
+                status: "completed",
+                per_page: 30
+              });
+              for (const run of runs.data.workflow_runs) {
+                if (run.conclusion !== "success") continue;
+                const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id
+                });
+                if (artifacts.data.artifacts.some(a => a.name === "phase-5ai-osm-bus-stop-candidate-inventory" && !a.expired)) {
+                  runId = run.id;
+                  break;
+                }
+              }
+            }
+            if (!runId) {
+              core.setFailed("No successful Phase 5AI run with a retained OSM audit artifact was found.");
+              return;
+            }
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId
+            });
+            if (!artifacts.data.artifacts.some(a => a.name === "phase-5ai-osm-bus-stop-candidate-inventory" && !a.expired)) {
+              core.setFailed("The selected Phase 5AI run has no retained OSM candidate artifact.");
+              return;
+            }
+            core.setOutput("run_id", String(runId));
+      - name: Download Phase 5AI audit artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: phase-5ai-osm-bus-stop-candidate-inventory
+          run-id: ${{ steps.resolve-artifact.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: data/phase5ai_artifact
+      - name: Place Phase 5AJ proximity audit at expected path
+        shell: bash
+        run: |
+          mkdir -p data/osm_stops
+          audit="$(find data/phase5ai_artifact -type f -name 'PHASE_5AJ_HISTORICAL_NODE_OSM_STOP_CANDIDATE_AUDIT.csv' -print -quit)"
+          test -n "$audit"
+          cp "$audit" data/osm_stops/PHASE_5AJ_HISTORICAL_NODE_OSM_STOP_CANDIDATE_AUDIT.csv
+      - name: Build owner-route OSM candidate crosswalk
+        run: python scripts/build_phase5aq_owner_route_osm_candidate_crosswalk.py --build
+      - name: Upload Phase 5AQ review outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-5aq-owner-route-osm-candidate-crosswalk
+          path: |
+            data/osm_stops/PHASE_5AQ_OWNER_ROUTE_OSM_CANDIDATE_CROSSWALK.csv
+            data/osm_stops/PHASE_5AQ_OWNER_ROUTE_OSM_CANDIDATE_CROSSWALK_REPORT.json
+          if-no-files-found: error
+          retention-days: 14
+
+  focused-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run Phase 5AQ unit tests
+        run: python -m unittest discover -s tests -p 'test_phase5aq_owner_route_osm_candidate_crosswalk.py' -v
