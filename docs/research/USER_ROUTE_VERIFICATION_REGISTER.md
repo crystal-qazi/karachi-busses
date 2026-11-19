@@ -345,3 +345,34 @@
 5. Daryabad
 6. Jinnah Bridge
 7. Tower
+
+
+## R14 — Maymar to Tower (awaiting owner review)
+
+- **Owner review:** Pending — do not treat as confirmed.
+- **Stop order:** Pending owner confirmation.
+- **Source limitation:** The adopted Think Transportation route inventory/KML does not include R14. Do not invent a Think Transportation sequence.
+- **Reference used for the review draft:** Sindh Mass Transit Authority, Karachi Bus Route Map, R14 via-description: https://smta.gos.pk/route-map (accessed 2026-11-19).
+- **Review basis:** The list below is transcribed from SMTA's official via-description and is explicitly attributed to SMTA. Owner approval would confirm this SMTA sequence, not a Think Transportation sequence.
+- **Review request:** Confirm whether the 17 displayed entries and their exact order are acceptable, or provide corrections and positions.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### SMTA-published forward sequence — awaiting owner confirmation
+
+1. Maymar (route origin)
+2. Nawaz Sharif Park
+3. Maymar Ext
+4. Maymar Mor
+5. Ahsanabad
+6. Jamali Pull
+7. Al-Asif
+8. Sorab Goth
+9. Ayesha Manzil
+10. Lalukhait
+11. Teen Hatti
+12. Jahangir Road
+13. Guru Mandar
+14. Numaish
+15. Taj Complex
+16. Sindh High Court
+17. Tower
