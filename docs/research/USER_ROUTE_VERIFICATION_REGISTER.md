@@ -419,17 +419,20 @@
 CMH Malir Cantt to Dolmen Mall via CMH, Cantt Bazar, Checkpost 02, Tank Chowk, Model Colony, Malir Halt, Colony Gate, Nata Khan, PAF Base Faisal, Karsaz, Nursery, FTC, Kala Pull, Gold Mart, Akhtar Colony, Khayaban-e-Ittehad, Clock Tower, Dolmen Mall.
 
 
-## EV-02 — Bahria Town to Malir Halt (awaiting owner review)
+## EV-02 — Bahria Town to Malir Halt
 
-- **Owner review:** Pending — do not treat as confirmed.
-- **Stop order:** Pending owner confirmation.
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed exactly as displayed below; all 10 entries accepted in the published order.
+- **Corrections / clarifications supplied:** Malir Cantt Gate 5 is also named **Checkpost 05**; Malir Cantt Gate 6 is also named **Checkpost 06**. These are alternate names for the corresponding entries, not additional stops.
 - **Primary review sequence:** Think Transportation's published route description, updated 18 November 2026: https://thinktransportation.net/red-bus-karachi/
 - **Government comparison:** SMTA's official route directory publishes a different, more detailed via-description for EV-02: https://smta.gos.pk/route-map (accessed 2026-11-19). Keep the two source descriptions distinct; do not merge their names or silently reorder them.
-- **Owner clarification received:** Malir Cantt Gate 5 is also named **Checkpost 05**; Malir Cantt Gate 6 is also named **Checkpost 06**. These are alternate names for the corresponding entries, not additional stops. The remaining sequence and complete order are still awaiting confirmation. This clarification does not resolve the separate SMTA via-description.
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-19
+- **Owner decision:** The project owner first clarified the two Checkpost aliases and then replied “correct” to the complete 10-entry sequence. Confirmation applies to the Think Transportation list only; it does not resolve the separate SMTA via-description.
 - **Important distinction:** Owner review is not independent physical-stop, boarding-pole, coordinate, operator, dispatch, or return-direction verification.
 - **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
 
-### Think Transportation forward sequence — awaiting owner confirmation
+### Owner-confirmed Think Transportation forward sequence
 
 1. Bahria Town
 2. Dumba Goth
