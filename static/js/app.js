@@ -119,7 +119,7 @@
     clearLayers();
     resultsElement.replaceChildren();
     if (!data.stops.length) {
-      showEmpty("No active bus stops with published routes were found within this radius. Try a larger radius or search a route.");
+      showEmpty("No active, verified bus stops with published routes were found within this radius. Unverified research candidates are intentionally hidden from the public map.");
       setStatus("No nearby active routes found.");
       return;
     }

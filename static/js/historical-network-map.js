@@ -13,7 +13,11 @@
     attribution: tileAttribution
   }).addTo(map);
 
-  const stopLayer = L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 42 });
+  // Keep the QA map usable when the optional MarkerCluster CDN asset is unavailable.
+  const hasMarkerCluster = typeof L.markerClusterGroup === "function";
+  const stopLayer = hasMarkerCluster
+    ? L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 42 })
+    : L.layerGroup();
   const segmentLayer = L.layerGroup().addTo(map);
   const anomalyLayer = L.layerGroup().addTo(map);
   const collisionLayer = L.layerGroup().addTo(map);
@@ -122,8 +126,13 @@
     buildSegments();
     const selected = routeFilter.value;
     const visibleSegments = dataset.segments.filter((segment) => !selected || segment.route_code === selected);
+    const stopCount = dataset.stops.length;
+    const markerMode = hasMarkerCluster
+      ? "Markers are clustered at wider zoom levels."
+      : "Marker-cluster library unavailable; displaying individual markers instead.";
     message.textContent = (selected ? "Route " + selected + ": " : "All routes: ") +
-      visibleSegments.length + " source-listed segments shown when enabled. Stops are clustered at wider zoom levels.";
+      visibleSegments.length + " source-listed segments shown when enabled. " +
+      stopCount + " unverified historical source stop markers loaded. " + markerMode;
   }
 
   async function load() {
@@ -135,6 +144,9 @@
       if (!response.ok) throw new Error("Server returned " + response.status);
       dataset = await response.json();
       if (!dataset.success) throw new Error(dataset.error || "Could not load the historical network.");
+      if (!Array.isArray(dataset.stops) || !Array.isArray(dataset.routes) || !Array.isArray(dataset.segments)) {
+        throw new Error("Historical map response is missing stops, routes or segments.");
+      }
       dataset.routes.forEach((route) => {
         const option = document.createElement("option");
         option.value = route.code;
