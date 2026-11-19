@@ -380,17 +380,20 @@
 17. Tower
 
 
-## EV-01 — CMH Malir Cantt to Dolmen Mall Clifton (awaiting owner review)
+## EV-01 — CMH Malir Cantt to Dolmen Mall Clifton
 
-- **Owner review:** Pending — do not treat as confirmed.
-- **Stop order:** Pending owner confirmation.
+- **Owner review:** Confirmed
+- **Stop order:** Confirmed exactly as displayed below; all 18 entries accepted in the published order.
+- **Corrections supplied:** None.
 - **Primary review sequence:** Think Transportation's published route description, updated 18 November 2026: https://thinktransportation.net/red-bus-karachi/
 - **Government comparison:** SMTA's official route directory publishes a different, more detailed via-description for EV-01: https://smta.gos.pk/route-map (accessed 2026-11-19). Keep the two source descriptions distinct; do not merge their names or silently reorder them.
-- **Review request:** Confirm whether the 18 Think Transportation entries and their exact order below are correct for the project's adopted route sequence. If not, provide corrections and positions. Confirmation applies to the Think Transportation list only; it does not resolve the separate SMTA via-description.
+- **Reviewed by:** Project owner
+- **Review date:** 2026-11-19
+- **Owner decision:** The project owner replied “correct” to the displayed 18-entry Think Transportation sequence. Confirmation applies to that list only; it does not resolve the separate SMTA via-description.
 - **Important distinction:** Owner review is not independent physical-stop, boarding-pole, coordinate, operator, dispatch, or return-direction verification.
 - **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
 
-### Think Transportation forward sequence — awaiting owner confirmation
+### Owner-confirmed Think Transportation forward sequence
 
 1. CMH Malir Cantt
 2. Tank Chowk
@@ -414,3 +417,31 @@
 ### SMTA via-description — comparison only, not merged into the review sequence
 
 CMH Malir Cantt to Dolmen Mall via CMH, Cantt Bazar, Checkpost 02, Tank Chowk, Model Colony, Malir Halt, Colony Gate, Nata Khan, PAF Base Faisal, Karsaz, Nursery, FTC, Kala Pull, Gold Mart, Akhtar Colony, Khayaban-e-Ittehad, Clock Tower, Dolmen Mall.
+
+
+## EV-02 — Bahria Town to Malir Halt (awaiting owner review)
+
+- **Owner review:** Pending — do not treat as confirmed.
+- **Stop order:** Pending owner confirmation.
+- **Primary review sequence:** Think Transportation's published route description, updated 18 November 2026: https://thinktransportation.net/red-bus-karachi/
+- **Government comparison:** SMTA's official route directory publishes a different, more detailed via-description for EV-02: https://smta.gos.pk/route-map (accessed 2026-11-19). Keep the two source descriptions distinct; do not merge their names or silently reorder them.
+- **Review request:** Confirm whether the 10 Think Transportation entries and their exact order below are correct for the project's adopted route sequence. If not, provide corrections and positions. Confirmation applies to the Think Transportation list only; it does not resolve the separate SMTA via-description.
+- **Important distinction:** Owner review is not independent physical-stop, boarding-pole, coordinate, operator, dispatch, or return-direction verification.
+- **Database impact:** None. No MySQL rows, route/stop verification statuses, route shapes, or public API publication state were changed.
+
+### Think Transportation forward sequence — awaiting owner confirmation
+
+1. Bahria Town
+2. Dumba Goth
+3. Toll Plaza
+4. Baqai University
+5. Malir Cantt Gate 5
+6. Malir Cantt Gate 6
+7. Tank Chowk
+8. Model Mor
+9. Jinnah Ave
+10. Malir Halt
+
+### SMTA via-description — comparison only, not merged into the review sequence
+
+Bahria Town to Malir Halt via Usmania, Domba Goth, Karachi Toll Plaza, Checkpost 05, Checkpost 06, Tank Chowk, Model Colony, Malir Halt.
