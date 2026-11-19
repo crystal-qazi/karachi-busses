@@ -19,7 +19,7 @@ Sources:
 - [Think Transportation — New Red Bus Karachi](https://thinktransportation.net/red-bus-karachi/), updated 18 November 2026.
 - [SMTA — Karachi Bus Route Map](https://smta.gos.pk/route-map), accessed 19 November 2026.
 
-Do not merge the lists or assume their entries are interchangeable. Owner confirmation is requested for the Think Transportation list because it is the adopted route-sequence reference. The SMTA description remains separately attributed comparison evidence.
+Do not merge the lists or assume their entries are interchangeable. The project owner's confirmation applies to the Think Transportation list because it is the adopted route-sequence reference. The SMTA description remains separately attributed comparison evidence.
 
 ## Owner review outcome
 
