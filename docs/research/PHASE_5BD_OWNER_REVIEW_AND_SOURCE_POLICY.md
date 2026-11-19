@@ -26,13 +26,14 @@ See [USER_ROUTE_VERIFICATION_REGISTER.md](USER_ROUTE_VERIFICATION_REGISTER.md) f
 | R10 | Confirmed with Do Talwar, Pak Tower and Abdullah Shah Ghazi separated in that order |
 | R11 | Confirmed |
 | R12 | Confirmed 2026-11-19 |
+| R13 | Confirmed 2026-11-19 |
 
 Owner review is not independent physical-stop, operator, dispatch, coordinate, or return-direction verification. No database verification state or publication eligibility changes were made.
 
 ## Next actions
 
-1. Prepare R12's displayed Think Transportation forward sequence for owner review; retain the SMTA endpoint conflict (Naddi Kinara vs Memon Goth) as a separate source observation.
-2. Continue owner review for R13, R14 and EV-01–EV-05.
+1. Prepare the R14 source-comparison and owner-review packet; preserve the fact that the currently adopted Think Transportation route list does not provide an R14 sequence while SMTA publishes a detailed via-description.
+2. Continue owner review for EV-01–EV-05 using clearly attributed published sequences and retain source discrepancies.
 3. Continue exact-name candidate matching against the 572 historical coordinate nodes; never promote a candidate based only on name similarity or proximity.
 4. Keep unverified stops/sources under review and route_shapes empty.
 5. Use OSM for geographic/road-network analysis only after candidate boarding points and licence constraints are checked. Do not derive public route geometry from the restricted KML before written permission.
