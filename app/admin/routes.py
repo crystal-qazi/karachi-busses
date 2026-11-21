@@ -164,9 +164,16 @@ def route_detail(route_id):
             name = _text("route_name", 180, True)
             description = _text("description", 5000)
             source_id = request.form.get("source_id") or None
+            if source_id and not source_id.isdigit():
+                raise ValueError("Select a valid data source.")
+            source_id_value = int(source_id) if source_id else None
             status = request.form.get("status", "draft")
+            moved_back_to_review = False
             with cursor_context(commit=True) as (_, cursor):
-                cursor.execute("SELECT status FROM bus_routes WHERE id=%s", (route_id,))
+                cursor.execute(
+                    "SELECT status, route_name, description, source_id FROM bus_routes WHERE id=%s",
+                    (route_id,),
+                )
                 current = cursor.fetchone()
                 if not current:
                     raise ValueError("Route not found.")
@@ -176,15 +183,24 @@ def route_detail(route_id):
                 if status not in allowed:
                     raise ValueError("Routes can only be activated through the verification workflow.")
 
+                # Editing passenger-visible metadata on a published route must
+                # withdraw it for review just like editing its stops or shape.
+                metadata_changed = (
+                    name != current["route_name"]
+                    or description != current["description"]
+                    or source_id_value != current["source_id"]
+                )
+                if current["status"] == "active" and status == "active" and metadata_changed:
+                    status = "under_review"
+                    moved_back_to_review = True
+
                 # An active route must always point to a verified source.
-                # Changing its source while keeping it active would otherwise
-                # bypass the publication verification gate.
                 if status == "active":
-                    if not source_id:
+                    if not source_id_value:
                         raise ValueError("An active route must have a verified data source.")
                     cursor.execute(
                         "SELECT verification_status FROM data_sources WHERE id=%s",
-                        (source_id,),
+                        (source_id_value,),
                     )
                     source = cursor.fetchone()
                     if not source or source["verification_status"] != "verified":
@@ -192,12 +208,15 @@ def route_detail(route_id):
 
                 cursor.execute(
                     "UPDATE bus_routes SET route_name=%s, description=%s, source_id=%s, status=%s WHERE id=%s",
-                    (name, description, source_id, status, route_id),
+                    (name, description, source_id_value, status, route_id),
                 )
                 if not cursor.rowcount:
-                    raise ValueError("Route not found.")
+                    raise ValueError("Route not found or unchanged.")
                 _audit(cursor, "update", "bus_route", route_id, {"status": status})
-            flash("Route updated.", "success")
+            if moved_back_to_review:
+                flash("Route updated and moved back to review. A reviewer must publish it again.", "warning")
+            else:
+                flash("Route updated.", "success")
         except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.route_detail", route_id=route_id))
