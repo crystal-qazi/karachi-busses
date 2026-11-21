@@ -22,6 +22,8 @@ for attribution policy.
 from __future__ import annotations
 
 import json
+import os
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -35,6 +37,15 @@ WGS84 = "EPSG:4326"
 # UTM zone 42N covers Karachi; the whole research pipeline measures planar
 # distance in this CRS to avoid degrees-based distortion.
 AREA_CRS = "EPSG:32642"
+
+
+class RoadSourceError(Exception):
+    """The OSM road GeoJSON source cannot be read or parsed.
+
+    A file that is merely absent from the extraction step should be reported
+    by the caller before invoking the loader; this error covers unreadable
+    or unparsable content.
+    """
 
 _transformer_4326_to_32642 = Transformer.from_crs(
     WGS84, AREA_CRS, always_xy=True
@@ -244,6 +255,73 @@ def load_roads(geojson: str | bytes | dict | Path) -> RoadIndex:
             wgs84_lines.append(part)
             props.append(feature_props)
     return RoadIndex(lines, wgs84_lines, props, len(lines))
+
+
+# Process-level cache so the (large) OSM road inventory is parsed and indexed
+# once per file version instead of on every snap request. Keyed by resolved
+# file path; entries are invalidated when the file's mtime or size changes.
+_road_cache_lock = threading.Lock()
+_road_index_cache: dict[str, dict] = {}
+
+
+def _file_signature(path: Path) -> tuple[int, int]:
+    stat = os.stat(path)
+    return (stat.st_mtime_ns, stat.st_size)
+
+
+def load_roads_cached(geojson: str | Path) -> RoadIndex:
+    """Return a process-level cached :class:`RoadIndex` for a GeoJSON file.
+
+    The cache key is the resolved file path. An entry is reused while the
+    file's ``st_mtime_ns`` and ``st_size`` are unchanged and is rebuilt when
+    either changes, so re-running the extraction script invalidates the cache
+    automatically. Concurrent callers share a single build: the first request
+    constructs the index while others wait on the same result instead of each
+    parsing the file independently.
+
+    A missing, unreadable or unparsable file raises :class:`RoadSourceError`.
+    A valid file that contains no usable road features returns an empty index
+    (same semantics as :func:`load_roads`); callers distinguish that case via
+    ``RoadIndex.is_empty``.
+    """
+    path = Path(geojson)
+    try:
+        key = str(path.resolve())
+        signature = _file_signature(path)
+    except OSError as exc:
+        raise RoadSourceError(f"The OSM road file cannot be accessed: {path}") from exc
+
+    cached = _road_index_cache.get(key)
+    if cached is not None and cached["signature"] == signature:
+        return cached["index"]
+
+    with _road_cache_lock:
+        # Another thread may have built this version while we waited.
+        cached = _road_index_cache.get(key)
+        if cached is not None and cached["signature"] == signature:
+            return cached["index"]
+        try:
+            index = load_roads(path)
+        except (OSError, ValueError, TypeError) as exc:
+            _road_index_cache.pop(key, None)
+            raise RoadSourceError(
+                f"The OSM road file could not be parsed: {path} ({exc})"
+            ) from exc
+        _road_index_cache[key] = {"signature": signature, "index": index}
+        return index
+
+
+def reset_road_index_cache(path: str | Path | None = None) -> None:
+    """Drop cached RoadIndex entries — all of them, or one file's entry.
+
+    Intended for tests and for callers that know a file changed without its
+    stat signature changing (e.g. same size, same mtime granularity).
+    """
+    with _road_cache_lock:
+        if path is None:
+            _road_index_cache.clear()
+        else:
+            _road_index_cache.pop(str(Path(path).resolve()), None)
 
 
 def _line_parts(geometry) -> list:

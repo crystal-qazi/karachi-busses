@@ -11,7 +11,7 @@ from app.admin import admin_bp
 from app.admin.auth import login_required
 from app.admin.errors import db_error_handler
 from app.database.helpers import cursor_context
-from app.snapping import load_roads, road_snap_candidates
+from app.snapping import RoadSourceError, load_roads_cached, road_snap_candidates
 
 CODE_RE = re.compile(r"^[A-Za-z0-9._-]{1,60}$")
 
@@ -845,7 +845,14 @@ def historical_network_snap():
 
     max_distance_m = float(current_app.config.get("SNAP_MAX_DISTANCE_M", 500))
     max_candidates = int(current_app.config.get("SNAP_MAX_CANDIDATES", 5))
-    roads = load_roads(roads_path)
+    try:
+        # Cached process-wide: the inventory is parsed and indexed once per
+        # file version, not once per request or per stop.
+        roads = load_roads_cached(roads_path)
+    except RoadSourceError:
+        return jsonify(success=False, error={
+            "code": "ROAD_DATA_MISSING",
+            "message": "The OSM road inventory exists but could not be read."}), 503
     if roads.is_empty:
         return jsonify(success=False, error={
             "code": "ROAD_DATA_MISSING",

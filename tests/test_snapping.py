@@ -1,5 +1,9 @@
 import importlib.util
+import json
+import os
 import sys
+import tempfile
+import threading
 import unittest
 from pathlib import Path
 
@@ -209,6 +213,151 @@ class SnapCandidatesTests(unittest.TestCase):
         candidates = SNAP.road_snap_candidates(24.85, 67.05, self.index,
                                                max_distance_m=100, max_candidates=5)
         self.assertEqual(candidates, [])
+
+
+@unittest.skipUnless(HAS_PYPROJ, "pyproj not installed")
+class RoadIndexCacheTests(unittest.TestCase):
+    """Process-level cache semantics of ``load_roads_cached``."""
+
+    # 2020-09 in nanoseconds; an exact multiple of the 100 ns FILETIME step
+    # so os.utime round-trips it exactly on Windows.
+    BASE_MTIME_NS = 1_600_000_000_000_000_000
+
+    def setUp(self):
+        SNAP.reset_road_index_cache()
+        self.addCleanup(SNAP.reset_road_index_cache)
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.path = Path(tmp.name) / "roads.geojson"
+        self.cache_key = str(self.path.resolve())
+
+    def _write(self, text, mtime_ns=None):
+        self.path.write_text(text, encoding="utf-8")
+        if mtime_ns is not None:
+            os.utime(self.path, ns=(mtime_ns, mtime_ns))
+
+    def _road_fc(self, way_id):
+        return json.dumps({"type": "FeatureCollection", "features": [
+            _road_feature(way_id, [(67.0, 24.8), (67.1, 24.8)]),
+        ]})
+
+    def test_missing_file_raises_road_source_error(self):
+        with self.assertRaises(SNAP.RoadSourceError):
+            SNAP.load_roads_cached(self.path)
+        self.assertNotIn(self.cache_key, SNAP._road_index_cache)
+
+    def test_directory_source_raises_road_source_error(self):
+        with self.assertRaises(SNAP.RoadSourceError):
+            SNAP.load_roads_cached(self.path.parent)
+
+    def test_invalid_json_raises_and_leaves_no_cache_entry(self):
+        self._write("{not valid json")
+        with self.assertRaises(SNAP.RoadSourceError):
+            SNAP.load_roads_cached(self.path)
+        self.assertNotIn(self.cache_key, SNAP._road_index_cache)
+
+    def test_failed_build_does_not_poison_cache(self):
+        self._write("{not valid json")
+        with self.assertRaises(SNAP.RoadSourceError):
+            SNAP.load_roads_cached(self.path)
+        # Repairing the same file must yield a working index.
+        self._write(self._road_fc(700))
+        index = SNAP.load_roads_cached(self.path)
+        self.assertEqual(index.feature_count, 1)
+        result = SNAP.nearest_road_snap(24.801, 67.05, index, max_distance_m=500)
+        self.assertEqual(result.way_id, "700")
+
+    def test_empty_collection_is_cached_as_empty_index(self):
+        self._write(json.dumps({"type": "FeatureCollection", "features": []}))
+        first = SNAP.load_roads_cached(self.path)
+        self.assertTrue(first.is_empty)
+        self.assertIsNone(SNAP.nearest_road_snap(24.8, 67.0, first,
+                                                 max_distance_m=100))
+        self.assertIs(SNAP.load_roads_cached(self.path), first)
+
+    def test_cache_reuse_returns_same_object(self):
+        self._write(self._road_fc(100))
+        first = SNAP.load_roads_cached(self.path)
+        self.assertIs(SNAP.load_roads_cached(self.path), first)
+
+    def test_mtime_change_invalidates_cache(self):
+        self._write(self._road_fc(1000), mtime_ns=self.BASE_MTIME_NS)
+        first = SNAP.load_roads_cached(self.path)
+        # Same byte length, different content, a later mtime.
+        self._write(self._road_fc(2000),
+                    mtime_ns=self.BASE_MTIME_NS + 1_000_000_000)
+        second = SNAP.load_roads_cached(self.path)
+        self.assertIsNot(second, first)
+        result = SNAP.nearest_road_snap(24.801, 67.05, second,
+                                        max_distance_m=500)
+        self.assertEqual(result.way_id, "2000")
+
+    def test_size_change_invalidates_cache(self):
+        self._write(self._road_fc(1000), mtime_ns=self.BASE_MTIME_NS)
+        first = SNAP.load_roads_cached(self.path)
+        original_size = os.stat(self.path).st_size
+        # Longer content, original mtime restored so only the size differs.
+        self._write(self._road_fc(3000) + "\n", mtime_ns=self.BASE_MTIME_NS)
+        self.assertEqual(os.stat(self.path).st_mtime_ns, self.BASE_MTIME_NS)
+        second = SNAP.load_roads_cached(self.path)
+        self.assertIsNot(second, first)
+        self.assertGreater(os.stat(self.path).st_size, original_size)
+        result = SNAP.nearest_road_snap(24.801, 67.05, second,
+                                        max_distance_m=500)
+        self.assertEqual(result.way_id, "3000")
+
+    def test_concurrent_requests_build_once(self):
+        self._write(self._road_fc(400))
+        real_load = SNAP.load_roads
+        builds = []
+        builds_lock = threading.Lock()
+
+        def counting_load(geojson):
+            with builds_lock:
+                builds.append(1)
+            return real_load(geojson)
+
+        SNAP.load_roads = counting_load
+        self.addCleanup(setattr, SNAP, "load_roads", real_load)
+
+        barrier = threading.Barrier(4)
+        results, errors = [], []
+
+        def worker():
+            try:
+                barrier.wait(timeout=10)
+                results.append(SNAP.load_roads_cached(self.path))
+            except Exception as exc:  # surfaced below
+                errors.append(exc)
+
+        threads = [threading.Thread(target=worker) for _ in range(4)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(timeout=30)
+        self.assertEqual(errors, [])
+        self.assertEqual(len(results), 4)
+        self.assertEqual(len(builds), 1)
+        self.assertEqual(len({id(r) for r in results}), 1)
+
+    def test_reset_forces_rebuild(self):
+        self._write(self._road_fc(500))
+        first = SNAP.load_roads_cached(self.path)
+        SNAP.reset_road_index_cache(self.path)
+        second = SNAP.load_roads_cached(self.path)
+        self.assertIsNot(second, first)
+        SNAP.reset_road_index_cache()
+        third = SNAP.load_roads_cached(self.path)
+        self.assertIsNot(third, second)
+
+    def test_relative_and_absolute_paths_share_entry(self):
+        self._write(self._road_fc(600))
+        absolute = SNAP.load_roads_cached(self.path)
+        cwd = os.getcwd()
+        os.chdir(self.path.parent)
+        self.addCleanup(os.chdir, cwd)
+        relative = SNAP.load_roads_cached(Path("roads.geojson"))
+        self.assertIs(relative, absolute)
 
 
 if __name__ == "__main__":

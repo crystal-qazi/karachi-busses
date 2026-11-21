@@ -10,6 +10,15 @@ import json
 import pytest
 
 from app.admin import routes as admin_routes
+from app.snapping import reset_road_index_cache
+
+
+@pytest.fixture(autouse=True)
+def _fresh_road_cache():
+    """Each test gets an empty RoadIndex cache (tmp files differ per test)."""
+    reset_road_index_cache()
+    yield
+    reset_road_index_cache()
 
 
 @pytest.fixture()

@@ -230,6 +230,8 @@
   const snapStopId = document.getElementById("snap-stop-id");
   const snapCandidateSelect = document.getElementById("snap-candidate");
   let snapPreviewInFlight = false;
+  let snapPreviewRequestSeq = 0;
+  let snapPreviewController = null;
   let snapCandidates = [];
   let snapOriginal = null;
 
@@ -337,6 +339,8 @@
     }
   }
 
+  const SNAP_PREVIEW_TIMEOUT_MS = 60000;
+
   async function previewSnap() {
     const raw = snapStopId.value.trim();
     if (!/^\d+$/.test(raw)) {
@@ -344,19 +348,27 @@
       message.classList.add("text-danger");
       return;
     }
-    if (snapPreviewInFlight) {
-      message.textContent = "A snap preview is already running. Please wait.";
-      return;
-    }
+    // A new request always supersedes the previous one: the obsolete fetch is
+    // aborted and its stale response ignored, so changing the stop ID never
+    // requires waiting for — or reloading after — an older request.
+    const requestId = ++snapPreviewRequestSeq;
+    if (snapPreviewController) snapPreviewController.abort();
+    const controller = new AbortController();
+    snapPreviewController = controller;
     snapPreviewInFlight = true;
     message.textContent = "Requesting geometric OSM road snap candidates for stop " + raw + "…";
     message.classList.remove("text-danger");
+    const timeoutId = setTimeout(() => {
+      controller.abort(new DOMException("Snap preview request timed out.", "TimeoutError"));
+    }, SNAP_PREVIEW_TIMEOUT_MS);
     try {
       const response = await fetch("/admin/historical-network/snap?stop_id=" + encodeURIComponent(raw), {
         headers: { "Accept": "application/json" },
-        credentials: "same-origin"
+        credentials: "same-origin",
+        signal: controller.signal
       });
       const payload = await response.json().catch(() => null);
+      if (requestId !== snapPreviewRequestSeq) return;
       if (!response.ok || !payload) {
         message.textContent = payload && payload.error ? payload.error.message : ("Server returned " + response.status);
         message.classList.add("text-danger");
@@ -364,10 +376,22 @@
       }
       renderSnapPreview(payload);
     } catch (error) {
-      message.textContent = "Could not preview snap: " + error.message;
-      message.classList.add("text-danger");
+      if (requestId !== snapPreviewRequestSeq) return;
+      if (error && error.name === "TimeoutError") {
+        message.textContent = "The snap preview request timed out. Please try again.";
+        message.classList.add("text-danger");
+      } else if (!(error && error.name === "AbortError")) {
+        message.textContent = "Could not preview snap: " + error.message;
+        message.classList.add("text-danger");
+      }
     } finally {
-      snapPreviewInFlight = false;
+      clearTimeout(timeoutId);
+      // Only the newest request may release the lock; a superseded request's
+      // cleanup must not clear the newer request's loading state.
+      if (requestId === snapPreviewRequestSeq) {
+        snapPreviewInFlight = false;
+        snapPreviewController = null;
+      }
     }
   }
 
