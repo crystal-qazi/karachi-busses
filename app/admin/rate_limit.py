@@ -55,12 +55,24 @@ def _sanitize_ip(ip: str) -> str:
 
 
 def client_ip() -> str:
-    """Resolve the client IP, honouring X-Forwarded-For only from trusted proxies."""
-    peer = request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+    """Resolve the rightmost non-trusted hop in a trusted proxy chain.
+
+    X-Forwarded-For is client-controlled until a trusted proxy appends the
+    address of its peer. Walk the chain from right to left and skip configured
+    trusted proxies so an attacker cannot choose the rate-limit key by
+    prepending a forged address.
+    """
     direct = request.remote_addr or "0.0.0.0"
-    trusted = _trusted_proxy_ips()
-    if direct in trusted and peer:
-        return peer
+    trusted = set(_trusted_proxy_ips())
+    if direct not in trusted:
+        return direct
+
+    forwarded = request.headers.get("X-Forwarded-For", "")
+    if not forwarded:
+        return direct
+    for hop in reversed([part.strip() for part in forwarded.split(",")]):
+        if hop and hop not in trusted:
+            return hop
     return direct
 
 

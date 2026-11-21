@@ -44,6 +44,21 @@ def _audit(cursor, action, entity_type, entity_id, details=None):
     )
 
 
+def _mark_route_under_review(cursor, route_id, reason):
+    """Withdraw an active route from passenger discovery after structural edits.
+
+    Route managers may edit records, but a previously published route must be
+    reviewed and explicitly republished before edited stops or geometry become
+    passenger-visible.
+    """
+    cursor.execute(
+        "UPDATE bus_routes SET status='under_review' WHERE id=%s AND status='active'",
+        (route_id,),
+    )
+    if cursor.rowcount:
+        _audit(cursor, "unpublish_for_review", "bus_route", route_id, {"reason": reason})
+
+
 @admin_bp.get("/")
 @login_required
 @db_error_handler
@@ -149,9 +164,16 @@ def route_detail(route_id):
             name = _text("route_name", 180, True)
             description = _text("description", 5000)
             source_id = request.form.get("source_id") or None
+            if source_id and not source_id.isdigit():
+                raise ValueError("Select a valid data source.")
+            source_id_value = int(source_id) if source_id else None
             status = request.form.get("status", "draft")
+            moved_back_to_review = False
             with cursor_context(commit=True) as (_, cursor):
-                cursor.execute("SELECT status FROM bus_routes WHERE id=%s", (route_id,))
+                cursor.execute(
+                    "SELECT status, route_name, description, source_id FROM bus_routes WHERE id=%s",
+                    (route_id,),
+                )
                 current = cursor.fetchone()
                 if not current:
                     raise ValueError("Route not found.")
@@ -161,15 +183,24 @@ def route_detail(route_id):
                 if status not in allowed:
                     raise ValueError("Routes can only be activated through the verification workflow.")
 
+                # Editing passenger-visible metadata on a published route must
+                # withdraw it for review just like editing its stops or shape.
+                metadata_changed = (
+                    name != current["route_name"]
+                    or description != current["description"]
+                    or source_id_value != current["source_id"]
+                )
+                if current["status"] == "active" and status == "active" and metadata_changed:
+                    status = "under_review"
+                    moved_back_to_review = True
+
                 # An active route must always point to a verified source.
-                # Changing its source while keeping it active would otherwise
-                # bypass the publication verification gate.
                 if status == "active":
-                    if not source_id:
+                    if not source_id_value:
                         raise ValueError("An active route must have a verified data source.")
                     cursor.execute(
                         "SELECT verification_status FROM data_sources WHERE id=%s",
-                        (source_id,),
+                        (source_id_value,),
                     )
                     source = cursor.fetchone()
                     if not source or source["verification_status"] != "verified":
@@ -177,12 +208,15 @@ def route_detail(route_id):
 
                 cursor.execute(
                     "UPDATE bus_routes SET route_name=%s, description=%s, source_id=%s, status=%s WHERE id=%s",
-                    (name, description, source_id, status, route_id),
+                    (name, description, source_id_value, status, route_id),
                 )
                 if not cursor.rowcount:
-                    raise ValueError("Route not found.")
+                    raise ValueError("Route not found or unchanged.")
                 _audit(cursor, "update", "bus_route", route_id, {"status": status})
-            flash("Route updated.", "success")
+            if moved_back_to_review:
+                flash("Route updated and moved back to review. A reviewer must publish it again.", "warning")
+            else:
+                flash("Route updated.", "success")
         except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.route_detail", route_id=route_id))
@@ -270,6 +304,7 @@ def create_direction(route_id):
                 (route_id, name, start, end),
             )
             _audit(cursor, "create", "route_direction", cursor.lastrowid, {"route_id": route_id})
+            _mark_route_under_review(cursor, route_id, "direction_added")
         flash("Direction added.", "success")
     except (ValueError, TypeError) as exc:
         flash(str(exc), "danger")
@@ -320,11 +355,13 @@ def add_direction_stop(direction_id):
         if sequence < 1:
             raise ValueError("Stop order must be 1 or greater.")
         with cursor_context(commit=True) as (_, cursor):
-            cursor.execute("SELECT id FROM route_directions WHERE id=%s", (direction_id,))
-            if not cursor.fetchone():
+            cursor.execute("SELECT route_id FROM route_directions WHERE id=%s", (direction_id,))
+            direction = cursor.fetchone()
+            if not direction:
                 raise ValueError("Direction not found.")
             cursor.execute("INSERT INTO route_stops (direction_id, stop_id, stop_sequence) VALUES (%s,%s,%s)", (direction_id, stop_id, sequence))
             _audit(cursor, "add_stop", "route_direction", direction_id, {"stop_id": stop_id, "sequence": sequence})
+            _mark_route_under_review(cursor, direction["route_id"], "direction_stop_added")
         flash("Stop linked to direction.", "success")
     except (ValueError, TypeError) as exc:
         flash(f"Could not add stop: {exc}", "danger")
@@ -336,8 +373,15 @@ def add_direction_stop(direction_id):
 @db_error_handler
 def remove_direction_stop(direction_id, stop_id):
     with cursor_context(commit=True) as (_, cursor):
+        cursor.execute("SELECT route_id FROM route_directions WHERE id=%s", (direction_id,))
+        direction = cursor.fetchone()
+        if not direction:
+            flash("Direction not found.", "danger")
+            return redirect(url_for("admin.routes"))
         cursor.execute("DELETE FROM route_stops WHERE direction_id=%s AND stop_id=%s", (direction_id, stop_id))
-        _audit(cursor, "remove_stop", "route_direction", direction_id, {"stop_id": stop_id})
+        if cursor.rowcount:
+            _audit(cursor, "remove_stop", "route_direction", direction_id, {"stop_id": stop_id})
+            _mark_route_under_review(cursor, direction["route_id"], "direction_stop_removed")
     flash("Stop removed from direction.", "success")
     return redirect(url_for("admin.direction_editor", direction_id=direction_id))
 
@@ -349,7 +393,7 @@ def save_direction_shape(direction_id):
     try:
         raw = request.form.get("geojson", "")
         geometry = json.loads(raw)
-        if geometry.get("type") != "LineString":
+        if not isinstance(geometry, dict) or geometry.get("type") != "LineString":
             raise ValueError("Route geometry must be a GeoJSON LineString.")
         coordinates = geometry.get("coordinates")
         if not isinstance(coordinates, list) or len(coordinates) < 2 or len(coordinates) > 20000:
@@ -360,14 +404,16 @@ def save_direction_shape(direction_id):
             _coordinate(pair[0], "Longitude", -180, 180)
             _coordinate(pair[1], "Latitude", -90, 90)
         with cursor_context(commit=True) as (_, cursor):
-            cursor.execute("SELECT id FROM route_directions WHERE id=%s", (direction_id,))
-            if not cursor.fetchone():
+            cursor.execute("SELECT route_id FROM route_directions WHERE id=%s", (direction_id,))
+            direction = cursor.fetchone()
+            if not direction:
                 raise ValueError("Direction not found.")
             cursor.execute("""
                 INSERT INTO route_shapes (direction_id, geojson) VALUES (%s,%s)
                 ON DUPLICATE KEY UPDATE geojson=VALUES(geojson)
             """, (direction_id, json.dumps(geometry)))
             _audit(cursor, "save_shape", "route_direction", direction_id, {"point_count": len(coordinates)})
+            _mark_route_under_review(cursor, direction["route_id"], "route_geometry_changed")
         flash("Route shape saved.", "success")
     except (ValueError, TypeError) as exc:
         flash(f"Shape was not saved: {exc}", "danger")
@@ -430,6 +476,14 @@ def update_stop(stop_id):
                 source = cursor.fetchone()
                 if not source or source["verification_status"] != "verified":
                     raise ValueError("An active stop requires a verified data source.")
+            cursor.execute("""
+                SELECT DISTINCT r.id
+                FROM bus_routes r
+                JOIN route_directions d ON d.route_id=r.id
+                JOIN route_stops rs ON rs.direction_id=d.id
+                WHERE rs.stop_id=%s AND r.status='active'
+            """, (stop_id,))
+            affected_route_ids = [row["id"] for row in cursor.fetchall()]
             cursor.execute(
                 "UPDATE bus_stops SET stop_name=%s, latitude=%s, longitude=%s, address=%s, source_id=%s, status=%s WHERE id=%s",
                 (name, lat, lng, address, source_id, status, stop_id),
@@ -437,6 +491,8 @@ def update_stop(stop_id):
             if not cursor.rowcount:
                 raise ValueError("Stop not found or unchanged.")
             _audit(cursor, "update", "bus_stop", stop_id)
+            for affected_route_id in affected_route_ids:
+                _mark_route_under_review(cursor, affected_route_id, "linked_stop_changed")
         flash("Stop updated.", "success")
     except (ValueError, TypeError) as exc:
         flash(str(exc), "danger")
