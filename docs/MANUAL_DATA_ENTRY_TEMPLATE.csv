@@ -1,0 +1,4 @@
+record_type,route_code,direction,operator,category,route_name,origin,destination,stop_sequence,stop_name,latitude,longitude,geometry_geojson,source_name,source_url,source_date,review_status,reviewer,notes
+route,R1,outbound,,,,,,,,,,,,,,,under_review,,
+stop,R1,outbound,,,,,,1,Example Stop,24.900000,67.100000,,Official source,,2026-11-21,under_review,,Replace example coordinates before use
+geometry,R1,outbound,,,,,,,,,,,"{""type"":""LineString"",""coordinates"":[[67.1,24.9],[67.11,24.91]]}",Official source,,2026-11-21,under_review,,GeoJSON order is longitude then latitude
