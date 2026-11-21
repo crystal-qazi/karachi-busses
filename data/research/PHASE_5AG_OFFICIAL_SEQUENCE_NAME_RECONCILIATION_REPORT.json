@@ -1,0 +1,54 @@
+{
+  "status": "name_only_reconciliation_not_physical_stop_verification",
+  "residual_source_rows": 82,
+  "output_rows": 82,
+  "counts": {
+    "direction_descriptor_reference_only": 11,
+    "exact_normalized_name": 71
+  },
+  "source_rows_by_route": {
+    "EV-01": 8,
+    "EV-02": 4,
+    "EV-03": 8,
+    "EV-04": 6,
+    "EV-05": 8,
+    "R1": 4,
+    "R11": 4,
+    "R12": 7,
+    "R13": 5,
+    "R14": 8,
+    "R2": 7,
+    "R3": 5,
+    "R4": 4,
+    "R8": 4
+  },
+  "output_rows_by_route": {
+    "EV-01": 8,
+    "EV-02": 4,
+    "EV-03": 8,
+    "EV-04": 6,
+    "EV-05": 8,
+    "R1": 4,
+    "R11": 4,
+    "R12": 7,
+    "R13": 5,
+    "R14": 8,
+    "R2": 7,
+    "R3": 5,
+    "R4": 4,
+    "R8": 4
+  },
+  "inputs": {
+    "phase_5aa_residual_csv_sha256": "278b88bcec4398f6c13ee1b62de7356a46ae34432ca26d7fa08e8ae69ff39bb4",
+    "phase_5af_official_sequences_sha256": "0d38e2a62155c9f2aa8cf89a36b485e774c66d897dcd944c3670fe1dc276cbf9",
+    "phase_5y_confirmed_aliases_sha256": "e70ae2eba7ce6206802adeff1da5c331a418a2d389cfb28d2efbb774dfad5ee0"
+  },
+  "output_sha256": "84151478276d40684fd19b6e41b745df12bd36d9ca83cc6df31a3a9cacb05372",
+  "limitations": [
+    "Only same-route exact normalized names and explicit Phase 5Y user-confirmed aliases are compared.",
+    "No fuzzy similarity score is accepted as a match.",
+    "A name match does not verify a physical passenger stop, boarding side, route direction, or live operation.",
+    "No coordinates, OSM nodes, roads, route geometry, or database values are assigned.",
+    "All records remain physically unverified and route approval remains not_approved."
+  ]
+}

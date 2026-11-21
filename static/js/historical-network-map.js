@@ -221,6 +221,102 @@
       stopCount + " unverified historical source stop markers loaded. " + markerMode;
   }
 
+  // Admin-only snap preview. Proposes a geometric OSM road snap for one stop
+  // via the server endpoint. The result is a candidate, never proof of the bus
+  // stop location; nothing is saved and no coordinates are changed.
+  const snapPreviewLayer = L.layerGroup().addTo(map);
+  const showSnapPreview = document.getElementById("show-snap-preview");
+  const snapPreviewBtn = document.getElementById("snap-preview-btn");
+  const snapStopId = document.getElementById("snap-stop-id");
+  let snapPreviewInFlight = false;
+
+  function clearSnapPreview() {
+    snapPreviewLayer.clearLayers();
+  }
+
+  function renderSnapPreview(payload) {
+    clearSnapPreview();
+    if (!payload || payload.success !== true || !payload.snapped) {
+      message.textContent = payload && payload.note
+        ? payload.note.message
+        : (payload && payload.error ? payload.error.message : "Snap preview unavailable.");
+      message.classList.add("text-danger");
+      return;
+    }
+    const original = payload.stop;
+    const proposed = payload.snapped;
+    const originalLatLng = L.latLng(original.latitude, original.longitude);
+    const proposedLatLng = L.latLng(proposed.latitude, proposed.longitude);
+
+    snapPreviewLayer.addLayer(L.marker(originalLatLng, {
+      icon: L.divIcon({ className: "", html: "<span style='display:block;width:13px;height:13px;border:3px solid white;border-radius:50%;background:#2478b8;box-shadow:0 1px 4px #555'></span>", iconSize: [13, 13], iconAnchor: [6, 6] })
+    }).bindPopup("<strong>" + escapeHtml(original.name) + "</strong><br><small>Original stop " + original.id + " · " + escapeHtml(original.status) + "</small>"));
+
+    snapPreviewLayer.addLayer(L.marker(proposedLatLng, {
+      icon: L.divIcon({ className: "", html: "<span style='display:block;width:14px;height:14px;border:3px solid white;border-radius:50%;background:#d35400;box-shadow:0 1px 4px #555'></span>", iconSize: [14, 14], iconAnchor: [7, 7] })
+    }).bindPopup("<strong>Proposed snap</strong><br><small>Road: " + escapeHtml(proposed.road_name || "(unnamed)") + " · " + escapeHtml(proposed.highway || "") + "<br>OSM way " + escapeHtml(proposed.osm_way_id || "") + "</small>"));
+
+    const connector = L.polyline([originalLatLng, proposedLatLng], {
+      color: "#d35400", weight: 2, dashArray: "4 5", opacity: .9
+    });
+    connector.bindPopup("<strong>Proposed OSM snap</strong><br><small>" +
+      escapeHtml(original.name) + " (stop " + original.id + ")</small><br>" +
+      "<small>Distance: <strong>" + proposed.distance_m + " m</strong></small><br>" +
+      "<small>Road: " + escapeHtml(proposed.road_name || "(unnamed)") + " (" + escapeHtml(proposed.highway || "?") + ")</small><br>" +
+      "<small>OSM way " + escapeHtml(proposed.osm_way_id || "") + "</small><br>" +
+      "<small class='text-danger'>Candidate only – not proof of the bus stop location. Nothing saved.</small>");
+    snapPreviewLayer.addLayer(connector);
+
+    if (showSnapPreview.checked) map.addLayer(snapPreviewLayer);
+    message.classList.remove("text-danger");
+    message.textContent = "Snap preview for stop " + original.id + ": distance " +
+      proposed.distance_m + " m · road " + (proposed.road_name || "(unnamed)") +
+      " · candidate only, not verified.";
+  }
+
+  async function previewSnap() {
+    const raw = snapStopId.value.trim();
+    if (!/^\d+$/.test(raw)) {
+      message.textContent = "Enter a numeric stop ID to preview a snap.";
+      message.classList.add("text-danger");
+      return;
+    }
+    if (snapPreviewInFlight) {
+      message.textContent = "A snap preview is already running. Please wait.";
+      return;
+    }
+    snapPreviewInFlight = true;
+    message.textContent = "Requesting a geometric OSM road snap for stop " + raw + "…";
+    message.classList.remove("text-danger");
+    try {
+      const response = await fetch("/admin/historical-network/snap?stop_id=" + encodeURIComponent(raw), {
+        headers: { "Accept": "application/json" },
+        credentials: "same-origin"
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload) {
+        message.textContent = payload && payload.error ? payload.error.message : ("Server returned " + response.status);
+        message.classList.add("text-danger");
+        return;
+      }
+      renderSnapPreview(payload);
+    } catch (error) {
+      message.textContent = "Could not preview snap: " + error.message;
+      message.classList.add("text-danger");
+    } finally {
+      snapPreviewInFlight = false;
+    }
+  }
+
+  if (snapPreviewBtn) snapPreviewBtn.addEventListener("click", previewSnap);
+  if (snapStopId) snapStopId.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") previewSnap();
+  });
+  if (showSnapPreview) showSnapPreview.addEventListener("change", () => {
+    if (showSnapPreview.checked) map.addLayer(snapPreviewLayer);
+    else map.removeLayer(snapPreviewLayer);
+  });
+
   async function load() {
     try {
       const response = await fetch("/admin/historical-network/data", {

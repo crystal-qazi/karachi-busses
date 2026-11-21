@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Think Transportation - Red Bus (Peoples Bus Service) Routes Karachi</name>
+    <description><![CDATA[Updated on 1st February 2025<br>www.thinktransportation.net<br>Think Transportation - Peoples Bus Service (Red Buses) Routes Karachi<br>]]></description>
+    <NetworkLink>
+      <name>Think Transportation - Red Bus (Peoples Bus Service) Routes Karachi</name>
+      <Link>
+        <href><![CDATA[https://www.google.com/maps/d/u/0/kml?forcekml=1&mid=15gf9WXMKT4x8Rna53Q7yEs2YEGS2-7s]]></href>
+      </Link>
+    </NetworkLink>
+  </Document>
+</kml>

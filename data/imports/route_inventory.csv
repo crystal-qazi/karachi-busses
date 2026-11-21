@@ -1,0 +1,16 @@
+route_code,route_family,kml_placemark,coordinate_vertices,polyline_length_km_approx,start_latitude,start_longitude,end_latitude,end_longitude,geometry_direction,official_stop_sequence_in_existing_register
+R1,Red Bus,R1 (Khokrapar No. 1 to Dockyard),573,30.441,24.90553,67.20928,24.83071,66.97111,as stored in source KML,Yes
+R2,Red Bus,R2 (Power House Chowrangi to Korangi Crossing),929,30.413,24.98534,67.06588,24.817002,67.108124,as stored in source KML,Yes
+R3,Red Bus,R3 (Power House Chowrangi to Nasir Jump),610,34.251,24.98534,67.06588,24.82039,67.1251,as stored in source KML,Yes
+R4,Red Bus,R4 (Power House Chowrangi to Keamari),956,24.064,24.98534,67.06588,24.81837,66.97489,as stored in source KML,Yes
+R8,Red Bus,R8 (Yousuf Goth to Tower),603,17.17,24.95853,66.92394,24.84874,66.9966,as stored in source KML,Yes
+R9,Red Bus,R9 (Al Khidmat Hadeed to Tower),626,41.965,24.87104,67.37219,24.8481,66.99544,as stored in source KML,No
+R10,Red Bus,R10 (Numaish to Ibrahim Hyderi),959,28.464,24.87223,67.03548,24.79453,67.13619,as stored in source KML,No
+R11,Red Bus,R11 (Miran Nakka to Ziauddin Hospital),779,18.953,24.879511,66.995567,24.81721,67.00716,as stored in source KML,Yes
+R12,Red Bus,R12 (Memon Goth to Lucky Star),596,34.147,24.91351,67.24588,24.85697,67.03341,as stored in source KML,Yes
+R13,Red Bus,R13 (Hawksbay to Tower ),659,18.506,24.86285,66.84951,24.84787,66.99521,as stored in source KML,Yes
+EV-01,Electric Bus,EV1 (Malir Cantt to Dolmen Mall Clifton),693,37.832,24.94879,67.2144,24.8036,67.02837,as stored in source KML,Yes
+EV-02,Electric Bus,EV2 (Bahria Town to Malir Halt),554,39.342,25.07125,67.30545,24.88488,67.17551,as stored in source KML,Yes
+EV-03,Electric Bus,EV3 (Malir Cantt to Numaish),833,23.457,24.93126,67.20478,24.87327,67.03638,as stored in source KML,Yes
+EV-04,Electric Bus,EV4 (Bahria Town to Ayesha Manzil),948,43.345,25.07122,67.30533,24.92721,67.06427,as stored in source KML,Yes
+EV-05,Electric Bus,EV5 (DHA City to Sohrab Goth),485,41.167,25.03787,67.44665,24.94362,67.08471,as stored in source KML,Yes

@@ -1,0 +1,56 @@
+{
+  "status": "phase_5aa_residual_name_review_built_not_stop_verification",
+  "created_at_utc": "2026-11-21T04:50:25.881734+00:00",
+  "inputs": {
+    "crosswalk": {
+      "path": "data\\research\\PHASE_5_STOP_NODE_CROSSWALK.csv",
+      "sha256": "fb7ee3dd8b508b6167cc89fd2df7b726d71854f1095ece5b040fbb38421c94ee"
+    },
+    "phase_5w_candidates": {
+      "path": "data\\research\\PHASE_5W_UNMATCHED_STOP_NAME_CANDIDATES.csv",
+      "sha256": "b08429cff103c6f5d0ab1434e63b5f50013b065b2f4ce9d433c319b60ef4e582"
+    },
+    "phase_5x_alias_shortlist": {
+      "path": "data\\research\\PHASE_5X_SPELLING_ALIAS_CANDIDATE_SHORTLIST.csv",
+      "sha256": "860551089864fe4aa5f5b2cac56a66436f6a5c47df348aa2dfea54d5bb83fb55"
+    },
+    "phase_5y_user_confirmed_aliases": {
+      "path": "data\\research\\PHASE_5Y_USER_CONFIRMED_NAME_ALIASES.csv",
+      "sha256": "e70ae2eba7ce6206802adeff1da5c331a418a2d389cfb28d2efbb774dfad5ee0"
+    }
+  },
+  "counts": {
+    "source_crosswalk_rows": 191,
+    "original_unmatched_rows": 102,
+    "confirmed_alias_occurrences_excluded": 20,
+    "remaining_unmatched_rows": 82
+  },
+  "remaining_unmatched_by_route": {
+    "EV-01": 8,
+    "EV-02": 4,
+    "EV-03": 8,
+    "EV-04": 6,
+    "EV-05": 8,
+    "R1": 4,
+    "R11": 4,
+    "R12": 7,
+    "R13": 5,
+    "R14": 8,
+    "R2": 7,
+    "R3": 5,
+    "R4": 4,
+    "R8": 4
+  },
+  "output": {
+    "csv": "data\\research\\PHASE_5AA_REMAINING_UNMATCHED_STOP_CANDIDATES.csv",
+    "sha256": "278b88bcec4398f6c13ee1b62de7356a46ae34432ca26d7fa08e8ae69ff39bb4",
+    "rows": 82
+  },
+  "limitations": [
+    "Candidate scores are name-only triage hints and are not confirmation.",
+    "No candidate coordinates are emitted or assigned.",
+    "No stop, boarding point, road side, bus access, route sequence, or route is approved.",
+    "All rows remain physically unverified and not approved.",
+    "No geocoding, snapping, route inference, geometry generation, or database write is performed."
+  ]
+}

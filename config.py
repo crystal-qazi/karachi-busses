@@ -84,3 +84,15 @@ class Config:
     OFFLINE_TILE_ATTRIBUTION = os.getenv("OFFLINE_TILE_ATTRIBUTION", "")
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
     JSON_SORT_KEYS = False
+
+    # OSM candidate-road inventory used by the admin snap preview. Generated
+    # by scripts/extract_osm_karachi_roads.py; may be absent until the extract
+    # has been run, in which case the snap endpoint reports ROAD_DATA_MISSING.
+    OSM_ROADS_GEOJSON = os.getenv(
+        "OSM_ROADS_GEOJSON",
+        str(Path(__file__).resolve().parent / "data" / "osm_roads" / "karachi-osm-bus-roads.geojson"),
+    )
+    # Maximum planar distance (metres) a stop may be from a road segment for a
+    # snap candidate to be proposed. A geometrically nearest road is only a
+    # candidate, never proof of the actual bus stop location.
+    SNAP_MAX_DISTANCE_M = float(os.getenv("SNAP_MAX_DISTANCE_M", "500"))

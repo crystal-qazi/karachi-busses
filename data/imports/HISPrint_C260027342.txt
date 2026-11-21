@@ -1,0 +1,49 @@
+
+Receipt                                                                  User:       admin@training.lnh.org
+                                                                         Terminal:   pc-3511.lnh.org
+                                                                         Print Date: 18-11-2026
+Location:         Retail 5                                               Print Time: 11:25 AM
+Receipt No:       C260027342                                   Receipt Date:   18-11-2026
+Received with thanks a sum of Rs.1,050.00
+Rupees One Thousand And Fifty only.
+Direct No.:      O260000156                                    Entry User:     admin@training.lnh.org
+Participant Name:    adnan  khan                               Participant Age:    27Y (Male)
+                                                               Participant Contact:03450000000
+-------------------------------------------------------------------------------------------------------------
+Requisition   Code      Description                   Qty.      Unit Price                      Amount(PKR)
+R260204963    CAT1-EB   LNH SYMPOSIA REGISTRATION CATE
+                        GORY 1 FOR EARLY BIRD         1         1050.00                            1,050.00
+
+                                                                Net Payable (Rounded off):         1,050.00
+                                                                Amount Paid (Cash)                 1,050.00
+-------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Prepared By:                                                             For Liaquat National Hospital
+
+
+
+
+
+
+
+
+

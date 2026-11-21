@@ -3,13 +3,15 @@ import io
 import json
 import math
 import re
+from pathlib import Path
 
-from flask import flash, jsonify, redirect, render_template, request, session, url_for
+from flask import current_app, flash, jsonify, redirect, render_template, request, session, url_for
 
 from app.admin import admin_bp
 from app.admin.auth import login_required
 from app.admin.errors import db_error_handler
 from app.database.helpers import cursor_context
+from app.snapping import load_roads, nearest_road_snap
 
 CODE_RE = re.compile(r"^[A-Za-z0-9._-]{1,60}$")
 
@@ -780,4 +782,91 @@ def historical_network_data():
         counts={"stops": len(stops), "routes": len(routes), "segments": len(segments),
                 "self_loops": sum(1 for segment in segments if segment["self_loop"])},
         stops=stops, routes=routes, segments=segments,
+    )
+
+
+@admin_bp.get("/historical-network/snap")
+@login_required
+@db_error_handler
+def historical_network_snap():
+    """Propose a geometric OSM road snap for one historical stop (preview only).
+
+    This is a *candidate* only, never proof that the bus actually stops there.
+    It reads the stop coordinates, runs the pure-geometry snapping engine from
+    ``app.snapping`` against the extracted OSM road inventory and returns the
+    original coordinate, the proposed snapped coordinate, the planar distance
+    in metres, and the nearest road's name/highway. It performs **no database
+    writes**: route assignments, stop names, statuses and stored coordinates
+    are never changed.
+    """
+    raw = request.args.get("stop_id", "").strip()
+    if not raw.isdigit():
+        return jsonify(success=False, error={
+            "code": "INVALID_STOP_ID", "message": "A numeric stop_id is required."}), 400
+
+    stop_id = int(raw)
+    source_name = "Karachi Bus Network Research Dataset (user-provided cleaned files)"
+    with cursor_context() as (_, cursor):
+        cursor.execute(
+            "SELECT id, source_name, verification_status FROM data_sources WHERE source_name=%s",
+            (source_name,),
+        )
+        source = cursor.fetchone()
+        if not source:
+            return jsonify(success=False, error={
+                "code": "NOT_FOUND", "message": "Historical research source not found."}), 404
+
+        cursor.execute(
+            """SELECT id, stop_name, latitude, longitude, status
+               FROM bus_stops WHERE id=%s AND source_id=%s""",
+            (stop_id, int(source["id"])),
+        )
+        stop = cursor.fetchone()
+        if not stop:
+            return jsonify(success=False, error={
+                "code": "NOT_FOUND", "message": f"Stop {stop_id} was not found in the historical source."}), 404
+
+    try:
+        lat = float(stop["latitude"])
+        lng = float(stop["longitude"])
+    except (TypeError, ValueError):
+        lat = lng = None
+    if lat is None or lng is None or not (-90.0 <= lat <= 90.0) or not (-180.0 <= lng <= 180.0):
+        return jsonify(success=False, error={
+            "code": "INVALID_COORDINATES",
+            "message": f"Stop {stop_id} has invalid or out-of-range coordinates."}), 422
+
+    roads_path = Path(current_app.config.get("OSM_ROADS_GEOJSON", ""))
+    if not roads_path.is_file():
+        return jsonify(success=False, error={
+            "code": "ROAD_DATA_MISSING",
+            "message": "OSM road data is not available. Run scripts/extract_osm_karachi_roads.py first."}), 503
+
+    max_distance_m = float(current_app.config.get("SNAP_MAX_DISTANCE_M", 500))
+    roads = load_roads(roads_path)
+    if roads.is_empty:
+        return jsonify(success=False, error={
+            "code": "ROAD_DATA_MISSING",
+            "message": "The OSM road inventory contains no usable road segments."}), 503
+
+    result = nearest_road_snap(lat, lng, roads, max_distance_m=max_distance_m)
+    original = {"id": stop_id, "name": stop["stop_name"], "status": stop["status"],
+                "latitude": lat, "longitude": lng}
+    if result is None:
+        return jsonify(
+            success=True,
+            stop=original,
+            snapped=None,
+            note={"code": "NO_SNAP_WITHIN_RANGE",
+                  "message": f"No OSM road segment is within {max_distance_m:g} m of this stop."},
+            max_distance_m=max_distance_m,
+        )
+
+    return jsonify(
+        success=True,
+        stop=original,
+        snapped=result.as_dict(),
+        max_distance_m=max_distance_m,
+        note={"code": "CANDIDATE_ONLY",
+              "message": "A geometrically nearest road is only a candidate, not proof of the bus stop location."},
     )

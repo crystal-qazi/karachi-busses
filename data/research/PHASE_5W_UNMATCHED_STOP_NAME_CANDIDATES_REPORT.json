@@ -1,0 +1,25 @@
+{
+  "status": "name_candidate_register_built_not_stop_verification",
+  "source_crosswalk": "data\\research\\PHASE_5_STOP_NODE_CROSSWALK.csv",
+  "source_crosswalk_sha256": "fb7ee3dd8b508b6167cc89fd2df7b726d71854f1095ece5b040fbb38421c94ee",
+  "source_node_audit": "data\\research\\PHASE_5_NODE_AUDIT.csv",
+  "source_node_audit_sha256": "d88bb846ac6a46c7cd7831e9bd5a4a74dac47be92b7a222beb6fd9c3c1d90890",
+  "output_csv": "data\\research\\PHASE_5W_UNMATCHED_STOP_NAME_CANDIDATES.csv",
+  "output_csv_sha256": "b08429cff103c6f5d0ab1434e63b5f50013b065b2f4ce9d433c319b60ef4e582",
+  "crosswalk_rows": 191,
+  "unmatched_rows_reviewed": 102,
+  "node_name_candidates": 572,
+  "candidate_method": "standard-library SequenceMatcher plus token Dice score",
+  "candidate_limit_per_stop": 3,
+  "threshold_count": 0.45,
+  "coordinates_emitted": false,
+  "automatic_assignments": 0,
+  "stop_verification_status": "all_unverified",
+  "route_approval_status": "all_not_approved",
+  "limitations": [
+    "Similarity is a text triage aid, not geographic or operational evidence.",
+    "Short/common names can produce misleading candidates.",
+    "Historical node labels may not represent current SMTA passenger stops.",
+    "No coordinates, road matches, route paths, or access permissions are inferred."
+  ]
+}
