@@ -374,7 +374,7 @@ def save_direction_shape(direction_id):
     try:
         raw = request.form.get("geojson", "")
         geometry = json.loads(raw)
-        if geometry.get("type") != "LineString":
+        if not isinstance(geometry, dict) or geometry.get("type") != "LineString":
             raise ValueError("Route geometry must be a GeoJSON LineString.")
         coordinates = geometry.get("coordinates")
         if not isinstance(coordinates, list) or len(coordinates) < 2 or len(coordinates) > 20000:
