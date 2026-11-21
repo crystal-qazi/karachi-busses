@@ -221,22 +221,54 @@
       stopCount + " unverified historical source stop markers loaded. " + markerMode;
   }
 
-  // Admin-only snap preview. Proposes a geometric OSM road snap for one stop
-  // via the server endpoint. The result is a candidate, never proof of the bus
-  // stop location; nothing is saved and no coordinates are changed.
+  // Admin-only snap preview. Proposes geometric OSM road snap candidates for
+  // one stop via the server endpoint. Each candidate is a preview only, never
+  // proof of the bus stop location; nothing is saved and no coordinates change.
   const snapPreviewLayer = L.layerGroup().addTo(map);
   const showSnapPreview = document.getElementById("show-snap-preview");
   const snapPreviewBtn = document.getElementById("snap-preview-btn");
   const snapStopId = document.getElementById("snap-stop-id");
+  const snapCandidateSelect = document.getElementById("snap-candidate");
   let snapPreviewInFlight = false;
+  let snapCandidates = [];
+  let snapOriginal = null;
 
   function clearSnapPreview() {
     snapPreviewLayer.clearLayers();
   }
 
+  function candidateLabel(candidate, index) {
+    return "#" + (index + 1) + " · " +
+      (candidate.road_name || "(unnamed)") +
+      (candidate.highway ? " (" + candidate.highway + ")" : "") +
+      " · " + candidate.distance_m + " m";
+  }
+
+  function populateCandidateSelect() {
+    snapCandidateSelect.innerHTML = "";
+    snapCandidateSelect.disabled = snapCandidates.length === 0;
+    if (snapCandidates.length === 0) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "No road candidate";
+      snapCandidateSelect.appendChild(opt);
+      return;
+    }
+    snapCandidates.forEach((candidate, index) => {
+      const opt = document.createElement("option");
+      opt.value = String(index);
+      opt.textContent = candidateLabel(candidate, index);
+      snapCandidateSelect.appendChild(opt);
+    });
+    snapCandidateSelect.value = "0";
+  }
+
   function renderSnapPreview(payload) {
     clearSnapPreview();
-    if (!payload || payload.success !== true || !payload.snapped) {
+    snapCandidates = [];
+    snapOriginal = null;
+    snapCandidateSelect.disabled = true;
+    if (!payload || payload.success !== true) {
       message.textContent = payload && payload.note
         ? payload.note.message
         : (payload && payload.error ? payload.error.message : "Snap preview unavailable.");
@@ -244,34 +276,65 @@
       return;
     }
     const original = payload.stop;
-    const proposed = payload.snapped;
-    const originalLatLng = L.latLng(original.latitude, original.longitude);
-    const proposedLatLng = L.latLng(proposed.latitude, proposed.longitude);
+    snapOriginal = original;
+    const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
+    snapCandidates = candidates;
+    populateCandidateSelect();
 
+    const originalLatLng = L.latLng(original.latitude, original.longitude);
     snapPreviewLayer.addLayer(L.marker(originalLatLng, {
       icon: L.divIcon({ className: "", html: "<span style='display:block;width:13px;height:13px;border:3px solid white;border-radius:50%;background:#2478b8;box-shadow:0 1px 4px #555'></span>", iconSize: [13, 13], iconAnchor: [6, 6] })
     }).bindPopup("<strong>" + escapeHtml(original.name) + "</strong><br><small>Original stop " + original.id + " · " + escapeHtml(original.status) + "</small>"));
 
-    snapPreviewLayer.addLayer(L.marker(proposedLatLng, {
-      icon: L.divIcon({ className: "", html: "<span style='display:block;width:14px;height:14px;border:3px solid white;border-radius:50%;background:#d35400;box-shadow:0 1px 4px #555'></span>", iconSize: [14, 14], iconAnchor: [7, 7] })
-    }).bindPopup("<strong>Proposed snap</strong><br><small>Road: " + escapeHtml(proposed.road_name || "(unnamed)") + " · " + escapeHtml(proposed.highway || "") + "<br>OSM way " + escapeHtml(proposed.osm_way_id || "") + "</small>"));
+    // Draw every candidate's snap marker and connector; the selected candidate
+    // additionally gets its road geometry highlighted.
+    candidates.forEach((candidate, index) => {
+      const latLng = L.latLng(candidate.latitude, candidate.longitude);
+      const isSelected = index === Number(snapCandidateSelect.value);
+      if (isSelected) {
+        snapPreviewLayer.addLayer(L.marker(latLng, {
+          icon: L.divIcon({ className: "", html: "<span style='display:block;width:14px;height:14px;border:3px solid white;border-radius:50%;background:#d35400;box-shadow:0 1px 4px #555'></span>", iconSize: [14, 14], iconAnchor: [7, 7] })
+        }).bindPopup("<strong>Selected snap candidate</strong><br><small>Road: " + escapeHtml(candidate.road_name || "(unnamed)") + " · " + escapeHtml(candidate.highway || "") + "<br>OSM way " + escapeHtml(candidate.osm_way_id || "") + "<br>Distance: " + candidate.distance_m + " m</small>"));
 
-    const connector = L.polyline([originalLatLng, proposedLatLng], {
-      color: "#d35400", weight: 2, dashArray: "4 5", opacity: .9
+        const connector = L.polyline([originalLatLng, latLng], {
+          color: "#d35400", weight: 2, dashArray: "4 5", opacity: .9
+        });
+        connector.bindPopup("<strong>Proposed OSM snap</strong><br><small>" +
+          escapeHtml(original.name) + " (stop " + original.id + ")</small><br>" +
+          "<small>Distance: <strong>" + candidate.distance_m + " m</strong></small><br>" +
+          "<small>Road: " + escapeHtml(candidate.road_name || "(unnamed)") + " (" + escapeHtml(candidate.highway || "?") + ")</small><br>" +
+          "<small>OSM way " + escapeHtml(candidate.osm_way_id || "") + "</small><br>" +
+          "<small class='text-danger'>Candidate only – not proof of the bus stop location. Nothing saved.</small>");
+        snapPreviewLayer.addLayer(connector);
+
+        // Highlight the exact road geometry of the selected candidate.
+        if (Array.isArray(candidate.way_geometry) && candidate.way_geometry.length) {
+          const coords = candidate.way_geometry.map((pair) => L.latLng(pair[1], pair[0]));
+          const roadLine = L.polyline(coords, { color: "#8e44ad", weight: 4, opacity: 0.85 });
+          roadLine.bindPopup("<strong>Candidate road</strong><br><small>OSM way " +
+            escapeHtml(candidate.osm_way_id || "") + " · " +
+            escapeHtml(candidate.road_name || "(unnamed)") + " (" +
+            escapeHtml(candidate.highway || "?") + ")</small>");
+          snapPreviewLayer.addLayer(roadLine);
+        }
+      } else {
+        // Non-selected candidates render as muted markers for comparison.
+        snapPreviewLayer.addLayer(L.marker(latLng, {
+          icon: L.divIcon({ className: "", html: "<span style='display:block;width:11px;height:11px;border:2px solid white;border-radius:50%;background:#9a9a9a;box-shadow:0 1px 3px #555'></span>", iconSize: [11, 11], iconAnchor: [5, 5] })
+        }).bindPopup("<strong>Alternative candidate</strong><br><small>Road: " + escapeHtml(candidate.road_name || "(unnamed)") + " · " + escapeHtml(candidate.highway || "") + "<br>OSM way " + escapeHtml(candidate.osm_way_id || "") + "<br>Distance: " + candidate.distance_m + " m</small>"));
+      }
     });
-    connector.bindPopup("<strong>Proposed OSM snap</strong><br><small>" +
-      escapeHtml(original.name) + " (stop " + original.id + ")</small><br>" +
-      "<small>Distance: <strong>" + proposed.distance_m + " m</strong></small><br>" +
-      "<small>Road: " + escapeHtml(proposed.road_name || "(unnamed)") + " (" + escapeHtml(proposed.highway || "?") + ")</small><br>" +
-      "<small>OSM way " + escapeHtml(proposed.osm_way_id || "") + "</small><br>" +
-      "<small class='text-danger'>Candidate only – not proof of the bus stop location. Nothing saved.</small>");
-    snapPreviewLayer.addLayer(connector);
 
     if (showSnapPreview.checked) map.addLayer(snapPreviewLayer);
     message.classList.remove("text-danger");
-    message.textContent = "Snap preview for stop " + original.id + ": distance " +
-      proposed.distance_m + " m · road " + (proposed.road_name || "(unnamed)") +
-      " · candidate only, not verified.";
+    if (candidates.length) {
+      message.textContent = "Snap preview for stop " + original.id + ": " + candidates.length +
+        " road candidate(s) · top: " + (candidates[0].road_name || "(unnamed)") +
+        " · candidate only, not verified.";
+    } else {
+      message.textContent = "Snap preview for stop " + original.id + ": " +
+        (payload.note ? payload.note.message : "No road candidate within range.");
+    }
   }
 
   async function previewSnap() {
@@ -286,7 +349,7 @@
       return;
     }
     snapPreviewInFlight = true;
-    message.textContent = "Requesting a geometric OSM road snap for stop " + raw + "…";
+    message.textContent = "Requesting geometric OSM road snap candidates for stop " + raw + "…";
     message.classList.remove("text-danger");
     try {
       const response = await fetch("/admin/historical-network/snap?stop_id=" + encodeURIComponent(raw), {
@@ -311,6 +374,13 @@
   if (snapPreviewBtn) snapPreviewBtn.addEventListener("click", previewSnap);
   if (snapStopId) snapStopId.addEventListener("keydown", (event) => {
     if (event.key === "Enter") previewSnap();
+  });
+  // Refreshing the preview on candidate change re-highlights the selected
+  // road geometry without re-fetching from the server.
+  if (snapCandidateSelect) snapCandidateSelect.addEventListener("change", () => {
+    if (snapOriginal && snapCandidates.length) {
+      renderSnapPreview({ success: true, stop: snapOriginal, candidates: snapCandidates });
+    }
   });
   if (showSnapPreview) showSnapPreview.addEventListener("change", () => {
     if (showSnapPreview.checked) map.addLayer(snapPreviewLayer);

@@ -1,0 +1,94 @@
+{
+  "status": "research_extract_complete_not_route_validation",
+  "created_at_utc": "2026-11-21T05:46:39.162364+00:00",
+  "source_provider": "Geofabrik Pakistan regional OSM PBF",
+  "input_pbf": "pakistan-latest.osm.pbf",
+  "input_pbf_sha256": "9490f8bb95895c01b4e7b8898900f68d7445a879bdf9c74b39ecee0ed6e150ea",
+  "boundary_source": "OpenStreetMap relation 6080948 (Karachi Division)",
+  "boundary_file": "karachi-division-6080948.geojson",
+  "boundary_sha256": "e4d6485c209156d820a9643b78c78ae365a3a510d40389f4dec300ec7a109fbc",
+  "clip_boundary": "validated parent relation only; OSM child district identities remain unresolved",
+  "feature_count": 100803,
+  "total_length_km_epsg_32642": 23738.458,
+  "length_by_highway_class_km": {
+    "living_street": 210.436,
+    "motorway": 202.989,
+    "motorway_link": 48.804,
+    "primary": 768.327,
+    "primary_link": 46.118,
+    "residential": 15308.753,
+    "secondary": 1068.556,
+    "secondary_link": 9.757,
+    "service": 2196.965,
+    "tertiary": 2276.989,
+    "tertiary_link": 5.141,
+    "trunk": 329.273,
+    "trunk_link": 40.448,
+    "unclassified": 1225.902
+  },
+  "counts": {
+    "excluded_non_bus_road": 1162020,
+    "highway:living_street": 1482,
+    "highway:motorway": 122,
+    "highway:motorway_link": 164,
+    "highway:primary": 1239,
+    "highway:primary_link": 505,
+    "highway:residential": 77007,
+    "highway:secondary": 1639,
+    "highway:secondary_link": 332,
+    "highway:service": 12198,
+    "highway:tertiary": 3508,
+    "highway:tertiary_link": 282,
+    "highway:trunk": 424,
+    "highway:trunk_link": 250,
+    "highway:unclassified": 1651,
+    "outside_parent_boundary": 1070628,
+    "ways_intersecting_parent": 100623
+  },
+  "outputs": {
+    "geojson": "karachi-osm-bus-roads.geojson",
+    "geojson_sha256": "be230b6243868cc43c86c5b7e4a06e841e2e5a61c0b34d647634b378a530f25f",
+    "compressed_geojson": "karachi-osm-bus-roads.geojson.gz",
+    "compressed_size_bytes": 6544549
+  },
+  "road_filter": {
+    "included_highway_values": [
+      "living_street",
+      "motorway",
+      "motorway_link",
+      "primary",
+      "primary_link",
+      "residential",
+      "road",
+      "secondary",
+      "secondary_link",
+      "service",
+      "tertiary",
+      "tertiary_link",
+      "trunk",
+      "trunk_link",
+      "unclassified"
+    ],
+    "excluded_access_values": [
+      "no",
+      "private"
+    ],
+    "note": "Candidate-road inventory only; conditional access, bus-specific permissions, vehicle dimensions, turn restrictions and temporal rules require routing review."
+  },
+  "preserved_attributes": [
+    "OSM way ID, version and timestamp",
+    "highway, name, ref, oneway, access, vehicle, motor_vehicle, bus, psv",
+    "surface, maxspeed, lanes, bridge, tunnel, junction, service, lit, width, layer",
+    "destination and turn-lane tags when present"
+  ],
+  "attribution": "© OpenStreetMap contributors",
+  "license": "Open Database License 1.0 (ODbL)",
+  "limitations": [
+    "OSM operational boundary, not government legal certification.",
+    "Roads clipped to parent relation 6080948 only; no district identity or aggregation inferred.",
+    "OSM road geometry is not a verified bus route or turn-by-turn path.",
+    "Access, bus, vehicle, turn and time restrictions are preserved but not fully evaluated.",
+    "Stops have not yet been snapped or matched to this network.",
+    "Review ODbL obligations before redistributing derived databases."
+  ]
+}

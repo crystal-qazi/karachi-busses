@@ -53,6 +53,11 @@ class SnapResult:
     int or an ``@id`` that is not purely numeric). ``road_name`` and
     ``highway`` are read from the OSM tags and may be empty when the road is
     unnamed or the tag is absent.
+
+    ``way_geometry`` is the WGS84 ``((lng, lat), ...)`` coordinates of the road
+    segment the candidate snapped to — used to highlight the exact road on the
+    map. ``way_tags`` carries the relevant OSM tags of that road so the caller
+    can display classification and routing details.
     """
 
     lat: float
@@ -61,16 +66,22 @@ class SnapResult:
     road_name: str
     highway: str
     way_id: str
+    way_geometry: tuple  # ((lng, lat), ...) in WGS84
+    way_tags: dict
 
-    def as_dict(self) -> dict[str, Any]:
-        return {
+    def as_dict(self, include_geometry: bool = True) -> dict[str, Any]:
+        result: dict[str, Any] = {
             "latitude": self.lat,
             "longitude": self.lng,
             "distance_m": round(self.distance_m, 3),
             "road_name": self.road_name,
             "highway": self.highway,
             "osm_way_id": self.way_id,
+            "tags": dict(self.way_tags),
         }
+        if include_geometry:
+            result["way_geometry"] = [list(c) for c in self.way_geometry]
+        return result
 
 
 class RoadIndex:
@@ -79,8 +90,9 @@ class RoadIndex:
     Build once with :func:`load_roads`, then reuse for many point queries.
     """
 
-    def __init__(self, lines: list, props: list, feature_count: int) -> None:
+    def __init__(self, lines: list, wgs84_lines: list, props: list, feature_count: int) -> None:
         self._lines = lines
+        self._wgs84_lines = wgs84_lines
         self._props = props
         self._tree = STRtree(lines)
         self.feature_count = feature_count
@@ -89,28 +101,27 @@ class RoadIndex:
     def is_empty(self) -> bool:
         return self.feature_count == 0
 
-    def snap(self, lat: float, lng: float, max_distance_m: float) -> SnapResult | None:
-        """Return the nearest road segment within ``max_distance_m`` or None."""
+    def _candidate_hits(self, lat: float, lng: float, max_distance_m: float) -> list[tuple[float, int]]:
+        """Return ``(distance_m, line_index)`` hits within ``max_distance_m``.
+
+        Both the buffer query and the distance measurement are done in the
+        planar CRS (metres). A ``distance <= max_distance_m`` filter is applied
+        so the buffer edge does not admit slightly-out-of-range segments.
+        """
         source_point = Point(float(lng), float(lat))
         if source_point.is_empty or not source_point.is_valid:
-            return None
-        point = transform(
-            _transformer_4326_to_32642.transform, source_point
-        )
-
-        # Query a buffer so STRtree returns a small candidate set, then take
-        # the true minimum planar distance to the candidate lines.
+            return []
+        point = transform(_transformer_4326_to_32642.transform, source_point)
         candidate_indexes = self._tree.query(point.buffer(max_distance_m))
-        candidates: list[tuple[float, int]] = []
+        hits: list[tuple[float, int]] = []
         for idx in candidate_indexes:
             i = int(idx)
             distance = float(point.distance(self._lines[i]))
             if distance <= max_distance_m:
-                candidates.append((distance, i))
-        if not candidates:
-            return None
+                hits.append((distance, i))
+        return hits
 
-        distance, i = min(candidates, key=lambda item: item[0])
+    def _build_result(self, distance: float, i: int, point) -> SnapResult:
         line = self._lines[i]
         p = self._props[i]
         tags = p.get("tags", {}) if isinstance(p, dict) else {}
@@ -122,6 +133,9 @@ class RoadIndex:
         )
         snap_lng, snap_lat = snap_wgs84.x, snap_wgs84.y
 
+        wgs84_line = self._wgs84_lines[i]
+        geometry = tuple((float(round(c[0], 8)), float(round(c[1], 8))) for c in wgs84_line.coords)
+
         return SnapResult(
             lat=round(float(snap_lat), 8),
             lng=round(float(snap_lng), 8),
@@ -129,7 +143,56 @@ class RoadIndex:
             road_name=str(tags.get("name", "") or ""),
             highway=str(tags.get("highway", "") or ""),
             way_id=str(p.get("@id", "") or ""),
+            way_geometry=geometry,
+            way_tags=dict(tags),
         )
+
+    def snap(self, lat: float, lng: float, max_distance_m: float) -> SnapResult | None:
+        """Return the nearest road segment within ``max_distance_m`` or None."""
+        hits = self._candidate_hits(lat, lng, max_distance_m)
+        if not hits:
+            return None
+        source_point = Point(float(lng), float(lat))
+        point = transform(_transformer_4326_to_32642.transform, source_point)
+        distance, i = min(hits, key=lambda item: item[0])
+        return self._build_result(distance, i, point)
+
+    def snap_candidates(
+        self,
+        lat: float,
+        lng: float,
+        max_distance_m: float,
+        max_candidates: int = 5,
+    ) -> list[SnapResult]:
+        """Return nearby road segments ordered by distance (nearest first).
+
+        Segments from the same OSM ``way_id`` are collapsed to a single result
+        (the closest segment of that way) so that a way split into many
+        segments — or overlapping/duplicate copies of the same way — does not
+        flood the candidate list. Two *distinct* roads that overlap or cross
+        near the point each still appear. Results are capped at
+        ``max_candidates``.
+        """
+        hits = self._candidate_hits(lat, lng, max_distance_m)
+        if not hits:
+            return []
+        source_point = Point(float(lng), float(lat))
+        point = transform(_transformer_4326_to_32642.transform, source_point)
+
+        # Deduplicate by OSM way id, keeping the closest segment per way.
+        best_per_way: dict[str, tuple[float, int]] = {}
+        order: list[str] = []
+        for distance, i in sorted(hits, key=lambda item: item[0]):
+            way_id = str(self._props[i].get("@id", "") or "")
+            if way_id not in best_per_way:
+                best_per_way[way_id] = (distance, i)
+                order.append(way_id)
+
+        results: list[SnapResult] = []
+        for way_id in order[:max_candidates]:
+            distance, i = best_per_way[way_id]
+            results.append(self._build_result(distance, i, point))
+        return results
 
 
 def _parse_geojson(geojson: str | bytes | dict | Path) -> dict:
@@ -160,6 +223,7 @@ def load_roads(geojson: str | bytes | dict | Path) -> RoadIndex:
     """
     data = _parse_geojson(geojson)
     lines: list = []
+    wgs84_lines: list = []
     props: list = []
     for feature in data.get("features", []):
         try:
@@ -169,15 +233,17 @@ def load_roads(geojson: str | bytes | dict | Path) -> RoadIndex:
         feature_props = feature.get("properties", {})
         for part in _line_parts(geometry):
             # Work in the planar CRS (matching the proximity audit) so that
-            # planar distance and buffer queries are in metres.
+            # planar distance and buffer queries are in metres. Keep the
+            # original WGS84 line for reporting the road geometry.
             projected = transform(
                 _transformer_4326_to_32642.transform, part
             )
             if projected.is_empty or not projected.is_valid or projected.length <= 0:
                 continue
             lines.append(projected)
+            wgs84_lines.append(part)
             props.append(feature_props)
-    return RoadIndex(lines, props, len(lines))
+    return RoadIndex(lines, wgs84_lines, props, len(lines))
 
 
 def _line_parts(geometry) -> list:
@@ -206,3 +272,21 @@ def nearest_road_snap(
     :class:`SnapResult` when a segment is within ``max_distance_m``, else None.
     """
     return roads.snap(lat, lng, max_distance_m)
+
+
+def road_snap_candidates(
+    lat: float,
+    lng: float,
+    roads: RoadIndex,
+    max_distance_m: float,
+    max_candidates: int = 5,
+) -> list[SnapResult]:
+    """Convenience wrapper: propose several nearby road candidates.
+
+    Delegates to :meth:`RoadIndex.snap_candidates`, returning the candidates
+    ordered by distance (nearest first), deduplicated by OSM way id and capped
+    at ``max_candidates``.
+    """
+    return roads.snap_candidates(
+        lat, lng, max_distance_m, max_candidates=max_candidates
+    )

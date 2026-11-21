@@ -96,3 +96,6 @@ class Config:
     # snap candidate to be proposed. A geometrically nearest road is only a
     # candidate, never proof of the actual bus stop location.
     SNAP_MAX_DISTANCE_M = float(os.getenv("SNAP_MAX_DISTANCE_M", "500"))
+    # Maximum number of alternative road candidates the snap preview proposes,
+    # ordered by planar distance. Preview-only; never saved.
+    SNAP_MAX_CANDIDATES = int(os.getenv("SNAP_MAX_CANDIDATES", "5"))

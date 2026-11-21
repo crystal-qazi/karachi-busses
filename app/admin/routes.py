@@ -11,7 +11,7 @@ from app.admin import admin_bp
 from app.admin.auth import login_required
 from app.admin.errors import db_error_handler
 from app.database.helpers import cursor_context
-from app.snapping import load_roads, nearest_road_snap
+from app.snapping import load_roads, road_snap_candidates
 
 CODE_RE = re.compile(r"^[A-Za-z0-9._-]{1,60}$")
 
@@ -789,15 +789,16 @@ def historical_network_data():
 @login_required
 @db_error_handler
 def historical_network_snap():
-    """Propose a geometric OSM road snap for one historical stop (preview only).
+    """Propose geometric OSM road snap candidates for one historical stop.
 
-    This is a *candidate* only, never proof that the bus actually stops there.
-    It reads the stop coordinates, runs the pure-geometry snapping engine from
-    ``app.snapping`` against the extracted OSM road inventory and returns the
-    original coordinate, the proposed snapped coordinate, the planar distance
-    in metres, and the nearest road's name/highway. It performs **no database
-    writes**: route assignments, stop names, statuses and stored coordinates
-    are never changed.
+    Preview only. The endpoint reads the stop coordinates, runs the pure-geometry
+    snapping engine from ``app.snapping`` against the extracted OSM road inventory
+    and returns the original coordinate plus a list of nearby road candidates
+    ordered by planar distance, each carrying its snapped coordinate, the distance
+    in metres, the OSM way id, road name, highway classification, relevant tags and
+    the road geometry for map highlighting. It performs **no database writes**:
+    route assignments, stop names, statuses and stored coordinates are never
+    changed.
     """
     raw = request.args.get("stop_id", "").strip()
     if not raw.isdigit():
@@ -843,30 +844,39 @@ def historical_network_snap():
             "message": "OSM road data is not available. Run scripts/extract_osm_karachi_roads.py first."}), 503
 
     max_distance_m = float(current_app.config.get("SNAP_MAX_DISTANCE_M", 500))
+    max_candidates = int(current_app.config.get("SNAP_MAX_CANDIDATES", 5))
     roads = load_roads(roads_path)
     if roads.is_empty:
         return jsonify(success=False, error={
             "code": "ROAD_DATA_MISSING",
             "message": "The OSM road inventory contains no usable road segments."}), 503
 
-    result = nearest_road_snap(lat, lng, roads, max_distance_m=max_distance_m)
+    candidates = road_snap_candidates(
+        lat, lng, roads,
+        max_distance_m=max_distance_m,
+        max_candidates=max_candidates,
+    )
     original = {"id": stop_id, "name": stop["stop_name"], "status": stop["status"],
                 "latitude": lat, "longitude": lng}
-    if result is None:
+    if not candidates:
         return jsonify(
             success=True,
             stop=original,
             snapped=None,
+            candidates=[],
             note={"code": "NO_SNAP_WITHIN_RANGE",
                   "message": f"No OSM road segment is within {max_distance_m:g} m of this stop."},
             max_distance_m=max_distance_m,
+            max_candidates=max_candidates,
         )
 
     return jsonify(
         success=True,
         stop=original,
-        snapped=result.as_dict(),
+        snapped=candidates[0].as_dict(),
+        candidates=[c.as_dict() for c in candidates],
         max_distance_m=max_distance_m,
+        max_candidates=max_candidates,
         note={"code": "CANDIDATE_ONLY",
               "message": "A geometrically nearest road is only a candidate, not proof of the bus stop location."},
     )

@@ -1,0 +1,207 @@
+{
+  "status": "geometry_validated_research_candidate",
+  "provider": "Geofabrik regional OSM PBF; parsed locally with PyOsmium",
+  "input_pbf": "pakistan-latest.osm.pbf",
+  "input_pbf_size_bytes": 158155685,
+  "input_pbf_sha256": "9490f8bb95895c01b4e7b8898900f68d7445a879bdf9c74b39ecee0ed6e150ea",
+  "created_at_utc": "2026-11-21T05:21:42.991978+00:00",
+  "relation": {
+    "id": 6080948,
+    "version": 42,
+    "timestamp": "2025-01-14 11:35:00+00:00",
+    "tags": {
+      "admin_level": "5",
+      "alt_name:ur": "کیرانچی",
+      "boundary": "administrative",
+      "name": "کراچی ڈویژن",
+      "name:ar": "كراتشي",
+      "name:azb": "کراچی",
+      "name:cs": "Karáčí",
+      "name:de": "Karatschi",
+      "name:el": "Καράτσι",
+      "name:en": "Karachi Division",
+      "name:eo": "Karaĉio",
+      "name:fa": "بخش کراچی",
+      "name:hr": "Karači",
+      "name:kab": "Karaci",
+      "name:ks": "کَرٲچی",
+      "name:mzn": "کراچی",
+      "name:pa": "ਕਰਾਚੀ",
+      "name:pl": "Karaczi",
+      "name:pnb": "کراچی ڈویژن",
+      "name:ps": "کراچۍ څانګه‎",
+      "name:sd": "ڪراچي",
+      "name:ug": "كاراچى",
+      "name:ur": "کراچی ڈویژن",
+      "name:zh": "卡拉奇",
+      "type": "boundary",
+      "wikidata": "Q8660",
+      "wikipedia": "ur:کراچی"
+    },
+    "members": [
+      {
+        "type": "n",
+        "ref": 3181550515,
+        "role": "admin_centre"
+      },
+      {
+        "type": "n",
+        "ref": 3181550515,
+        "role": "label"
+      },
+      {
+        "type": "w",
+        "ref": 1209174951,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1209174954,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1209192339,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1209207938,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1209174952,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1009930475,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 727299043,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1221482300,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1208979150,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1208979151,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1209386627,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 239378051,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1221482296,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1209269286,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1209269288,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1209269298,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1209269289,
+        "role": "outer"
+      },
+      {
+        "type": "w",
+        "ref": 1209269290,
+        "role": "outer"
+      },
+      {
+        "type": "r",
+        "ref": 16347667,
+        "role": "subarea"
+      },
+      {
+        "type": "r",
+        "ref": 16349281,
+        "role": "subarea"
+      },
+      {
+        "type": "r",
+        "ref": 16350242,
+        "role": "subarea"
+      },
+      {
+        "type": "r",
+        "ref": 16350632,
+        "role": "subarea"
+      },
+      {
+        "type": "r",
+        "ref": 16350836,
+        "role": "subarea"
+      },
+      {
+        "type": "r",
+        "ref": 16351022,
+        "role": "subarea"
+      },
+      {
+        "type": "r",
+        "ref": 16351916,
+        "role": "subarea"
+      }
+    ]
+  },
+  "relation_member_count": 27,
+  "geojson_file": "karachi-division-6080948.geojson",
+  "geojson_sha256": "e4d6485c209156d820a9643b78c78ae365a3a510d40389f4dec300ec7a109fbc",
+  "attribution": "© OpenStreetMap contributors",
+  "license": "Open Database License 1.0 (ODbL)",
+  "validation": {
+    "geometry_type": "MultiPolygon",
+    "polygon_count": 1,
+    "ring_count": 1,
+    "coordinate_count": 501,
+    "is_valid": true,
+    "validity_reason": "Valid Geometry",
+    "area_crs": "EPSG:32642",
+    "area_m2": 5841130509.49,
+    "area_km2": 5841.130509,
+    "bounds_wgs84": [
+      66.2862312,
+      24.4273517,
+      67.5827753,
+      25.676796
+    ]
+  },
+  "limitations": [
+    "OSM operational boundary, not government legal certification.",
+    "Area is planar EPSG:32642 and must be compared with official references.",
+    "District overlays are not validated.",
+    "Independent visual review required before road extraction or production use."
+  ]
+}
