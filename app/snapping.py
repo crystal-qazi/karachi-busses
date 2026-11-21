@@ -205,6 +205,30 @@ class RoadIndex:
             results.append(self._build_result(distance, i, point))
         return results
 
+    def parts_intersecting(self, polygon) -> list[tuple]:
+        """Return ``(wgs84_line, projected_line, props)`` for every stored
+        road part whose geometry intersects ``polygon``.
+
+        ``polygon`` must be in WGS84 (EPSG:4326, lng/lat) — it is transformed
+        to the planar CRS before the spatial-index query, matching how the
+        other RoadIndex queries receive WGS84 input.
+
+        Used by the road-network routing module to build area-restricted
+        subgraphs; the tuple order matches :meth:`iter_parts`.
+        """
+        indexes = self._tree.query(transform(_transformer_4326_to_32642.transform, polygon))
+        return [
+            (self._wgs84_lines[int(i)], self._lines[int(i)], self._props[int(i)])
+            for i in indexes
+        ]
+
+    def iter_parts(self) -> "list[tuple]":
+        """Return ``(wgs84_line, projected_line, props)`` for all road parts."""
+        return [
+            (self._wgs84_lines[i], self._lines[i], self._props[i])
+            for i in range(len(self._lines))
+        ]
+
 
 def _parse_geojson(geojson: str | bytes | dict | Path) -> dict:
     """Return a parsed FeatureCollection dict from path, raw text or dict."""
@@ -336,6 +360,11 @@ def _line_parts(geometry) -> list:
     if geom_type == "GeometryCollection":
         return [part for child in geometry.geoms for part in _line_parts(child)]
     return []
+
+
+def project_wgs84(lng: float, lat: float) -> tuple[float, float]:
+    """Project a WGS84 ``(lng, lat)`` pair to planar ``(x, y)`` metres (EPSG:32642)."""
+    return _transformer_4326_to_32642.transform(float(lng), float(lat))
 
 
 def nearest_road_snap(

@@ -19,7 +19,7 @@
  <span class="badge text-bg-warning">Source verification pending</span>
 </div>
 <div class="alert alert-warning py-2">
- <strong>Important:</strong> Dashed connections are straight-line source-listed links, not bus paths. Click a dashed segment to request a temporary road-following candidate from OSRM using OpenStreetMap road data. Enter a stop ID and click "Preview snap" to propose a geometric OSM road snap (original marker, proposed marker, connecting line, distance in metres and road name). All candidates are previews only: they are not verified bus alignments, are not saved, and do not change route or stop status.
+ <strong>Important:</strong> Dashed connections are straight-line source-listed links, not bus paths. Click a dashed segment to request a temporary road-following candidate from OSRM using OpenStreetMap road data. Enter a stop ID and click "Preview snap" to propose a geometric OSM road snap (original marker, proposed marker, connecting line, distance in metres and road name). Select a route and click "Preview route road geometry" to route its ordered stops through the connected OSM road graph with one-way restrictions respected — routed legs appear as solid connected-road candidates and legs that cannot be routed are flagged dashed red, never bridged by a fabricated path. All candidates are previews only: they are not verified bus alignments, are not saved, and do not change route or stop status.
 </div>
 <div class="row g-2 mb-3" id="map-stats">
  <div class="col-6 col-md-3"><div class="qa-stat"><div class="small text-secondary">Stops</div><strong id="stat-stops">—</strong></div></div>
@@ -46,12 +46,22 @@
    </select>
    <div class="form-check"><input class="form-check-input" type="checkbox" id="show-snap-preview" checked><label class="form-check-label" for="show-snap-preview">Show snap preview</label></div>
   </div>
+  <div class="col-md-7 d-flex flex-wrap gap-2 align-items-center">
+   <button id="route-geometry-btn" class="btn btn-sm btn-outline-success" type="button">Preview route road geometry</button>
+   <div class="form-check"><input class="form-check-input" type="checkbox" id="show-route-geometry" checked><label class="form-check-label" for="show-route-geometry">Show route geometry</label></div>
+   <small class="text-secondary">Routes the selected route's ordered stops through the connected OSM road graph (one-way aware, preview only).</small>
+  </div>
  </div>
  <div class="map-legend small text-secondary mt-3">
-  <span><i class="legend-dot"></i> Stop</span><span><i class="legend-dot legend-collision"></i> Shared coordinate</span>
+  <span><i class="legend-dot" style="background:#2478b8"></i> Stop · under review</span>
+  <span><i class="legend-dot" style="background:#2e7d32"></i> Stop · active</span>
+  <span><i class="legend-dot" style="background:#757575"></i> Stop · other status</span>
+  <span><i class="legend-dot legend-collision"></i> Shared coordinate</span>
   <span><i class="legend-dot legend-anomaly"></i> Self-loop anomaly</span><span>Dashed line = source-listed connection</span>
   <span><i class="legend-dot" style="background:#d35400"></i> Proposed snap</span>
   <span><i class="legend-dot" style="background:#8e44ad"></i> Selected candidate road</span>
+  <span>Solid coloured line = proposed connected-road path (per-route colour)</span>
+  <span><i class="legend-dot" style="background:#c0392b"></i> Problem leg (dashed, not routed)</span>
  </div>
 </div>
 <div class="card p-2"><div id="historical-map" role="img" aria-label="Map of unverified historical Karachi bus stops and selected route connections" data-tile-url="{{ map_tile_url }}" data-tile-max-zoom="{{ map_tile_max_zoom }}" data-tile-attribution="{{ map_attribution }}"></div></div>

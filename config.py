@@ -99,3 +99,16 @@ class Config:
     # Maximum number of alternative road candidates the snap preview proposes,
     # ordered by planar distance. Preview-only; never saved.
     SNAP_MAX_CANDIDATES = int(os.getenv("SNAP_MAX_CANDIDATES", "5"))
+
+    # Road-based route geometry preview (connected OSM paths, one-way aware).
+    # Maximum distance (metres) a route stop may sit from a road segment for
+    # the leg search to attach it to the network.
+    ROUTE_SNAP_MAX_DISTANCE_M = float(os.getenv("ROUTE_SNAP_MAX_DISTANCE_M", "150"))
+    # How far beyond the route-stop bounding box (metres) connected road parts
+    # are collected when building the per-leg routing subgraph.
+    ROUTE_BBOX_PAD_M = float(os.getenv("ROUTE_BBOX_PAD_M", "1500"))
+    # Cost budget for one leg: straight-line distance × factor + extra metres.
+    # A leg whose cheapest lawful path exceeds the budget is reported as a
+    # problem instead of returning a fabricated detour.
+    ROUTE_COST_BUDGET_FACTOR = float(os.getenv("ROUTE_COST_BUDGET_FACTOR", "3.0"))
+    ROUTE_COST_BUDGET_EXTRA_M = float(os.getenv("ROUTE_COST_BUDGET_EXTRA_M", "2500"))

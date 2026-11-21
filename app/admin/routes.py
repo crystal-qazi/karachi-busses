@@ -11,7 +11,9 @@ from app.admin import admin_bp
 from app.admin.auth import login_required
 from app.admin.errors import db_error_handler
 from app.database.helpers import cursor_context
+from app.road_network import RoadGraph, route_stops
 from app.snapping import RoadSourceError, load_roads_cached, road_snap_candidates
+from shapely.geometry import box
 
 CODE_RE = re.compile(r"^[A-Za-z0-9._-]{1,60}$")
 
@@ -886,4 +888,193 @@ def historical_network_snap():
         max_candidates=max_candidates,
         note={"code": "CANDIDATE_ONLY",
               "message": "A geometrically nearest road is only a candidate, not proof of the bus stop location."},
+    )
+
+
+@admin_bp.get("/historical-network/route-geometry")
+@login_required
+@db_error_handler
+def historical_network_route_geometry():
+    """Propose connected OSM road geometry for a historical route's ordered stops.
+
+    Preview only. For every direction of the route, the ordered stop sequence
+    is routed leg-by-leg through the connected road graph built from the
+    extracted OSM inventory (``app.road_network``): one-way restrictions are
+    respected, paths stay on connected roads and legs that cannot be routed
+    are flagged instead of being bridged by a fabricated line. Routed legs are
+    connected-road **candidates**, not proof of the historical bus alignment.
+    No database writes: stop coordinates, statuses, route assignments and
+    stored shapes are never changed.
+    """
+    raw = request.args.get("route_id", "").strip()
+    if not raw.isdigit():
+        return jsonify(success=False, error={
+            "code": "INVALID_ROUTE_ID", "message": "A numeric route_id is required."}), 400
+    route_id = int(raw)
+
+    source_name = "Karachi Bus Network Research Dataset (user-provided cleaned files)"
+    with cursor_context() as (_, cursor):
+        cursor.execute(
+            """SELECT r.id, r.route_code, r.route_name, r.status
+               FROM bus_routes r
+               JOIN data_sources s ON s.id=r.source_id
+               WHERE r.id=%s AND s.source_name=%s""",
+            (route_id, source_name),
+        )
+        route = cursor.fetchone()
+        if not route:
+            return jsonify(success=False, error={
+                "code": "NOT_FOUND",
+                "message": f"Route {route_id} was not found in the historical source."}), 404
+
+        cursor.execute(
+            """SELECT id, direction_name, start_label, end_label
+               FROM route_directions WHERE route_id=%s ORDER BY id""",
+            (route_id,),
+        )
+        directions = cursor.fetchall()
+        directions_payload = []
+        for direction in directions:
+            cursor.execute(
+                """SELECT s.id, s.stop_name, s.latitude, s.longitude, s.status,
+                          rs.stop_sequence
+                   FROM route_stops rs
+                   JOIN bus_stops s ON s.id=rs.stop_id
+                   WHERE rs.direction_id=%s
+                   ORDER BY rs.stop_sequence, s.id""",
+                (int(direction["id"]),),
+            )
+            stops = [
+                {"id": int(row["id"]), "name": row["stop_name"],
+                 "sequence": int(row["stop_sequence"]), "status": row["status"],
+                 "lat": row["latitude"], "lng": row["longitude"]}
+                for row in cursor.fetchall()
+            ]
+            directions_payload.append({
+                "direction_id": int(direction["id"]),
+                "direction_name": direction["direction_name"],
+                "start_label": direction["start_label"],
+                "end_label": direction["end_label"],
+                "stops": stops,
+            })
+
+    if not directions_payload:
+        return jsonify(success=False, error={
+            "code": "NO_DIRECTIONS",
+            "message": f"Route {route_id} has no directions."}), 404
+
+    roads_path = Path(current_app.config.get("OSM_ROADS_GEOJSON", ""))
+    if not roads_path.is_file():
+        return jsonify(success=False, error={
+            "code": "ROAD_DATA_MISSING",
+            "message": "OSM road data is not available. Run scripts/extract_osm_karachi_roads.py first."}), 503
+    try:
+        roads = load_roads_cached(roads_path)
+    except RoadSourceError:
+        return jsonify(success=False, error={
+            "code": "ROAD_DATA_MISSING",
+            "message": "The OSM road inventory exists but could not be read."}), 503
+    if roads.is_empty:
+        return jsonify(success=False, error={
+            "code": "ROAD_DATA_MISSING",
+            "message": "The OSM road inventory contains no usable road segments."}), 503
+
+    max_snap_distance_m = float(current_app.config.get("ROUTE_SNAP_MAX_DISTANCE_M", 150))
+    bbox_pad_m = float(current_app.config.get("ROUTE_BBOX_PAD_M", 1500))
+    cost_budget_factor = float(current_app.config.get("ROUTE_COST_BUDGET_FACTOR", 3.0))
+    cost_budget_extra_m = float(current_app.config.get("ROUTE_COST_BUDGET_EXTRA_M", 2500))
+
+    routed_directions = []
+    for direction in directions_payload:
+        stops = direction["stops"]
+        if not stops:
+            routed_directions.append({
+                "direction_id": direction["direction_id"],
+                "direction_name": direction["direction_name"],
+                "stops": [], "stops_without_coordinates": [],
+                "summary": {"status": "no_stops", "leg_count": 0,
+                            "routed_legs": 0, "problem_legs": 0},
+                "legs": [], "geometry": [],
+            })
+            continue
+
+        # Boundary check: route_stops needs numeric coordinates; stops without
+        # valid coordinates are reported instead of silently skipped.
+        invalid_stops = []
+        routable = []
+        for stop in stops:
+            try:
+                lat = float(stop["lat"])
+                lng = float(stop["lng"])
+            except (TypeError, ValueError):
+                invalid_stops.append({"id": stop["id"], "name": stop["name"],
+                                      "sequence": stop["sequence"]})
+                continue
+            if not (-90.0 <= lat <= 90.0) or not (-180.0 <= lng <= 180.0):
+                invalid_stops.append({"id": stop["id"], "name": stop["name"],
+                                      "sequence": stop["sequence"]})
+                continue
+            stop["lat"] = lat
+            stop["lng"] = lng
+            routable.append(stop)
+
+        direction_payload = {
+            "direction_id": direction["direction_id"],
+            "direction_name": direction["direction_name"],
+            "stops": [
+                {"id": s["id"], "name": s["name"], "sequence": s["sequence"],
+                 "lat": s["lat"], "lng": s["lng"], "status": s["status"]}
+                for s in routable
+            ],
+            "stops_without_coordinates": invalid_stops,
+        }
+        if not routable:
+            direction_payload["summary"] = {
+                "status": "no_stops", "leg_count": 0,
+                "routed_legs": 0, "problem_legs": 0}
+            direction_payload["legs"] = []
+            direction_payload["geometry"] = []
+            routed_directions.append(direction_payload)
+            continue
+        if invalid_stops:
+            direction_payload["summary"] = {
+                "status": "missing_coordinates", "leg_count": 0,
+                "routed_legs": 0, "problem_legs": 0}
+            direction_payload["legs"] = []
+            direction_payload["geometry"] = []
+            routed_directions.append(direction_payload)
+            continue
+
+        pad_deg = bbox_pad_m / 111_000.0
+        area = box(
+            min(s["lng"] for s in routable) - pad_deg,
+            min(s["lat"] for s in routable) - pad_deg,
+            max(s["lng"] for s in routable) + pad_deg,
+            max(s["lat"] for s in routable) + pad_deg,
+        )
+        graph = RoadGraph.from_parts(roads.parts_intersecting(area))
+        result = route_stops(
+            graph, roads, routable,
+            max_snap_distance_m=max_snap_distance_m,
+            cost_budget_factor=cost_budget_factor,
+            cost_budget_extra_m=cost_budget_extra_m,
+        )
+        direction_payload["summary"] = result["summary"]
+        direction_payload["legs"] = result["legs"]
+        direction_payload["geometry"] = result["geometry"]
+        routed_directions.append(direction_payload)
+
+    return jsonify(
+        success=True,
+        route={"id": int(route["id"]), "code": route["route_code"],
+               "name": route["route_name"], "status": route["status"]},
+        directions=routed_directions,
+        config={"max_snap_distance_m": max_snap_distance_m,
+                "bbox_pad_m": bbox_pad_m,
+                "cost_budget_factor": cost_budget_factor,
+                "cost_budget_extra_m": cost_budget_extra_m},
+        note={"code": "CANDIDATE_ONLY",
+              "message": "Routed legs are connected-road candidates from current OSM data, "
+                         "not proof of the historical bus alignment. Problem legs are "
+                         "flagged, never bridged by a fabricated path. Nothing is saved."},
     )

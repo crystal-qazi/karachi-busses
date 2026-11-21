@@ -45,6 +45,14 @@
     for (const char of code) hash = (hash * 31 + char.charCodeAt(0)) | 0;
     return "hsl(" + (Math.abs(hash) % 360) + " 68% 38%)";
   };
+  // Verification status drives the marker colour so reviewers can tell
+  // under-review source stops from anything else on the QA map.
+  const stopStatusColor = (status) => {
+    const value = String(status || "").toLowerCase();
+    if (value === "under_review") return "#2478b8";
+    if (value === "active") return "#2e7d32";
+    return "#757575";
+  };
 
   function buildStops() {
     stopLayer.clearLayers();
@@ -82,7 +90,8 @@
       } else {
         const stopIcon = L.divIcon({
           className: "",
-          html: "<span style='display:block;width:11px;height:11px;border:2px solid white;border-radius:50%;background:#2478b8;box-shadow:0 1px 4px #555'></span>",
+          html: "<span style='display:block;width:11px;height:11px;border:2px solid white;border-radius:50%;background:" +
+            stopStatusColor(first.status) + ";box-shadow:0 1px 4px #555'></span>",
           iconSize: [11, 11], iconAnchor: [5, 5]
         });
         stopLayer.addLayer(L.marker([first.lat, first.lng], { icon: stopIcon }).bindPopup(popup));
@@ -411,6 +420,166 @@
     else map.removeLayer(snapPreviewLayer);
   });
 
+  // Admin-only connected-road route geometry preview. Fetches the server's
+  // one-way-aware routing of the selected route's ordered stops and draws
+  // routed legs as solid connected-road candidates; legs the engine could not
+  // route are drawn dashed (never bridged by a fabricated path). Nothing is
+  // saved and stop coordinates or statuses never change.
+  const routeGeometryLayer = L.layerGroup().addTo(map);
+  const routeGeometryBtn = document.getElementById("route-geometry-btn");
+  const showRouteGeometry = document.getElementById("show-route-geometry");
+  const ROUTE_GEOMETRY_TIMEOUT_MS = 120000;
+  let routeGeometryRequestSeq = 0;
+  let routeGeometryController = null;
+
+  function clearRouteGeometry() {
+    routeGeometryLayer.clearLayers();
+  }
+
+  function legFlagText(flags) {
+    if (!Array.isArray(flags) || !flags.length) return "";
+    const labels = {
+      oneway_restrictions_respected: "one-way rules respected",
+      no_connected_path_within_budget: "no connected road path within budget",
+      from_endpoint_not_snappable: "start stop has no road within snap limit",
+      to_endpoint_not_snappable: "end stop has no road within snap limit",
+      large_detour_vs_straight: "path far longer than the straight line — review",
+      same_segment: "both stops on the same road segment",
+      zero_length_leg: "zero-length leg",
+    };
+    return "<br><small>Flags: " + flags.map(
+      (flag) => escapeHtml(labels[flag] || flag)).join("; ") + "</small>";
+  }
+
+  function renderRouteGeometry(payload) {
+    clearRouteGeometry();
+    if (!payload || payload.success !== true) {
+      message.textContent = payload && payload.error
+        ? payload.error.message : "Route geometry preview unavailable.";
+      message.classList.add("text-danger");
+      return;
+    }
+    const bounds = L.latLngBounds();
+    payload.directions.forEach((direction) => {
+      // Solid line: the combined connected-road candidate geometry.
+      if (Array.isArray(direction.geometry) && direction.geometry.length > 1) {
+        const latLngs = direction.geometry.map(
+          (point) => [Number(point[1]), Number(point[0])]);
+        const line = L.polyline(latLngs, {
+          color: routeColor(payload.route.code), weight: 4, opacity: .85
+        });
+        line.bindPopup("<strong>Proposed connected-road path · route " +
+          escapeHtml(payload.route.code) + "</strong><br><small>Direction: " +
+          escapeHtml(direction.direction_name || "") + " · " +
+          direction.summary.routed_legs + "/" + direction.summary.leg_count +
+          " legs routed</small><br><small class='text-danger'>Connected-road candidate " +
+          "from current OSM data — not proof of the historical bus alignment. Nothing saved.</small>");
+        routeGeometryLayer.addLayer(line);
+        latLngs.forEach((point) => bounds.extend(point));
+      }
+      // Problem legs (never routed) and detour-flagged routed legs are drawn
+      // individually on top of the combined line.
+      (direction.legs || []).forEach((leg) => {
+        const isProblem = leg.status !== "routed";
+        const isDetour = Array.isArray(leg.flags) &&
+          leg.flags.includes("large_detour_vs_straight");
+        if (!isProblem && !isDetour) return;
+        if (!Array.isArray(leg.geometry) || leg.geometry.length < 2) return;
+        const latLngs = leg.geometry.map(
+          (point) => [Number(point[1]), Number(point[0])]);
+        const line = L.polyline(latLngs, {
+          color: isProblem ? "#c0392b" : "#e67e22",
+          weight: 3, opacity: .9, dashArray: "8 8"
+        });
+        const heading = isProblem
+          ? "<strong>Problem leg (not routed)</strong>"
+          : "<strong>Routed leg flagged for review</strong>";
+        line.bindPopup(heading +
+          "<br><small>Route " + escapeHtml(payload.route.code) + " · " +
+          escapeHtml(direction.direction_name || "") + "<br>Stops: " +
+          escapeHtml(leg.from_stop ? leg.from_stop.name : "?") + " → " +
+          escapeHtml(leg.to_stop ? leg.to_stop.name : "?") +
+          "<br>Status: " + escapeHtml(leg.status) +
+          (leg.straight_m != null ? "<br>Straight distance: " + leg.straight_m + " m" : "") +
+          (leg.network_distance_m != null ? "<br>Road distance: " + leg.network_distance_m + " m" : "") +
+          legFlagText(leg.flags) +
+          "</small><br><small class='text-danger'>Preview only — the source-listed data is unchanged.</small>");
+        routeGeometryLayer.addLayer(line);
+        latLngs.forEach((point) => bounds.extend(point));
+      });
+    });
+    if (showRouteGeometry.checked) map.addLayer(routeGeometryLayer);
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [24, 24] });
+    message.classList.remove("text-danger");
+    const summary = payload.directions.map((direction) =>
+      direction.direction_name + ": " + direction.summary.status +
+      " (" + direction.summary.routed_legs + "/" + direction.summary.leg_count + " legs)").join(" · ");
+    message.textContent = "Road-geometry preview for route " + payload.route.code +
+      " — " + summary + ". Routed legs are OSM connected-road candidates, not verified bus alignment.";
+  }
+
+  async function previewRouteGeometry() {
+    const selected = routeFilter.value;
+    if (!selected) {
+      message.textContent = "Select a route in the route filter first.";
+      message.classList.add("text-danger");
+      return;
+    }
+    const route = (dataset.routes || []).find((item) => item.code === selected);
+    if (!route || !Number.isFinite(Number(route.id))) {
+      message.textContent = "The selected route has no route ID in the loaded dataset.";
+      message.classList.add("text-danger");
+      return;
+    }
+    // Same supersession contract as the snap preview: a newer request aborts
+    // and discards the older one.
+    const requestId = ++routeGeometryRequestSeq;
+    if (routeGeometryController) routeGeometryController.abort();
+    const controller = new AbortController();
+    routeGeometryController = controller;
+    message.textContent = "Routing route " + selected +
+      " through the OSM road graph (this can take up to a minute for long routes)…";
+    message.classList.remove("text-danger");
+    const timeoutId = setTimeout(() => {
+      controller.abort(new DOMException("Route geometry request timed out.", "TimeoutError"));
+    }, ROUTE_GEOMETRY_TIMEOUT_MS);
+    try {
+      const response = await fetch(
+        "/admin/historical-network/route-geometry?route_id=" + encodeURIComponent(route.id), {
+        headers: { "Accept": "application/json" },
+        credentials: "same-origin",
+        signal: controller.signal
+      });
+      const payload = await response.json().catch(() => null);
+      if (requestId !== routeGeometryRequestSeq) return;
+      if (!response.ok || !payload) {
+        message.textContent = payload && payload.error
+          ? payload.error.message : ("Server returned " + response.status);
+        message.classList.add("text-danger");
+        return;
+      }
+      renderRouteGeometry(payload);
+    } catch (error) {
+      if (requestId !== routeGeometryRequestSeq) return;
+      if (error && error.name === "TimeoutError") {
+        message.textContent = "The route geometry request timed out. Please try again.";
+        message.classList.add("text-danger");
+      } else if (!(error && error.name === "AbortError")) {
+        message.textContent = "Could not preview route geometry: " + error.message;
+        message.classList.add("text-danger");
+      }
+    } finally {
+      clearTimeout(timeoutId);
+      if (requestId === routeGeometryRequestSeq) routeGeometryController = null;
+    }
+  }
+
+  if (routeGeometryBtn) routeGeometryBtn.addEventListener("click", previewRouteGeometry);
+  if (showRouteGeometry) showRouteGeometry.addEventListener("change", () => {
+    if (showRouteGeometry.checked) map.addLayer(routeGeometryLayer);
+    else map.removeLayer(routeGeometryLayer);
+  });
+
   async function load() {
     try {
       const response = await fetch("/admin/historical-network/data", {
@@ -443,7 +612,13 @@
   }
 
   [routeFilter, showSegments, showCollisions, showAnomalies].forEach((control) => {
-    control.addEventListener("change", () => { if (dataset) render(); });
+    control.addEventListener("change", () => {
+      if (!dataset) return;
+      // Geometry belongs to the previously selected route; do not show it
+      // next to a different route's data.
+      if (control === routeFilter) clearRouteGeometry();
+      render();
+    });
   });
   load();
 })();

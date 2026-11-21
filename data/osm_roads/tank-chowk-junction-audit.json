@@ -1,0 +1,177 @@
+{
+  "status": "tank_chowk_junction_topology_audit_review_aid_only",
+  "roads_source": "D:\\USB_Sync\\Development\\AI_project\\gptweb\\karachi-busses\\data\\osm_roads\\karachi-osm-bus-roads.geojson",
+  "audit_area_pad_m": 800.0,
+  "audit_area_parts": 783,
+  "graph_nodes": 4058,
+  "graph_edges": 4630,
+  "focus_ways": [
+    {
+      "osm_way_id": "545406459",
+      "in_audit_area": true,
+      "name": "",
+      "highway": "trunk_link",
+      "forward_only": true,
+      "backward_only": false,
+      "part_count": 1,
+      "node_count": 12,
+      "network_length_m": 32.69,
+      "endpoints": [
+        {
+          "lng": 67.1859829,
+          "lat": 24.9124498,
+          "degree_out": 1
+        },
+        {
+          "lng": 67.1859193,
+          "lat": 24.9126687,
+          "degree_out": 2
+        }
+      ]
+    },
+    {
+      "osm_way_id": "850584014",
+      "in_audit_area": true,
+      "name": "جناح ایونیو",
+      "highway": "secondary",
+      "forward_only": true,
+      "backward_only": false,
+      "part_count": 1,
+      "node_count": 21,
+      "network_length_m": 1350.28,
+      "endpoints": [
+        {
+          "lng": 67.1854108,
+          "lat": 24.9124715,
+          "degree_out": 2
+        },
+        {
+          "lng": 67.1987671,
+          "lat": 24.91212,
+          "degree_out": 2
+        }
+      ]
+    },
+    {
+      "osm_way_id": "522535777",
+      "in_audit_area": true,
+      "name": "",
+      "highway": "trunk",
+      "forward_only": true,
+      "backward_only": false,
+      "part_count": 1,
+      "node_count": 27,
+      "network_length_m": 887.05,
+      "endpoints": [
+        {
+          "lng": 67.1854108,
+          "lat": 24.9124715,
+          "degree_out": 2
+        },
+        {
+          "lng": 67.1870554,
+          "lat": 24.9183119,
+          "degree_out": 1
+        }
+      ]
+    },
+    {
+      "osm_way_id": "883797721",
+      "in_audit_area": true,
+      "name": "جناح ایونیو",
+      "highway": "secondary",
+      "forward_only": true,
+      "backward_only": false,
+      "part_count": 1,
+      "node_count": 37,
+      "network_length_m": 1472.8,
+      "endpoints": [
+        {
+          "lng": 67.1846757,
+          "lat": 24.9115182,
+          "degree_out": 1
+        },
+        {
+          "lng": 67.1987896,
+          "lat": 24.9120686,
+          "degree_out": 3
+        }
+      ]
+    },
+    {
+      "osm_way_id": "522375908",
+      "in_audit_area": true,
+      "name": "",
+      "highway": "trunk",
+      "forward_only": true,
+      "backward_only": false,
+      "part_count": 1,
+      "node_count": 54,
+      "network_length_m": 1990.11,
+      "endpoints": [
+        {
+          "lng": 67.1851838,
+          "lat": 24.9125622,
+          "degree_out": 2
+        },
+        {
+          "lng": 67.1800599,
+          "lat": 24.9254957,
+          "degree_out": 3
+        }
+      ]
+    }
+  ],
+  "shared_node_pairs": {
+    "522535777~545406459": 1,
+    "522535777~850584014": 1,
+    "545406459~850584014": 1
+  },
+  "junction_nodes": [
+    {
+      "lng": 67.1854108,
+      "lat": 24.9124715,
+      "focus_ways": [
+        "522535777",
+        "850584014"
+      ],
+      "in_degree": 2,
+      "out_degree": 2,
+      "other_way_count": 1,
+      "other_way_ids": [
+        "935503740"
+      ]
+    },
+    {
+      "lng": 67.1859829,
+      "lat": 24.9124498,
+      "focus_ways": [
+        "545406459",
+        "850584014"
+      ],
+      "in_degree": 2,
+      "out_degree": 1,
+      "other_way_count": 0,
+      "other_way_ids": []
+    },
+    {
+      "lng": 67.1859193,
+      "lat": 24.9126687,
+      "focus_ways": [
+        "522535777",
+        "545406459"
+      ],
+      "in_degree": 1,
+      "out_degree": 2,
+      "other_way_count": 0,
+      "other_way_ids": []
+    }
+  ],
+  "dead_ends": [],
+  "limitations": [
+    "Coordinate-equality node matching reflects the exported GeoJSON; it does not read raw OSM node ids.",
+    "A missing link here is a geometric observation, not proof that a physical road connection is absent in OSM.",
+    "This audit does not verify bus movements, stop placement or the historical route alignment."
+  ],
+  "attribution": "© OpenStreetMap contributors"
+}
