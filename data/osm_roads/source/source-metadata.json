@@ -1,0 +1,16 @@
+{
+  "provider": "Geofabrik",
+  "source_url": "https://download.geofabrik.de/asia/pakistan-latest.osm.pbf",
+  "checksum_url": "https://download.geofabrik.de/asia/pakistan-latest.osm.pbf.md5",
+  "retrieved_at_utc": "2026-11-21T05:17:38.948736+00:00",
+  "source_checksum_algorithm": "MD5 (when provider sidecar is available; transport integrity only)",
+  "source_md5_expected": "012b44e7955f527d793b50bb468ffd1f",
+  "source_md5_actual": "012b44e7955f527d793b50bb468ffd1f",
+  "file_sha256": "9490f8bb95895c01b4e7b8898900f68d7445a879bdf9c74b39ecee0ed6e150ea",
+  "file_name": "pakistan-latest.osm.pbf",
+  "file_size_bytes": 158155685,
+  "data_license": "Open Database License 1.0 (ODbL)",
+  "attribution": "\u00a9 OpenStreetMap contributors",
+  "scope": "Pakistan regional extract; not yet clipped to Karachi",
+  "warning": "Do not publish derived database without reviewing ODbL obligations."
+}
