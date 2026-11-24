@@ -302,26 +302,11 @@ def test_db_error_in_admin_route_returns_flash_and_redirect(seeded_admin, monkey
     assert "Database temporarily unavailable" in r2.get_data(as_text=True)
 
 
-def test_db_error_in_json_endpoint_returns_503(seeded_admin, monkeypatch):
-    app = seeded_admin
-    tc = app.test_client()
-    tc.post("/admin/login", data={"username": "regression_admin", "password": "RegressionPW-123"})
-    import app.admin.routes as routes_module
+def test_removed_historical_network_endpoint_returns_not_found():
+    app = create_app({"TESTING": True, "SECRET_KEY": "test" * 20})
+    response = app.test_client().get("/admin/historical-network/data")
+    assert response.status_code == 404
 
-    @contextmanager
-    def _boom(**kwargs):
-        raise mysql.connector.Error("Simulated database failure")
-
-    monkeypatch.setattr(routes_module, "cursor_context", _boom)
-    r = tc.get("/admin/historical-network/data")
-    assert r.status_code == 503
-    payload = r.get_json()
-    assert payload["success"] is False
-    assert payload["error"]["code"] == "DATABASE_UNAVAILABLE"
-    # No SQL text or credentials should leak
-    text = json.dumps(payload).lower()
-    for needle in ("select", "insert", "update", "root", "password"):
-        assert needle not in text, f"leak: {needle!r} in JSON error payload"
 
 
 # ---------- helper ----------

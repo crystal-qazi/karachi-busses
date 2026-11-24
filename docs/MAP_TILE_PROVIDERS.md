@@ -7,7 +7,7 @@ govern offline tile use.
 ## Online map provider
 
 The interactive Leaflet layers on every map page (public discovery map,
-admin direction editor, stop picker, historical network QA map) are backed
+admin direction editor and stop picker) are backed
 by a single, **server-driven** online tile provider.
 
 - The provider URL, max zoom, and attribution are read from the Flask
