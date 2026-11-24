@@ -42,12 +42,23 @@
             <button id="search-button" class="btn btn-outline-success" type="button">Search</button>
           </div>
           <div class="border-top mt-3 pt-3">
-            <label for="journey-destination" class="form-label fw-semibold">Plan a bus journey</label>
+            <label for="journey-from" class="form-label fw-semibold">From</label>
+            <input id="journey-from" class="form-control mb-2" type="search"
+                   placeholder="Search starting place or area" autocomplete="off" maxlength="100">
+            <label for="journey-to" class="form-label fw-semibold">To</label>
+            <input id="journey-to" class="form-control mb-2" type="search"
+                   placeholder="Search destination or area" autocomplete="off" maxlength="100">
+            <button id="journey-button" class="btn btn-success w-100" type="button">Find buses</button>
+            <div class="form-text">Search Karachi locations for both ends. Nearby published stops are matched at each end; only routes that travel From to To in the correct stop order are listed. You can also tap the map to set the From point.</div>
+          </div>
+          <div class="border-top mt-3 pt-3">
+            <label for="map-location-input" class="form-label fw-semibold">Search a map location</label>
             <div class="input-group">
-              <input id="journey-destination" class="form-control" type="search" placeholder="Destination stop or area" maxlength="100">
-              <button id="journey-button" class="btn btn-success" type="button">Find buses</button>
+              <input id="map-location-input" class="form-control" type="search"
+                     placeholder="Area, landmark or road in Karachi" autocomplete="off" maxlength="100">
+              <button id="map-location-button" class="btn btn-outline-success" type="button">Find</button>
             </div>
-            <div class="form-text">Find direct buses or one transfer using your selected GPS/map origin. Destination must match a published bus stop.</div>
+            <div class="form-text">Location search uses OpenStreetMap Nominatim. Map search results are location suggestions, not bus service guarantees.</div>
           </div>
         </section>
         <section class="panel p-3 mt-3">
