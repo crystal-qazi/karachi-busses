@@ -53,9 +53,12 @@ def _segment_shape(shape, start, end):
         )
 
     first, last = nearest_index(start), nearest_index(end)
-    if last <= first:
+    if first == last:
         return None
-    segment = coordinates[first:last + 1]
+    if last > first:
+        segment = coordinates[first:last + 1]
+    else:
+        segment = list(reversed(coordinates[last:first + 1]))
     if len(segment) < 2:
         return None
     return {"type": "LineString", "coordinates": segment}
