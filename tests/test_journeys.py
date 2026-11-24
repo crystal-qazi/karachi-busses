@@ -34,7 +34,7 @@ def _row(direction, route, sequence, stop_id, stop_name, lat, shape=None):
     }
 
 
-def _journey_url(from_lat=24.8600, to_lat=24.8620, radius=75):
+def _journey_url(from_lat=24.8600, to_lat=24.8620, radius=100):
     return (
         "/api/v1/journeys?origin_lat=" + str(from_lat) +
         "&origin_lng=67&destination_lat=" + str(to_lat) +
