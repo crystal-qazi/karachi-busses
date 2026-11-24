@@ -32,7 +32,6 @@ def _is_api_request() -> bool:
 
     - ``/api/...``: any API blueprint request.
     - ``Accept: application/json``: a browser or fetch call expecting JSON.
-    - ``/admin/historical-network/data``: the admin map's data endpoint.
     - ``/admin/.../map-data``: the admin direction map-data API endpoint.
     """
     path = request.path
