@@ -4,7 +4,7 @@ import json
 import math
 import re
 
-from flask import current_app, flash, jsonify, redirect, render_template, request, session, url_for
+from flask import flash, redirect, render_template, request, session, url_for
 
 from app.admin import admin_bp
 from app.admin.auth import login_required
