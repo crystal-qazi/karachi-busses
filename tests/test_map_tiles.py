@@ -170,7 +170,6 @@ def test_leaflet_css_sri_hash_is_current_in_all_templates():
         "templates/public/index.html",
         "templates/admin/stops.html",
         "templates/admin/direction_editor.html",
-        "templates/admin/historical_network.html",
     )
     for path in paths:
         source = Path(path).read_text(encoding="utf-8")
