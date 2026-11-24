@@ -84,3 +84,9 @@ def test_direction_not_found(client, monkeypatch):
 def test_search_requires_two_characters(client):
     response = client.get("/api/v1/search?q=a")
     assert response.status_code == 400
+
+
+def test_location_search_validates_query_without_calling_geocoder(client):
+    response = client.get("/api/v1/locations/search?q=a")
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "INVALID_PARAMETER"
