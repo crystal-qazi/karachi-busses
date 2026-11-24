@@ -1,4 +1,5 @@
-"""Direct and single-transfer journey discovery from static route data."""
+"""Direct and single-transfer journey discovery between two map locations."""
+import json
 import math
 
 from flask import Blueprint, jsonify, request
@@ -21,66 +22,102 @@ def _distance(a_lat, a_lng, b_lat, b_lng):
     return 2 * EARTH_RADIUS_METRES * math.asin(min(1, math.sqrt(value)))
 
 
+def _shape_value(value):
+    if not value:
+        return None
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except (TypeError, ValueError):
+            return None
+    return value
+
+
+def _segment_shape(shape, start, end):
+    """Return only the saved LineString section between the selected stops."""
+    if not shape:
+        return None
+    if shape.get("type") == "Feature":
+        shape = shape.get("geometry") or {}
+    if shape.get("type") != "LineString":
+        return None
+    coordinates = shape.get("coordinates") or []
+    if len(coordinates) < 2:
+        return None
+
+    def nearest_index(stop):
+        return min(
+            range(len(coordinates)),
+            key=lambda i: (coordinates[i][0] - stop["lng"]) ** 2
+            + (coordinates[i][1] - stop["lat"]) ** 2,
+        )
+
+    first, last = nearest_index(start), nearest_index(end)
+    if last <= first:
+        return None
+    segment = coordinates[first:last + 1]
+    if len(segment) < 2:
+        return None
+    return {"type": "LineString", "coordinates": segment}
+
+
+def _make_leg(direction, board, alight, stops):
+    return {
+        "direction": {
+            key: value for key, value in direction.items()
+            if key not in {"stops", "shape"}
+        },
+        "board_stop": board,
+        "alight_stop": alight,
+        "stops": stops,
+        "shape": _segment_shape(direction.get("shape"), board, alight),
+    }
+
+
 @journey_api_bp.get("/journeys")
 def journeys():
     try:
         origin_lat = float(request.args["origin_lat"])
         origin_lng = float(request.args["origin_lng"])
+        destination_lat = float(request.args["destination_lat"])
+        destination_lng = float(request.args["destination_lng"])
         radius = float(request.args.get("radius", "1500"))
-        destination = (request.args.get("destination") or "").strip()
     except (KeyError, TypeError, ValueError):
-        return _error("Provide origin_lat, origin_lng and destination.")
-    if not all(math.isfinite(v) for v in (origin_lat, origin_lng, radius)):
-        return _error("Origin coordinates and radius must be finite numbers.")
-    if not -90 <= origin_lat <= 90 or not -180 <= origin_lng <= 180:
-        return _error("Origin coordinates are outside valid ranges.")
+        return _error("Provide valid From and To coordinates.")
+    values = (origin_lat, origin_lng, destination_lat, destination_lng, radius)
+    if not all(math.isfinite(value) for value in values):
+        return _error("Coordinates and radius must be finite numbers.")
+    if not -90 <= origin_lat <= 90 or not -90 <= destination_lat <= 90:
+        return _error("Latitude values must be between -90 and 90.")
+    if not -180 <= origin_lng <= 180 or not -180 <= destination_lng <= 180:
+        return _error("Longitude values must be between -180 and 180.")
     if not 100 <= radius <= 10_000:
         return _error("radius must be between 100 and 10,000 metres.")
-    if len(destination) < 2 or len(destination) > 100:
-        return _error("Destination must contain 2–100 characters.")
 
     try:
         with cursor_context() as (_, cursor):
-            lat_delta = radius / 111_320
-            lng_delta = min(radius / (111_320 * max(abs(math.cos(math.radians(origin_lat))), 0.01)), 180)
-            term = "%" + destination + "%"
             cursor.execute("""
                 SELECT d.id AS direction_id, d.direction_name, d.start_label, d.end_label,
                        r.id AS route_id, r.route_code, r.route_name, o.name AS operator_name,
                        s.id AS stop_id, s.stop_name, s.latitude, s.longitude, s.address,
-                       rs.stop_sequence
+                       rs.stop_sequence, sh.geojson AS shape_geojson
                 FROM route_directions d
                 JOIN bus_routes r ON r.id=d.route_id AND r.status='active'
-                JOIN data_sources route_source ON route_source.id=r.source_id AND route_source.verification_status='verified'
+                JOIN data_sources route_source ON route_source.id=r.source_id
+                  AND route_source.verification_status='verified'
                 LEFT JOIN bus_operators o ON o.id=r.operator_id AND o.is_active=1
                 JOIN route_stops rs ON rs.direction_id=d.id
                 JOIN bus_stops s ON s.id=rs.stop_id AND s.status='active'
-                JOIN data_sources stop_source ON stop_source.id=s.source_id AND stop_source.verification_status='verified'
-                WHERE EXISTS (
-                    SELECT 1 FROM route_stops origin_rs
-                    JOIN bus_stops origin_stop ON origin_stop.id=origin_rs.stop_id
-                    JOIN data_sources origin_source ON origin_source.id=origin_stop.source_id
-                      AND origin_source.verification_status='verified'
-                    WHERE origin_rs.direction_id=d.id AND origin_stop.status='active'
-                      AND origin_stop.latitude BETWEEN %s AND %s
-                      AND origin_stop.longitude BETWEEN %s AND %s
-                ) OR EXISTS (
-                    SELECT 1 FROM route_stops destination_rs
-                    JOIN bus_stops destination_stop ON destination_stop.id=destination_rs.stop_id
-                    JOIN data_sources destination_source ON destination_source.id=destination_stop.source_id
-                      AND destination_source.verification_status='verified'
-                    WHERE destination_rs.direction_id=d.id AND destination_stop.status='active'
-                      AND (destination_stop.stop_name LIKE %s OR destination_stop.address LIKE %s)
-                )
+                JOIN data_sources stop_source ON stop_source.id=s.source_id
+                  AND stop_source.verification_status='verified'
+                LEFT JOIN route_shapes sh ON sh.direction_id=d.id
                 ORDER BY d.id, rs.stop_sequence
-            """, (origin_lat-lat_delta, origin_lat+lat_delta,
-                  origin_lng-lng_delta, origin_lng+lng_delta, term, term))
+            """)
             rows = cursor.fetchall()
     except Exception:
         return _error("Journey search is temporarily unavailable.", "DATABASE_UNAVAILABLE", 503)
 
-    directions = {}
-    stops = {}
+    directions, stops = {}, {}
     for row in rows:
         stop_id = int(row["stop_id"])
         stop = stops.setdefault(stop_id, {
@@ -96,39 +133,39 @@ def journeys():
                 "id": int(row["route_id"]), "code": row["route_code"],
                 "name": row["route_name"], "operator": row.get("operator_name"),
             },
+            "shape": _shape_value(row.get("shape_geojson")),
             "stops": [],
         })
         direction["stops"].append({**stop, "sequence": int(row["stop_sequence"])})
-
-    destination_lower = destination.casefold()
-    destination_stops = [
-        stop for stop in stops.values()
-        if destination_lower in stop["name"].casefold()
-        or destination_lower in (stop["address"] or "").casefold()
-    ]
-    if not destination_stops:
-        return jsonify(success=True, data={
-            "destination_query": destination, "destination_matches": [],
-            "journeys": [], "message": "No active bus stop matches this destination. Try a nearby stop or area name.",
-        })
 
     origin_stops = [
         stop for stop in stops.values()
         if _distance(origin_lat, origin_lng, stop["lat"], stop["lng"]) <= radius
     ]
+    destination_stops = [
+        stop for stop in stops.values()
+        if _distance(destination_lat, destination_lng, stop["lat"], stop["lng"]) <= radius
+    ]
     origin_stops.sort(key=lambda stop: _distance(origin_lat, origin_lng, stop["lat"], stop["lng"]))
-    if not origin_stops:
+    destination_stops.sort(key=lambda stop: _distance(destination_lat, destination_lng, stop["lat"], stop["lng"]))
+
+    if not origin_stops or not destination_stops:
+        message = (
+            "No active published bus stops were found near your starting location."
+            if not origin_stops else
+            "No active published bus stops were found near your destination."
+        )
         return jsonify(success=True, data={
-            "destination_query": destination,
-            "destination_matches": destination_stops[:20],
-            "journeys": [], "message": "No active route stops were found near your origin.",
+            "origin_stop_count": len(origin_stops),
+            "destination_stop_count": len(destination_stops),
+            "journeys": [], "journey_count": 0, "message": message,
         })
 
-    origin_ids = {s["id"] for s in origin_stops}
-    destination_ids = {s["id"] for s in destination_stops}
+    origin_ids = {stop["id"] for stop in origin_stops}
+    destination_ids = {stop["id"] for stop in destination_stops}
     candidates = []
 
-    # Direct: board at or near origin, then pass a matching destination stop.
+    # A direct journey is valid only when the same direction serves From then To.
     for direction in directions.values():
         seq = direction["stops"]
         for i, board in enumerate(seq):
@@ -140,17 +177,12 @@ def journeys():
                     candidates.append({
                         "type": "direct", "transfer_count": 0,
                         "origin_stop": board, "destination_stop": alight,
-                        "legs": [{
-                            "direction": {k: v for k, v in direction.items() if k != "stops"},
-                            "board_stop": board, "alight_stop": alight,
-                            "stops": seq[i:j + 1],
-                        }],
+                        "legs": [_make_leg(direction, board, alight, seq[i:j + 1])],
                         "sort_distance": _distance(origin_lat, origin_lng, board["lat"], board["lng"]),
                     })
                     break
 
-    # One transfer: first direction boards near origin; second direction continues
-    # from a shared stop and reaches a matching destination stop.
+    # One-transfer journeys must share a real published interchange stop.
     for first in directions.values():
         first_stops = first["stops"]
         for i, board in enumerate(first_stops):
@@ -174,16 +206,8 @@ def journeys():
                                 "origin_stop": board, "transfer_stop": interchange,
                                 "destination_stop": alight,
                                 "legs": [
-                                    {
-                                        "direction": {x: y for x, y in first.items() if x != "stops"},
-                                        "board_stop": board, "alight_stop": interchange,
-                                        "stops": first_stops[i:j + 1],
-                                    },
-                                    {
-                                        "direction": {x: y for x, y in second.items() if x != "stops"},
-                                        "board_stop": transfer_board, "alight_stop": alight,
-                                        "stops": second_stops[k:m + 1],
-                                    },
+                                    _make_leg(first, board, interchange, first_stops[i:j + 1]),
+                                    _make_leg(second, transfer_board, alight, second_stops[k:m + 1]),
                                 ],
                                 "sort_distance": _distance(origin_lat, origin_lng, board["lat"], board["lng"]),
                             })
@@ -195,8 +219,6 @@ def journeys():
                         continue
                     break
 
-    # Remove duplicate itineraries that differ only by a repeated match in a
-    # route's stop list, then prefer fewer transfers and nearer boarding stops.
     unique = {}
     for item in candidates:
         key = (item["type"], tuple(leg["direction"]["id"] for leg in item["legs"]),
@@ -206,14 +228,14 @@ def journeys():
     results = sorted(unique.values(), key=lambda item: (
         item["transfer_count"], item["sort_distance"],
         sum(len(leg["stops"]) for leg in item["legs"])
-    ))[:20]
+    ))[:30]
     for item in results:
         item.pop("sort_distance", None)
     return jsonify(success=True, data={
-        "destination_query": destination,
-        "destination_matches": destination_stops[:20],
         "origin_stop_count": len(origin_stops),
+        "destination_stop_count": len(destination_stops),
         "journeys": results,
         "journey_count": len(results),
-        "message": None if results else "No direct or one-transfer journey was found using the currently published routes.",
+        "message": None if results else
+            "No direct or one-transfer journey was found using the currently published routes.",
     })
