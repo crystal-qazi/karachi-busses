@@ -31,14 +31,30 @@ def data_sources():
             )
         flash("Source recorded as pending verification.", "success")
         return redirect(url_for("admin.data_sources"))
+    try:
+        page = max(1, int(request.args.get("page", "1")))
+    except (TypeError, ValueError):
+        page = 1
+    query = request.args.get("q", "").strip()[:100]
+    per_page = 25
+    where = "WHERE ds.source_name LIKE %s OR ds.source_url LIKE %s OR ds.notes LIKE %s OR ds.verification_status LIKE %s" if query else ""
+    params = (f"%{query}%", f"%{query}%", f"%{query}%", f"%{query}%") if query else ()
     with cursor_context() as (_, cursor):
-        cursor.execute("""
+        cursor.execute(f"SELECT COUNT(*) AS total FROM data_sources ds {where}", params)
+        total = cursor.fetchone()["total"]
+        pages = max(1, (total + per_page - 1) // per_page)
+        page = min(page, pages)
+        cursor.execute(f"""
             SELECT ds.*,
               (SELECT COUNT(*) FROM bus_routes r WHERE r.source_id=ds.id) AS route_count
-            FROM data_sources ds ORDER BY ds.created_at DESC
-        """)
+            FROM data_sources ds {where}
+            ORDER BY ds.created_at DESC LIMIT %s OFFSET %s
+        """, (*params, per_page, (page - 1) * per_page))
         rows = cursor.fetchall()
-    return render_template("admin/data_sources.html", sources=rows)
+    pagination = {"page": page, "pages": pages, "total": total,
+                  "query": query, "start": (page - 1) * per_page + 1 if total else 0,
+                  "end": min(page * per_page, total)}
+    return render_template("admin/data_sources.html", sources=rows, pagination=pagination)
 
 
 @admin_bp.post("/data-sources/<int:source_id>/verification")
