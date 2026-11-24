@@ -296,28 +296,43 @@
     mapLocationButton.disabled = true;
     setStatus("Searching OpenStreetMap locations…");
     try {
-      const location = await geocodeLocation(query);
-      map.setView([location.lat, location.lng], 16);
-      addUserMarker(location.lat, location.lng, location.label);
-      setStatus("Map centred on " + location.label + ". Use this place in From or To.");
-      const card = document.createElement("div");
-      card.className = "border rounded-3 p-2 mb-2";
-      const label = document.createElement("div");
-      label.className = "small fw-semibold";
-      label.textContent = location.label;
-      card.append(label);
-      card.append(makeButton("Use as From", () => {
-        currentOrigin = {lat: location.lat, lng: location.lng, label: location.label};
-        fromInput.value = location.label;
-        discover(location.lat, location.lng, location.label);
-      }));
-      card.append(makeButton("Use as To", () => {
-        toInput.value = location.label;
-        toInput.dataset.lat = location.lat;
-        toInput.dataset.lng = location.lng;
-        setStatus("Destination set to " + location.label + ".");
-      }, "btn btn-sm btn-outline-primary w-100 text-start mt-1"));
-      resultsElement.replaceChildren(card);
+      const data = await getJson("/api/v1/locations/search?q=" + encodeURIComponent(query));
+      resultsElement.replaceChildren();
+      if (!data.locations.length) {
+        showEmpty("No Karachi location matched. Try another name or tap the map.");
+        setStatus("No matching map location found.");
+        return;
+      }
+      const summary = document.createElement("p");
+      summary.className = "small text-secondary";
+      summary.textContent = data.locations.length + " location matches. Choose the correct place:";
+      resultsElement.append(summary);
+      data.locations.forEach((location) => {
+        const card = document.createElement("div");
+        card.className = "border rounded-3 p-2 mb-2";
+        const label = document.createElement("div");
+        label.className = "small fw-semibold mb-2";
+        label.textContent = location.label;
+        card.append(label);
+        card.append(makeButton("Show on map", () => {
+          map.setView([location.lat, location.lng], 16);
+          addUserMarker(location.lat, location.lng, location.label);
+          setStatus("Map centred on " + location.label + ".");
+        }));
+        card.append(makeButton("Use as From", () => {
+          currentOrigin = {lat: location.lat, lng: location.lng, label: location.label};
+          fromInput.value = location.label;
+          discover(location.lat, location.lng, location.label);
+        }, "btn btn-sm btn-outline-success w-100 text-start mt-1"));
+        card.append(makeButton("Use as To", () => {
+          toInput.value = location.label;
+          toInput.dataset.lat = location.lat;
+          toInput.dataset.lng = location.lng;
+          setStatus("Destination set to " + location.label + ".");
+        }, "btn btn-sm btn-outline-primary w-100 text-start mt-1"));
+        resultsElement.append(card);
+      });
+      setStatus("Choose a location result, then use it as From or To.");
     } catch (error) {
       setStatus(error.message);
     } finally {
