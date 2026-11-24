@@ -13,6 +13,26 @@ from app.database.helpers import cursor_context
 
 CODE_RE = re.compile(r"^[A-Za-z0-9._-]{1,60}$")
 
+def _list_page():
+    """Return bounded, validated pagination and search parameters for admin lists."""
+    try:
+        page = max(1, int(request.args.get("page", "1")))
+    except (TypeError, ValueError):
+        page = 1
+    query = request.args.get("q", "").strip()[:100]
+    per_page = 25
+    return page, per_page, (page - 1) * per_page, query
+
+
+def _pagination(total, page, per_page, query):
+    pages = max(1, math.ceil(total / per_page))
+    page = min(page, pages)
+    return {"page": page, "pages": pages, "total": total,
+            "per_page": per_page, "query": query,
+            "start": (page - 1) * per_page + 1 if total else 0,
+            "end": min(page * per_page, total)}
+
+
 
 def _text(name, max_length, required=False):
     value = request.form.get(name, "").strip()
@@ -89,10 +109,17 @@ def operators():
         except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.operators"))
+    page, per_page, offset, query = _list_page()
     with cursor_context() as (_, cursor):
-        cursor.execute("SELECT * FROM bus_operators ORDER BY name")
+        where = "WHERE name LIKE %s OR contact LIKE %s OR website LIKE %s" if query else ""
+        params = (f"%{query}%", f"%{query}%", f"%{query}%") if query else ()
+        cursor.execute(f"SELECT COUNT(*) AS total FROM bus_operators {where}", params)
+        total = cursor.fetchone()["total"]
+        pagination = _pagination(total, page, per_page, query)
+        cursor.execute(f"SELECT * FROM bus_operators {where} ORDER BY name LIMIT %s OFFSET %s",
+                       (*params, per_page, (pagination["page"] - 1) * per_page))
         rows = cursor.fetchall()
-    return render_template("admin/operators.html", operators=rows)
+    return render_template("admin/operators.html", operators=rows, pagination=pagination)
 
 
 @admin_bp.post("/operators/<int:operator_id>/toggle")
@@ -141,14 +168,20 @@ def routes():
         operators_list = cursor.fetchall()
         cursor.execute("SELECT id, source_name, verification_status FROM data_sources ORDER BY source_name")
         sources_list = cursor.fetchall()
-        cursor.execute("""
+        page, per_page, offset, query = _list_page()
+        where = "WHERE r.route_code LIKE %s OR r.route_name LIKE %s OR o.name LIKE %s OR r.status LIKE %s" if query else ""
+        params = (f"%{query}%", f"%{query}%", f"%{query}%", f"%{query}%") if query else ()
+        cursor.execute(f"SELECT COUNT(*) AS total FROM bus_routes r LEFT JOIN bus_operators o ON o.id=r.operator_id {where}", params)
+        total = cursor.fetchone()["total"]
+        pagination = _pagination(total, page, per_page, query)
+        cursor.execute(f"""
             SELECT r.*, o.name AS operator_name,
                    (SELECT COUNT(*) FROM route_directions d WHERE d.route_id=r.id) AS direction_count
             FROM bus_routes r LEFT JOIN bus_operators o ON o.id=r.operator_id
-            ORDER BY r.updated_at DESC
-        """)
+            {where} ORDER BY r.updated_at DESC LIMIT %s OFFSET %s
+        """, (*params, per_page, (pagination["page"] - 1) * per_page))
         rows = cursor.fetchall()
-    return render_template("admin/routes.html", routes=rows, operators=operators_list, sources=sources_list)
+    return render_template("admin/routes.html", routes=rows, operators=operators_list, sources=sources_list, pagination=pagination)
 
 
 @admin_bp.route("/routes/<int:route_id>", methods=["GET", "POST"])
@@ -445,12 +478,19 @@ def stops():
         except (ValueError, TypeError) as exc:
             flash(str(exc), "danger")
         return redirect(url_for("admin.stops"))
+    page, per_page, offset, query = _list_page()
     with cursor_context() as (_, cursor):
-        cursor.execute("SELECT * FROM bus_stops ORDER BY stop_name")
+        where = "WHERE stop_name LIKE %s OR address LIKE %s OR status LIKE %s" if query else ""
+        params = (f"%{query}%", f"%{query}%", f"%{query}%") if query else ()
+        cursor.execute(f"SELECT COUNT(*) AS total FROM bus_stops {where}", params)
+        total = cursor.fetchone()["total"]
+        pagination = _pagination(total, page, per_page, query)
+        cursor.execute(f"SELECT * FROM bus_stops {where} ORDER BY stop_name LIMIT %s OFFSET %s",
+                       (*params, per_page, (pagination["page"] - 1) * per_page))
         rows = cursor.fetchall()
         cursor.execute("SELECT id, source_name, verification_status FROM data_sources ORDER BY source_name")
         sources = cursor.fetchall()
-    return render_template("admin/stops.html", stops=rows, sources=sources)
+    return render_template("admin/stops.html", stops=rows, sources=sources, pagination=pagination)
 
 
 @admin_bp.post("/stops/<int:stop_id>/update")
