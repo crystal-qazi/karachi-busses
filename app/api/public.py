@@ -1,7 +1,6 @@
 """Public read-only APIs for static Karachi bus route discovery."""
 import json
 import math
-import json
 import time
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
