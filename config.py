@@ -87,7 +87,7 @@ class Config:
 
     # OSM candidate-road inventory used by the admin snap preview. Generated
     # by scripts/extract_osm_karachi_roads.py; may be absent until the extract
-    # has been run, in which case the snap endpoint reports ROAD_DATA_MISSING.
+    # has been run, in which case research-only road-analysis scripts report missing input.
     OSM_ROADS_GEOJSON = os.getenv(
         "OSM_ROADS_GEOJSON",
         str(Path(__file__).resolve().parent / "data" / "osm_roads" / "karachi-osm-bus-roads.geojson"),
