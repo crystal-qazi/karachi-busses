@@ -1,12 +1,68 @@
 """Public read-only APIs for static Karachi bus route discovery."""
 import json
 import math
+import json
+import time
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 from flask import Blueprint, jsonify, request
 from app.database.helpers import cursor_context
 
 public_api_bp = Blueprint("public_api", __name__)
 EARTH_RADIUS_METRES = 6_371_000
+
 DEFAULT_RADIUS_METRES = 1_500
+_LOCATION_CACHE = {}
+_LAST_GEOCODE_REQUEST = 0.0
+
+
+@public_api_bp.get("/locations/search")
+def search_locations():
+    """Geocode a user-entered map place within the Karachi region using OSM Nominatim."""
+    global _LAST_GEOCODE_REQUEST
+    query = (request.args.get("q") or "").strip()
+    if len(query) < 2 or len(query) > 100:
+        return _error("Location search must contain 2–100 characters.")
+    cache_key = query.casefold()
+    if cache_key in _LOCATION_CACHE:
+        return jsonify(success=True, data={"query": query, "locations": _LOCATION_CACHE[cache_key]})
+
+    # Nominatim's public service policy limits usage to one request per second.
+    import threading
+    lock = getattr(search_locations, "_lock", None)
+    if lock is None:
+        lock = threading.Lock()
+        search_locations._lock = lock
+    try:
+        with lock:
+            wait = 1.05 - (time.monotonic() - _LAST_GEOCODE_REQUEST)
+            if wait > 0:
+                time.sleep(wait)
+            params = urlencode({
+                "q": query, "format": "jsonv2", "limit": 8,
+                "countrycodes": "pk", "bounded": 1,
+                "viewbox": "66.5,25.1,67.6,24.5",
+            })
+            req = Request(
+                "https://nominatim.openstreetmap.org/search?" + params,
+                headers={"User-Agent": "KarachiBuses/1.0 (public route finder)", "Accept": "application/json"},
+            )
+            with urlopen(req, timeout=7) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            _LAST_GEOCODE_REQUEST = time.monotonic()
+        locations = [{
+            "name": item.get("name") or item.get("display_name", query).split(",")[0],
+            "label": item.get("display_name", query),
+            "lat": float(item["lat"]), "lng": float(item["lon"]),
+            "type": item.get("type"),
+        } for item in payload if item.get("lat") and item.get("lon")]
+        _LOCATION_CACHE[cache_key] = locations
+        if len(_LOCATION_CACHE) > 256:
+            _LOCATION_CACHE.pop(next(iter(_LOCATION_CACHE)))
+    except Exception:
+        return _error("Map location search is temporarily unavailable. You can also tap the map to choose a point.",
+                      "GEOCODING_UNAVAILABLE", 503)
+    return jsonify(success=True, data={"query": query, "locations": locations})
 
 
 def _error(message, code="INVALID_PARAMETER", status=400):
