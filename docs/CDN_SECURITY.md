@@ -34,9 +34,7 @@ object-src 'none';
 upgrade-insecure-requests
 ```
 
-`style-src` permits `'unsafe-inline'` because the historical network
-template and the stop-picker template contain inline `<style>` blocks.
-This is acceptable while those styles are static, server-rendered HTML.
+`style-src` permits `'unsafe-inline'` because the stop-picker template contains an inline `<style>` block. This is acceptable while that style is static, server-rendered HTML.
 
 Additional headers on all HTML responses:
 
@@ -50,9 +48,7 @@ Additional headers on all HTML responses:
   these are binary PNG images served on demand with no stable integrity
   hash and no SRI support in `img-src`. They are limited to the OSM tile
   domain by `img-src`.
-- **Inline `<style>` blocks in admin templates** (historical network map,
-  stop picker): no SRI for inline content; the style rule is pinned to
-  `'unsafe-inline'`. If these blocks are extracted into external files,
+- **Inline `<style>` blocks in the stop-picker admin template**: no SRI for inline content; the style rule is pinned to `'unsafe-inline'`. If this block is extracted into an external file,
   the CSP should be tightened to remove `'unsafe-inline'` and add the new
   CSS files to `style-src` with SRI.
 
