@@ -34,3 +34,26 @@
   .admin-main .table-responsive{max-height:65vh}
   .admin-main .table-responsive table{min-width:640px}
 }
+
+
+/* Keep the stops list pagination aligned when the page count grows. */
+.stops-pagination-row{min-width:0}
+.stops-pagination-nav{max-width:100%;min-width:0}
+.stops-pagination{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:.25rem;
+  max-width:100%;
+}
+.stops-pagination .page-item{margin:0}
+.stops-pagination .page-link{
+  min-width:2.25rem;
+  text-align:center;
+  border-radius:.375rem;
+}
+@media(max-width:767px){
+  .stops-pagination-row{align-items:stretch!important}
+  .stops-pagination-nav{width:100%}
+  .stops-pagination{justify-content:flex-start}
+}
