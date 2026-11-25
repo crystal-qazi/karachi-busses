@@ -16,3 +16,10 @@ def test_csp_allows_leaflet_draw_sprite_images(app):
     policy = response.headers.get("Content-Security-Policy", "")
     img_src = next((directive for directive in policy.split(";") if directive.strip().startswith("img-src ")), "")
     assert "https://cdnjs.cloudflare.com" in img_src
+
+
+def test_csp_allows_nominatim_landmark_search(app):
+    response = app.test_client().get("/privacy")
+    policy = response.headers.get("Content-Security-Policy", "")
+    connect_src = next((directive for directive in policy.split(";") if directive.strip().startswith("connect-src ")), "")
+    assert "https://nominatim.openstreetmap.org" in connect_src
