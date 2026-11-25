@@ -26,7 +26,7 @@ default-src 'self';
 script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com;
 style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com;
 img-src 'self' data: https://cdnjs.cloudflare.com https://tile.openstreetmap.org https://*.tile.openstreetmap.org;
-connect-src 'self' https://cdn.jsdelivr.net https://unpkg.com;
+connect-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://nominatim.openstreetmap.org;
 frame-ancestors 'self';
 base-uri 'self';
 form-action 'self' https://www.openstreetmap.org;
@@ -42,7 +42,7 @@ Additional headers on all HTML responses:
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `X-Frame-Options: SAMEORIGIN` (PWA service worker stays functional)
 
-## Resources that cannot use SRI
+The admin direction editor uses the public Nominatim API for explicit landmark searches and reverse lookups. Its host is therefore allow-listed in `connect-src`; searches are submitted only when the user presses the search button or verifies a map point (not on every keystroke). Follow the [Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/) and avoid automated/high-volume requests.\n\n## Resources that cannot use SRI
 
 - **OpenStreetMap raster tiles** (`https://{s}.tile.openstreetmap.org/…`):
   these are binary PNG images served on demand with no stable integrity
