@@ -123,46 +123,7 @@
 
 {% block scripts %}
 
-<script>
-  (() => {
-    const search = document.getElementById("ordered-stop-search");
-    const select = document.getElementById("ordered-stop-select");
-    const status = document.getElementById("ordered-stop-search-status");
-    const addButton = document.getElementById("add-ordered-stop");
-    if (!search || !select || !status || !addButton) return;
-
-    const options = Array.from(select.options);
-    const updateStopOptions = () => {
-      const query = search.value.trim().toLocaleLowerCase();
-      let visibleCount = 0;
-      let firstVisible = null;
-
-      options.forEach((option) => {
-        const searchableText = (option.textContent + " " + option.value).toLocaleLowerCase();
-        const matches = !query || searchableText.includes(query);
-        option.hidden = !matches;
-        if (matches) {
-          visibleCount += 1;
-          if (!firstVisible) firstVisible = option;
-        }
-      });
-
-      if (select.selectedOptions.length && select.selectedOptions[0].hidden) {
-        select.value = firstVisible ? firstVisible.value : "";
-      }
-
-      select.disabled = visibleCount === 0;
-      addButton.disabled = visibleCount === 0;
-      status.textContent = query
-        ? visibleCount + " matching stop" + (visibleCount === 1 ? "" : "s")
-        : options.length + " stops available";
-      if (visibleCount === 0) status.textContent = "No stops found. Try another name or ID.";
-    };
-
-    search.addEventListener("input", updateStopOptions);
-    updateStopOptions();
-  })();
-</script>
+<script src="{{ url_for('static', filename='js/direction-editor.js') }}" defer></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha384-JP5UPxIO2Tm2o79Fb0tGYMa44jkWar53aBoCbd8ah0+LcCDoohTIYr+zIXyfGIJN" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/admin-map.js') }}" defer></script>
