@@ -79,6 +79,53 @@ def _shape_value(value):
     return value
 
 
+
+@public_api_bp.get("/routes/map")
+def map_routes():
+    """Return published route directions that have saved road geometry for the default map."""
+    try:
+        with cursor_context() as (_, cursor):
+            cursor.execute("""
+                SELECT d.id AS direction_id, d.direction_name,
+                       r.id AS route_id, r.route_code, r.route_name,
+                       rs.geojson
+                FROM route_directions d
+                JOIN bus_routes r ON r.id=d.route_id
+                JOIN data_sources route_source ON route_source.id=r.source_id
+                    AND route_source.verification_status='verified'
+                JOIN route_shapes rs ON rs.direction_id=d.id
+                WHERE r.status='active'
+                ORDER BY r.route_code, d.direction_name
+            """)
+            rows = cursor.fetchall()
+    except Exception:
+        return _error("Published map routes are temporarily unavailable.",
+                      "DATABASE_UNAVAILABLE", 503)
+
+    directions = []
+    for row in rows:
+        shape = _shape_value(row.get("geojson"))
+        if not isinstance(shape, dict) or shape.get("type") != "LineString":
+            continue
+        coordinates = shape.get("coordinates")
+        if not isinstance(coordinates, list) or len(coordinates) < 2:
+            continue
+        directions.append({
+            "id": int(row["direction_id"]),
+            "name": row["direction_name"],
+            "route": {
+                "id": int(row["route_id"]),
+                "code": row["route_code"],
+                "name": row["route_name"],
+            },
+            "shape": shape,
+        })
+    return jsonify(success=True, data={
+        "direction_count": len(directions),
+        "directions": directions,
+    })
+
+
 @public_api_bp.get("/discover/nearby")
 def nearby():
     try:

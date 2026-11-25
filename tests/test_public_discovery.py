@@ -3,6 +3,42 @@ from contextlib import contextmanager
 import pytest
 
 
+
+def test_map_routes_returns_only_valid_published_route_shapes(client, monkeypatch):
+    from app.api import public
+
+    rows = [
+        {"direction_id": 7, "direction_name": "Northbound", "route_id": 2,
+         "route_code": "R-1", "route_name": "Tower - Saddar",
+         "geojson": {"type": "LineString", "coordinates": [[67.0, 24.8], [67.1, 24.9]]}},
+        {"direction_id": 8, "direction_name": "Southbound", "route_id": 2,
+         "route_code": "R-1", "route_name": "Tower - Saddar", "geojson": None},
+    ]
+
+    class Cursor:
+        def execute(self, sql, params=None):
+            assert "verification_status='verified'" in sql
+            assert "r.status='active'" in sql
+        def fetchall(self): return rows
+        def close(self): pass
+
+    class Connection:
+        def cursor(self, dictionary=True): return Cursor()
+        def close(self): pass
+
+    @contextmanager
+    def fake_cursor_context(**kwargs):
+        yield Connection(), Cursor()
+
+    monkeypatch.setattr(public, "cursor_context", fake_cursor_context)
+    response = client.get("/api/v1/routes/map")
+    assert response.status_code == 200
+    data = response.get_json()["data"]
+    assert data["direction_count"] == 1
+    assert data["directions"][0]["id"] == 7
+    assert data["directions"][0]["shape"]["type"] == "LineString"
+
+
 def test_nearby_requires_coordinates(client):
     response = client.get("/api/v1/discover/nearby")
     assert response.status_code == 400
