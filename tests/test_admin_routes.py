@@ -44,3 +44,9 @@ def test_admin_navigation_does_not_link_historical_network(client):
     response = client.get("/admin/")
     assert response.status_code == 200
     assert b"Historical network" not in response.data
+
+
+def test_public_app_script_guards_optional_map_location_controls(client):
+    response = client.get("/static/js/app.js")
+    assert response.status_code == 200
+    assert b"if (mapLocationButton && mapLocationInput)" in response.data

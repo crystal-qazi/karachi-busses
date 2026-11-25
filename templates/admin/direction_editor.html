@@ -1,14 +1,115 @@
-{% extends "admin/base.html" %}{% block title %}Direction editor{% endblock %}{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" integrity="sha384-NZLkVuBRMEeB4VeZz27WwTRvlhec30biQ8Xx7zG7JJnkvEKRg5qi6BNbEXo9ydwv" crossorigin="anonymous"><style>
-#route-map{height:72vh;min-height:560px;border-radius:12px}
-#route-map-panel:fullscreen{background:#fff;padding:16px;overflow:auto}
-#route-map-panel:fullscreen #route-map{height:calc(100vh - 210px);min-height:420px}
-.stop-list{max-height:360px;overflow:auto}
-@media(max-width:767px){#route-map{height:65vh;min-height:440px}}
-</style>{% endblock %}{% block content %}<p><a href="{{ url_for('admin.route_detail',route_id=direction.route_id) }}">← {{ direction.route_code }} {{ direction.route_name }}</a></p><h1 class="h3">{{ direction.direction_name }}</h1><p class="text-secondary">{{ direction.start_label or 'Start' }} → {{ direction.end_label or 'End' }}</p><div class="row g-3"><div class="col-12"><div class="card p-3" id="route-map-panel"><div class="d-flex flex-wrap justify-content-between align-items-center gap-2"><div><h2 class="h5 mb-1">Draw route geometry</h2><p class="small text-secondary mb-2">Trace the actual bus road. Search a landmark or click the map to verify a location before saving.</p></div><button class="btn btn-outline-secondary btn-sm" type="button" id="map-fullscreen">Expand map</button></div>
-<form id="place-search-form" class="input-group mb-2"><input id="place-search" class="form-control" type="search" placeholder="Search landmark / place in Karachi…" aria-label="Search landmark or place"><button class="btn btn-outline-success" type="submit">Search place</button></form><div id="place-search-status" class="small text-secondary mb-2" role="status"></div>
-<div class="d-flex flex-wrap gap-2 align-items-center mb-2"><button class="btn btn-outline-success btn-sm" type="button" id="verify-map-point">Verify a point on map</button><span class="small text-secondary">Search results and verification use OpenStreetMap / Nominatim.</span></div>
-<div class="border rounded p-2 mb-2 small"><strong>Place:</strong> <span id="verified-place">No place selected</span><br><strong>Coordinates:</strong> <span id="verified-coordinates">—</span></div>
-<div id="route-map" data-shape='{{ shape_json|safe }}' data-tile-url="{{ map_tile_url }}" data-tile-max-zoom="{{ map_tile_max_zoom }}" data-tile-attribution="{{ map_attribution }}"></div>
-<div class="d-flex flex-wrap gap-2 align-items-center mt-2"><strong id="route-point-count" class="small">0 route points</strong><button class="btn btn-outline-secondary btn-sm" type="button" id="undo-point" disabled>Undo last point</button><button class="btn btn-outline-secondary btn-sm" type="button" id="redo-point" disabled>Redo point</button></div>
-<div class="input-group mt-2"><label class="input-group-text" for="route-point-select">Selected point</label><select class="form-select" id="route-point-select" aria-label="Select route point"></select><button class="btn btn-outline-danger" type="button" id="remove-point" disabled>Remove point</button></div>
-<form method="post" action="{{ url_for('admin.save_direction_shape',direction_id=direction.id) }}" id="shape-form" class="mt-3"><input type="hidden" name="geojson" id="shape-json"><button class="btn btn-success" id="save-shape" type="submit">Save route line</button><button class="btn btn-outline-secondary ms-2" id="clear-shape" type="button">Clear line</button></form></div></div><div class="col-12"><div class="card p-3"><h2 class="h5">Ordered stops</h2><form method="post" action="{{ url_for('admin.add_direction_stop',direction_id=direction.id) }}"><label class="form-label">Select existing stop</label><select class="form-select mb-2" name="stop_id" required>{% for s in all_stops %}<option value="{{ s.id }}">{{ s.stop_name }}</option>{% endfor %}</select><label class="form-label">Sequence number</label><input class="form-control mb-3" type="number" min="1" name="stop_sequence" value="{{ linked_stops|length + 1 }}" required><button class="btn btn-outline-success w-100">Add stop to direction</button></form><hr><div class="stop-list">{% for s in linked_stops %}<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div><span class="badge text-bg-light">{{ s.stop_sequence }}</span> {{ s.stop_name }}<div class="small text-secondary">{{ s.latitude }}, {{ s.longitude }}</div></div><form method="post" action="{{ url_for('admin.remove_direction_stop',direction_id=direction.id,stop_id=s.id) }}"><button class="btn btn-sm btn-outline-danger">×</button></form></div>{% else %}<p class="small text-secondary">No stops linked yet.</p>{% endfor %}</div></div></div></div>{% endblock %}{% block scripts %}<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha384-JP5UPxIO2Tm2o79Fb0tGYMa44jkWar53aBoCbd8ah+0LcCDoohTIYr+zIXyfGIJN" crossorigin="anonymous"></script><script src="{{ url_for('static',filename='js/admin-map.js') }}" defer></script>{% endblock %}
+{% extends "admin/base.html" %}
+
+{% block title %}Direction editor{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" integrity="sha384-NZLkVuBRMEeB4VeZz27WwTRvlhec30biQ8Xx7zG7JJnkvEKRg5qi6BNbEXo9ydwv" crossorigin="anonymous">
+<style>
+  #route-map { height: 72vh; min-height: 560px; border-radius: 12px; }
+  #route-map-panel:fullscreen { background: #fff; padding: 16px; overflow: auto; }
+  #route-map-panel:fullscreen #route-map { height: calc(100vh - 210px); min-height: 420px; }
+  .stop-list { max-height: 360px; overflow: auto; }
+  @media (max-width: 767px) {
+    #route-map { height: 65vh; min-height: 440px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<p>
+  <a href="{{ url_for('admin.route_detail', route_id=direction.route_id) }}">← {{ direction.route_code }} {{ direction.route_name }}</a>
+</p>
+<h1 class="h3">{{ direction.direction_name }}</h1>
+<p class="text-secondary">{{ direction.start_label or 'Start' }} → {{ direction.end_label or 'End' }}</p>
+
+<div class="row g-3">
+  <div class="col-12">
+    <section class="card p-3" id="route-map-panel">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+          <h2 class="h5 mb-1">Draw route geometry</h2>
+          <p class="small text-secondary mb-2">Trace the actual bus road. Search a landmark or click the map to verify a location before saving.</p>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm" type="button" id="map-fullscreen">Expand map</button>
+      </div>
+
+      <form id="place-search-form" class="input-group mb-2">
+        <input id="place-search" class="form-control" type="search" placeholder="Search landmark / place in Karachi…" aria-label="Search landmark or place">
+        <button class="btn btn-outline-success" type="submit">Search place</button>
+      </form>
+      <div id="place-search-status" class="small text-secondary mb-2" role="status"></div>
+
+      <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+        <button class="btn btn-outline-success btn-sm" type="button" id="verify-map-point">Verify a point on map</button>
+        <span class="small text-secondary">Search results and verification use OpenStreetMap / Nominatim.</span>
+      </div>
+
+      <div class="border rounded p-2 mb-2 small">
+        <strong>Place:</strong> <span id="verified-place">No place selected</span><br>
+        <strong>Coordinates:</strong> <span id="verified-coordinates">—</span>
+      </div>
+
+      <div id="route-map" data-shape='{{ shape_json|safe }}' data-tile-url="{{ map_tile_url }}" data-tile-max-zoom="{{ map_tile_max_zoom }}" data-tile-attribution="{{ map_attribution }}"></div>
+
+      <div class="d-flex flex-wrap gap-2 align-items-center mt-2">
+        <strong id="route-point-count" class="small">0 route points</strong>
+        <button class="btn btn-outline-secondary btn-sm" type="button" id="undo-point" disabled>Undo last point</button>
+        <button class="btn btn-outline-secondary btn-sm" type="button" id="redo-point" disabled>Redo point</button>
+      </div>
+
+      <div class="input-group mt-2">
+        <label class="input-group-text" for="route-point-select">Selected point</label>
+        <select class="form-select" id="route-point-select" aria-label="Select route point"></select>
+        <button class="btn btn-outline-danger" type="button" id="remove-point" disabled>Remove point</button>
+      </div>
+
+      <form method="post" action="{{ url_for('admin.save_direction_shape', direction_id=direction.id) }}" id="shape-form" class="mt-3">
+        <input type="hidden" name="geojson" id="shape-json">
+        <button class="btn btn-success" id="save-shape" type="submit">Save route line</button>
+        <button class="btn btn-outline-secondary ms-2" id="clear-shape" type="button">Clear line</button>
+      </form>
+    </section>
+  </div>
+
+  <div class="col-12">
+    <section class="card p-3">
+      <h2 class="h5">Ordered stops</h2>
+      <form method="post" action="{{ url_for('admin.add_direction_stop', direction_id=direction.id) }}">
+        <label class="form-label">Select existing stop</label>
+        <select class="form-select mb-2" name="stop_id" required>
+          {% for stop in all_stops %}
+          <option value="{{ stop.id }}">{{ stop.stop_name }}</option>
+          {% endfor %}
+        </select>
+        <label class="form-label">Sequence number</label>
+        <input class="form-control mb-3" type="number" min="1" name="stop_sequence" value="{{ linked_stops|length + 1 }}" required>
+        <button class="btn btn-outline-success w-100">Add stop to direction</button>
+      </form>
+
+      <hr>
+      <div class="stop-list">
+        {% for stop in linked_stops %}
+        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+          <div>
+            <span class="badge text-bg-light">{{ stop.stop_sequence }}</span> {{ stop.stop_name }}
+            <div class="small text-secondary">{{ stop.latitude }}, {{ stop.longitude }}</div>
+          </div>
+          <form method="post" action="{{ url_for('admin.remove_direction_stop', direction_id=direction.id, stop_id=stop.id) }}">
+            <button class="btn btn-sm btn-outline-danger">×</button>
+          </form>
+        </div>
+        {% else %}
+        <p class="small text-secondary">No stops linked yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha384-JP5UPxIO2Tm2o79Fb0tGYMa44jkWar53aBoCbd8ah+0LcCDoohTIYr+zIXyfGIJN" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/admin-map.js') }}" defer></script>
+{% endblock %}

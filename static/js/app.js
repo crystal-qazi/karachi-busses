@@ -339,8 +339,14 @@
       mapLocationButton.disabled = false;
     }
   }
-  mapLocationButton.addEventListener("click", searchMapLocation);
-  mapLocationInput.addEventListener("keydown", (event) => { if (event.key === "Enter") searchMapLocation(); });
+  // Map-place search was added after the original public map controls. Keep
+  // the shared map script safe on cached/older markup and pages that omit it.
+  if (mapLocationButton && mapLocationInput) {
+    mapLocationButton.addEventListener("click", searchMapLocation);
+    mapLocationInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") searchMapLocation();
+    });
+  }
 
   function addJourneyLegToMap(leg, color, fitPoints) {
     if (leg.shape && leg.shape.type === "LineString" && Array.isArray(leg.shape.coordinates)) {
