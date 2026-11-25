@@ -155,7 +155,8 @@
   }
 
   function renderNearby(data) {
-    clearLayers();
+    // Selecting a From location should refresh nearby stops, not erase the published route lines.
+    stopsLayer.clearLayers();
     resultsElement.replaceChildren();
     if (!data.stops.length) {
       showEmpty("No active, verified bus stops with published routes were found within this radius. Unverified research candidates are intentionally hidden from the public map.");
