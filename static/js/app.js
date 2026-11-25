@@ -246,6 +246,21 @@
     );
   });
 
+  function showDestinationMarker(lat, lng, label) {
+    destinationLayer.clearLayers();
+    const markerIcon = L.divIcon({
+      className: "destination-marker-icon",
+      html: '<div class="destination-map-pin"><span>TO</span></div>',
+      iconSize: [42, 52],
+      iconAnchor: [21, 50],
+      popupAnchor: [0, -48]
+    });
+    L.marker([lat, lng], {icon: markerIcon, keyboard: true, title: "Destination: " + label})
+      .addTo(destinationLayer)
+      .bindPopup("Destination (To): " + label)
+      .openPopup();
+  }
+
   function setDestination(lat, lng, label) {
     const destinationLabel = label || ("Map point " + lat.toFixed(5) + ", " + lng.toFixed(5));
     if (toInput) {
@@ -253,10 +268,7 @@
       toInput.dataset.lat = String(lat);
       toInput.dataset.lng = String(lng);
     }
-    destinationLayer.clearLayers();
-    L.circleMarker([lat, lng], {
-      radius: 9, color: "#fff", weight: 3, fillColor: "#d94841", fillOpacity: 1
-    }).addTo(destinationLayer).bindPopup("To: " + destinationLabel).openPopup();
+    showDestinationMarker(lat, lng, destinationLabel);
     map.panTo([lat, lng]);
     setStatus("Destination set to " + destinationLabel + ". Click Find buses to see available journeys.");
   }
@@ -468,10 +480,7 @@
       }
       toInput.dataset.lat = destination.lat;
       toInput.dataset.lng = destination.lng;
-      destinationLayer.clearLayers();
-      L.circleMarker([destination.lat, destination.lng], {
-        radius: 9, color: "#fff", weight: 3, fillColor: "#d94841", fillOpacity: 1
-      }).addTo(destinationLayer).bindPopup("To: " + (destination.label || toQuery));
+      showDestinationMarker(destination.lat, destination.lng, destination.label || toQuery);
 
       const params = new URLSearchParams({
         origin_lat: origin.lat, origin_lng: origin.lng,
