@@ -28,7 +28,9 @@
   let currentOrigin = null;
   const radiusSelect = document.getElementById("radius-select");
   const userLayer = L.layerGroup().addTo(map);
+  const destinationLayer = L.layerGroup().addTo(map);
   const stopsLayer = L.layerGroup().addTo(map);
+  let activeMapTarget = "from";
   const routeLayer = L.layerGroup().addTo(map);
   const routePalette = [
     "#d73027", "#4575b4", "#1a9850", "#984ea3", "#f46d43",
@@ -244,9 +246,32 @@
     );
   });
 
+  function setDestination(lat, lng, label) {
+    const destinationLabel = label || ("Map point " + lat.toFixed(5) + ", " + lng.toFixed(5));
+    if (toInput) {
+      toInput.value = destinationLabel;
+      toInput.dataset.lat = String(lat);
+      toInput.dataset.lng = String(lng);
+    }
+    destinationLayer.clearLayers();
+    L.circleMarker([lat, lng], {
+      radius: 9, color: "#fff", weight: 3, fillColor: "#d94841", fillOpacity: 1
+    }).addTo(destinationLayer).bindPopup("To: " + destinationLabel).openPopup();
+    map.panTo([lat, lng]);
+    setStatus("Destination set to " + destinationLabel + ". Click Find buses to see available journeys.");
+  }
+
+  if (fromInput) fromInput.addEventListener("focus", () => { activeMapTarget = "from"; });
+  if (toInput) toInput.addEventListener("focus", () => { activeMapTarget = "to"; });
+
   map.on("click", (event) => {
-    discover(event.latlng.lat, event.latlng.lng,
-      "Map point " + event.latlng.lat.toFixed(5) + ", " + event.latlng.lng.toFixed(5));
+    const {lat, lng} = event.latlng;
+    if (activeMapTarget === "to") {
+      setDestination(lat, lng);
+      return;
+    }
+    discover(lat, lng,
+      "Map point " + lat.toFixed(5) + ", " + lng.toFixed(5));
     setStatus("Using the point you selected on the map as your From location…");
   });
 
@@ -358,9 +383,7 @@
         }, "btn btn-sm btn-outline-success w-100 text-start mt-1"));
         card.append(makeButton("Use as To", () => {
           toInput.value = location.label;
-          toInput.dataset.lat = location.lat;
-          toInput.dataset.lng = location.lng;
-          setStatus("Destination set to " + location.label + ".");
+          setDestination(location.lat, location.lng, location.label);
         }, "btn btn-sm btn-outline-primary w-100 text-start mt-1"));
         resultsElement.append(card);
       });
@@ -445,6 +468,10 @@
       }
       toInput.dataset.lat = destination.lat;
       toInput.dataset.lng = destination.lng;
+      destinationLayer.clearLayers();
+      L.circleMarker([destination.lat, destination.lng], {
+        radius: 9, color: "#fff", weight: 3, fillColor: "#d94841", fillOpacity: 1
+      }).addTo(destinationLayer).bindPopup("To: " + (destination.label || toQuery));
 
       const params = new URLSearchParams({
         origin_lat: origin.lat, origin_lng: origin.lng,
@@ -526,6 +553,7 @@
       if (input === toInput) {
         delete input.dataset.lat;
         delete input.dataset.lng;
+        destinationLayer.clearLayers();
       }
     });
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") findJourneys(); });
