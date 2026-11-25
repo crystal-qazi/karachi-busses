@@ -18,7 +18,7 @@
 
   const drawControl = new L.Control.Draw({
     draw: { polyline: { shapeOptions: { color: "#126b50", weight: 5 } }, polygon: false, rectangle: false, circle: false, circlemarker: false, marker: false },
-    edit: { featureGroup: drawn, remove: true }
+    edit: { featureGroup: drawn, remove: false }
   });
   map.addControl(drawControl);
 
