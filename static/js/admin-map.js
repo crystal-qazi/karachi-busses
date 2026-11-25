@@ -102,27 +102,60 @@
     refreshPointControls();
   });
 
-  document.getElementById("import-geojson")?.addEventListener("click", async () => {
-    const file = document.getElementById("geojson-file")?.files?.[0];
-    if (!file) return alert("Choose a GeoJSON file first.");
-    if (file.size > 2 * 1024 * 1024) return alert("GeoJSON file must be 2 MB or smaller.");
+  const geojsonFileInput = document.getElementById("geojson-file");
+  const importGeojsonButton = document.getElementById("import-geojson");
+  const geojsonUploadStatus = document.getElementById("geojson-upload-status");
+  importGeojsonButton?.addEventListener("click", async () => {
+    const file = geojsonFileInput?.files?.[0];
+    const reportUpload = message => {
+      if (geojsonUploadStatus) geojsonUploadStatus.textContent = message;
+    };
+    if (!file) {
+      reportUpload("Choose a .geojson or .json file first.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      reportUpload("GeoJSON file must be 2 MB or smaller.");
+      return;
+    }
+    importGeojsonButton.disabled = true;
+    reportUpload("Reading GeoJSON…");
     try {
       const parsed = JSON.parse(await file.text());
-      const geometry = parsed.type === "Feature" ? parsed.geometry : parsed;
-      if (!geometry || geometry.type !== "LineString" || !Array.isArray(geometry.coordinates) || geometry.coordinates.length < 2) {
-        throw new Error("Expected a GeoJSON LineString or Feature containing a LineString.");
+      let geometry = parsed;
+      if (parsed?.type === "Feature") geometry = parsed.geometry;
+      if (parsed?.type === "FeatureCollection") {
+        const features = parsed.features || [];
+        if (features.length !== 1) {
+          throw new Error("FeatureCollection must contain exactly one route feature.");
+        }
+        geometry = features[0]?.geometry;
+      }
+      if (!geometry || geometry.type !== "LineString" ||
+          !Array.isArray(geometry.coordinates) ||
+          geometry.coordinates.length < 2 || geometry.coordinates.length > 20000) {
+        throw new Error("Expected a GeoJSON LineString or a Feature containing one, with 2–20,000 points.");
       }
       const points = geometry.coordinates.map(pair => {
-        if (!Array.isArray(pair) || pair.length < 2 || !Number.isFinite(Number(pair[0])) || !Number.isFinite(Number(pair[1]))) {
-          throw new Error("GeoJSON contains an invalid coordinate.");
+        if (!Array.isArray(pair) || pair.length < 2 ||
+            !Number.isFinite(Number(pair[0])) || !Number.isFinite(Number(pair[1]))) {
+          throw new Error("GeoJSON contains an invalid coordinate pair.");
         }
-        return L.latLng(Number(pair[1]), Number(pair[0]));
+        const lng = Number(pair[0]);
+        const lat = Number(pair[1]);
+        if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+          throw new Error("GeoJSON contains coordinates outside valid longitude/latitude ranges.");
+        }
+        return L.latLng(lat, lng);
       });
       replacePoints(points);
       redoStack.length = 0;
       map.fitBounds(L.latLngBounds(points), { padding: [24, 24] });
+      reportUpload("Loaded " + points.length + " route points. Review the line, then click Save route line.");
     } catch (error) {
-      alert("Could not load GeoJSON: " + error.message);
+      reportUpload("Could not load GeoJSON: " + error.message);
+    } finally {
+      importGeojsonButton.disabled = false;
     }
   });
 
