@@ -138,7 +138,7 @@
       }
       const points = geometry.coordinates.map(pair => {
         if (!Array.isArray(pair) || pair.length < 2 ||
-            !Number.isFinite(Number(pair[0])) || !Number.isFinite(Number(pair[1])))) {
+            !Number.isFinite(Number(pair[0])) || !Number.isFinite(Number(pair[1]))) {
           throw new Error("GeoJSON contains an invalid coordinate pair.");
         }
         const lng = Number(pair[0]);
