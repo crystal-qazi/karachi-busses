@@ -1,19 +1,13 @@
-const CACHE_NAME = "karachi-buses-shell-v4";
+const CACHE_NAME = "karachi-buses-shell-v5";
 const APP_SHELL = [
   "/", "/offline", "/privacy", "/manifest.json", "/static/css/app.css",
   "/static/js/app.js", "/static/images/bus.svg"
 ];
 
 // Offline map tiles are intentionally NOT cached by default. The standard
-// OSM tile server (tile.openstreetmap.org) does not permit offline tile
-// downloads / prefetching / archives, so it must never be a target of any
-// offline tile cache. A separate offline tile provider may only be enabled
-// when its terms explicitly allow offline use AND it is configured here.
-// Leave OFFLINE_TILE_PROVIDER_HOST empty to keep offline tiling disabled.
+// OSM tile server does not permit offline tile downloads or prefetching.
 const OFFLINE_TILE_PROVIDER_HOST = "";
 const TILE_CACHE_NAME = "karachi-buses-offline-tiles-v1";
-// OSM subdomains used by the standard tile URL — always excluded from any
-// offline tile cache regardless of configuration.
 const FORBIDDEN_TILE_HOSTS = new Set([
   "tile.openstreetmap.org",
   "a.tile.openstreetmap.org",
@@ -22,49 +16,115 @@ const FORBIDDEN_TILE_HOSTS = new Set([
 ]);
 
 function isOfflineTile(url) {
-  if (!OFFLINE_TILE_PROVIDER_HOST) return false;
-  if (FORBIDDEN_TILE_HOSTS.has(url.host)) return false;
-  return url.host === OFFLINE_TILE_PROVIDER_HOST;
+  return Boolean(
+    OFFLINE_TILE_PROVIDER_HOST &&
+    !FORBIDDEN_TILE_HOSTS.has(url.host) &&
+    url.host === OFFLINE_TILE_PROVIDER_HOST
+  );
+}
+
+function isAdminOrAuthPath(pathname) {
+  return pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
+    pathname === "/login" ||
+    pathname.startsWith("/login/") ||
+    pathname === "/logout";
 }
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(APP_SHELL))
+      .catch(() => undefined)
+  );
   self.skipWaiting();
 });
+
 self.addEventListener("activate", (event) => {
-  event.waitUntil(caches.keys().then((keys) => Promise.all(
-    keys.filter((key) => key.startsWith("karachi-buses-") && key !== CACHE_NAME && key !== TILE_CACHE_NAME)
-      .map((key) => caches.delete(key))
-  )));
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(
+      keys.filter((key) =>
+        key.startsWith("karachi-buses-") &&
+        key !== CACHE_NAME &&
+        key !== TILE_CACHE_NAME
+      ).map((key) => caches.delete(key))
+    ))
+  );
   self.clients.claim();
 });
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);
+
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
+
+  // Admin pages contain authenticated and frequently changing data. Always
+  // let the browser request them directly; never serve them from the SW cache.
+  if (isAdminOrAuthPath(url.pathname)) return;
+
+  // API responses are dynamic and must always go to the application server.
   if (url.pathname.startsWith("/api/")) return;
-  // Same-origin tile archive of the licensed offline provider, when enabled.
+
   if (isOfflineTile(url)) {
-    event.respondWith(caches.match(request).then((cached) => cached || fetch(request).then((response) => {
-      if (response.ok && response.status === 200) {
+    event.respondWith((async () => {
+      try {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+
+        const response = await fetch(request);
+        if (response.ok && response.status === 200) {
+          const copy = response.clone();
+          caches.open(TILE_CACHE_NAME)
+            .then((cache) => cache.put(request, copy))
+            .catch(() => undefined);
+        }
+        return response;
+      } catch (_error) {
+        return Response.error();
+      }
+    })());
+    return;
+  }
+
+  if (request.mode === "navigate") {
+    event.respondWith((async () => {
+      try {
+        return await fetch(request);
+      } catch (_error) {
+        try {
+          return (await caches.match(request)) ||
+            (await caches.match("/offline")) ||
+            Response.error();
+        } catch (_cacheError) {
+          return Response.error();
+        }
+      }
+    })());
+    return;
+  }
+
+  // Cache-first for static same-origin assets, with all cache/network failures
+  // handled so a rejected promise never escapes the fetch event.
+  event.respondWith((async () => {
+    try {
+      const cached = await caches.match(request);
+      if (cached) return cached;
+
+      const response = await fetch(request);
+      if (response.ok) {
         const copy = response.clone();
-        caches.open(TILE_CACHE_NAME).then((cache) => cache.put(request, copy));
+        caches.open(CACHE_NAME)
+          .then((cache) => cache.put(request, copy))
+          .catch(() => undefined);
       }
       return response;
-    })));
-    return;
-  }
-  if (request.mode === "navigate") {
-    event.respondWith(fetch(request).catch(() =>
-      caches.match(request).then((cached) => cached || caches.match("/offline"))
-    ));
-    return;
-  }
-  event.respondWith(caches.match(request).then((cached) => cached || fetch(request).then((response) => {
-    if (response.ok) {
-      const copy = response.clone();
-      caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+    } catch (_error) {
+      try {
+        return (await caches.match(request)) || Response.error();
+      } catch (_cacheError) {
+        return Response.error();
+      }
     }
-    return response;
-  })));
+  })());
 });
