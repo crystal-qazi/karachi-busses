@@ -125,6 +125,35 @@
     }
   }
 
+
+  async function showAllPublishedRoutes() {
+    setStatus("Loading published bus routes on the map…");
+    try {
+      const data = await getJson("/api/v1/routes/map");
+      routeLayer.clearLayers();
+      stopsLayer.clearLayers();
+      const bounds = [];
+      data.directions.forEach((direction) => {
+        const coordinates = direction.shape.coordinates;
+        const points = coordinates.map((pair) => [pair[1], pair[0]]);
+        L.polyline(points, {
+          color: routeColor(direction.route.id),
+          weight: 4,
+          opacity: 0.78
+        }).addTo(routeLayer).bindPopup(
+          direction.route.code + " · " + direction.route.name + " — " + direction.name
+        );
+        bounds.push(...points);
+      });
+      if (bounds.length) map.fitBounds(bounds, {padding: [24, 24], maxZoom: 13});
+      setStatus(data.direction_count
+        ? data.direction_count + " published route directions shown. Search and select a route to isolate it on the map."
+        : "No published route geometry is available yet. Search for a route or stop.");
+    } catch (error) {
+      setStatus(error.message);
+    }
+  }
+
   function renderNearby(data) {
     clearLayers();
     resultsElement.replaceChildren();
@@ -487,6 +516,9 @@
   }
 
   if (journeyButton) journeyButton.addEventListener("click", findJourneys);
+
+  // Show all published route lines on the initial map; route selection isolates one direction.
+  showAllPublishedRoutes();
   [fromInput, toInput].filter(Boolean).forEach((input) => {
     input.addEventListener("input", () => {
       if (input === toInput) {
