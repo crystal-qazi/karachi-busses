@@ -50,6 +50,16 @@
         <strong>Coordinates:</strong> <span id="verified-coordinates">—</span>
       </div>
 
+      <div class="border rounded p-3 mb-2">
+        <label class="form-label fw-semibold mb-1" for="geojson-file">Upload route line (GeoJSON)</label>
+        <div class="input-group">
+          <input class="form-control" id="geojson-file" type="file" accept=".geojson,.json,application/geo+json,application/json">
+          <button class="btn btn-outline-success" type="button" id="import-geojson">Load GeoJSON on map</button>
+        </div>
+        <div class="form-text">Supported format: GeoJSON LineString or a Feature containing a LineString. Loading replaces the current unsaved line; review it on the map, then click Save route line.</div>
+        <div id="geojson-upload-status" class="small text-secondary mt-1" role="status" aria-live="polite"></div>
+      </div>
+
       <div id="route-map" data-shape='{{ shape_json|safe }}' data-tile-url="{{ map_tile_url }}" data-tile-max-zoom="{{ map_tile_max_zoom }}" data-tile-attribution="{{ map_attribution }}"></div>
 
       <div class="d-flex flex-wrap gap-2 align-items-center mt-2">
