@@ -25,7 +25,7 @@ service-worker scope handling):
 default-src 'self';
 script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com;
 style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com;
-img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org;
+img-src 'self' data: https://cdnjs.cloudflare.com https://tile.openstreetmap.org https://*.tile.openstreetmap.org;
 connect-src 'self' https://cdn.jsdelivr.net https://unpkg.com;
 frame-ancestors 'self';
 base-uri 'self';

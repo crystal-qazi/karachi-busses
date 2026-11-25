@@ -9,3 +9,10 @@ def test_all_admin_templates_compile(app):
 def test_direction_editor_template_compiles(app):
     template = app.jinja_env.get_template("admin/direction_editor.html")
     assert template.name == "admin/direction_editor.html"
+
+
+def test_csp_allows_leaflet_draw_sprite_images(app):
+    response = app.test_client().get("/privacy")
+    policy = response.headers.get("Content-Security-Policy", "")
+    img_src = next((directive for directive in policy.split(";") if directive.strip().startswith("img-src ")), "")
+    assert "https://cdnjs.cloudflare.com" in img_src
