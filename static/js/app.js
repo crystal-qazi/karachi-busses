@@ -52,9 +52,19 @@
   }
   function addUserMarker(lat, lng, label) {
     userLayer.clearLayers();
-    L.circleMarker([lat, lng], {
-      radius: 9, color: "#fff", weight: 3, fillColor: "#1769aa", fillOpacity: 1
-    }).addTo(userLayer).bindPopup(label || "Selected starting location");
+    const markerLabel = label || "Selected starting location";
+    const markerIcon = L.divIcon({
+      className: "from-marker-icon",
+      html: '<div class="from-map-pin"><span>FROM</span></div>',
+      iconSize: [52, 52],
+      iconAnchor: [26, 50],
+      popupAnchor: [0, -48]
+    });
+    L.marker([lat, lng], {
+      icon: markerIcon,
+      keyboard: true,
+      title: "From: " + markerLabel
+    }).addTo(userLayer).bindPopup("From: " + markerLabel);
   }
   function makeButton(label, onClick, className) {
     const button = document.createElement("button");
