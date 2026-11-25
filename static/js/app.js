@@ -36,7 +36,7 @@
     "#6a3d9a", "#e6ab02", "#1f78b4", "#b15928", "#4daf4a"
   ];
 
-  function setStatus(message) { status.textContent = message; }
+  function setStatus(message) { if (status) status.textContent = message; }
   function clearLayers() {
     stopsLayer.clearLayers();
     routeLayer.clearLayers();
@@ -63,6 +63,7 @@
     return button;
   }
   function showEmpty(message) {
+    if (!resultsElement) return;
     resultsElement.replaceChildren();
     const p = document.createElement("p");
     p.className = "text-secondary small mb-0";
@@ -165,7 +166,7 @@
     map.setView([lat, lng], 15);
     setStatus("Searching nearby bus stops…");
     showEmpty("Searching published routes…");
-    const radius = Number(radiusSelect.value || 1500);
+    const radius = Number(radiusSelect?.value || 1500);
     try {
       const url = "/api/v1/discover/nearby?lat=" + encodeURIComponent(lat) +
         "&lng=" + encodeURIComponent(lng) + "&radius=" + radius + "&limit=60";
@@ -176,7 +177,7 @@
     }
   }
 
-  radiusSelect.addEventListener("change", () => {
+  if (radiusSelect) radiusSelect.addEventListener("change", () => {
     if (currentOrigin) {
       const {lat, lng, label} = currentOrigin;
       const radius = Number(radiusSelect.value || 1500);
@@ -187,7 +188,7 @@
     }
   });
 
-  locateButton.addEventListener("click", () => {
+  if (locateButton) locateButton.addEventListener("click", () => {
     if (!navigator.geolocation) {
       setStatus("Location is not supported. Tap the map to choose a location manually.");
       return;
@@ -219,7 +220,7 @@
   });
 
   async function search() {
-    const query = searchInput.value.trim();
+    const query = searchInput?.value?.trim() || "";
     if (query.length < 2) {
       setStatus("Enter at least 2 characters to search.");
       return;
@@ -287,13 +288,13 @@
     }
   }
 
-  searchButton.addEventListener("click", search);
-  searchInput.addEventListener("keydown", (event) => { if (event.key === "Enter") search(); });
+  if (searchButton) searchButton.addEventListener("click", search);
+  if (searchInput) searchInput.addEventListener("keydown", (event) => { if (event.key === "Enter") search(); });
 
   async function searchMapLocation() {
-    const query = mapLocationInput.value.trim();
+    const query = mapLocationInput?.value?.trim() || "";
     if (query.length < 2) { setStatus("Enter at least 2 characters for a map location."); return; }
-    mapLocationButton.disabled = true;
+    if (mapLocationButton) mapLocationButton.disabled = true;
     setStatus("Searching OpenStreetMap locations…");
     try {
       const data = await getJson("/api/v1/locations/search?q=" + encodeURIComponent(query));
@@ -336,7 +337,7 @@
     } catch (error) {
       setStatus(error.message);
     } finally {
-      mapLocationButton.disabled = false;
+      if (mapLocationButton) mapLocationButton.disabled = false;
     }
   }
   // Map-place search was added after the original public map controls. Keep
@@ -376,6 +377,10 @@
   }
 
   async function findJourneys() {
+    if (!fromInput || !toInput || !journeyButton) {
+      setStatus("Journey search controls are missing from this page. Refresh the page and try again.");
+      return;
+    }
     const fromQuery = fromInput.value.trim();
     const toQuery = toInput.value.trim();
     if (!toQuery || toQuery.length < 2) {
@@ -413,7 +418,7 @@
       const params = new URLSearchParams({
         origin_lat: origin.lat, origin_lng: origin.lng,
         destination_lat: destination.lat, destination_lng: destination.lng,
-        radius: radiusSelect.value || "1500"
+        radius: radiusSelect?.value || "1500"
       });
       const data = await getJson("/api/v1/journeys?" + params.toString());
       resultsElement.replaceChildren();
@@ -481,8 +486,8 @@
     }
   }
 
-  journeyButton.addEventListener("click", findJourneys);
-  [fromInput, toInput].forEach((input) => {
+  if (journeyButton) journeyButton.addEventListener("click", findJourneys);
+  [fromInput, toInput].filter(Boolean).forEach((input) => {
     input.addEventListener("input", () => {
       if (input === toInput) {
         delete input.dataset.lat;
