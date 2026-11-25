@@ -553,6 +553,7 @@
       if (input === toInput) {
         delete input.dataset.lat;
         delete input.dataset.lng;
+        destinationLayer.clearLayers();
       }
     });
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") findJourneys(); });
